@@ -3,8 +3,6 @@
 `teleop` is a generalized framework for teleoperation input handling in ROS2. It pairs well with `ros2_control`, but is 
 generalized to be useful for teleoperation with any system. 
 
-It was written by Bailey Chessum at the end of the 2024-25 design cycle.
-
 ## Inputs
 
 TODO: Write
@@ -103,7 +101,7 @@ joy_input_source:
   
 ```
 
-![Example mapping of inputs in a diagram](./docs/big_teleop_input_mapping_example_light.drawio.svg)
+![Example mapping of inputs in a diagram](teleop/docs/big_teleop_input_mapping_example_light.drawio.svg)
 
 Remapping is entirely optional. If you don't set the parameters in `remap` for an input, the `Button` or `Axis` will 
 just use the provided bool/double reference directly. So, beyond declaring parameters, there is no additional overhead. 

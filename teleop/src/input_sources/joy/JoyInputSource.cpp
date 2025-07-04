@@ -4,7 +4,7 @@
 
 #include "../../../include/teleop/input_sources/joy/JoyInputSource.hpp"
 
-#include "colors.h"
+#include "colors.hpp"
 
 namespace teleop {
 

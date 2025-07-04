@@ -10,7 +10,6 @@
 
 // generate_parameter_library_cpp include/teleop/teleop_parameters.hpp src/parameters.yaml
 #include "teleop_parameters.hpp"
-//#include <teleop/teleop_parameters.hpp>
 #include "control_modes/ControlModeManager.hpp"
 #include "input_sources/InputSourceManager.hpp"
 #include "commands/CommandManager.hpp"
@@ -19,7 +18,7 @@ namespace teleop
 {
   /**
    * @class TeleopArmJoy
-   * @brief Class for handling joystick and other inputs and publishing arm commands.
+   * @brief TODO
    */
   class TeleopArmJoy : public rclcpp::Node, public CommandDelegate {
   public:
@@ -44,8 +43,6 @@ namespace teleop
     [[nodiscard]] const std::shared_ptr<ControlModeManager> get_control_modes() const override;
 
   private:
-    void update_state();
-
     std::shared_ptr<ParamListener> param_listener_;
     Params params_;
 

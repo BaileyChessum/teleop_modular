@@ -1,18 +1,17 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>teleop</name>
-  <version>2.4.5</version>
-  <description>Generic joystick teleop for twist robots.</description>
+  <version>0.0.0</version>
+  <description>A framework for teleoperation input handling in ROS2.</description>
   <maintainer email="bailey.chessum1@gmail.com">Bailey Chessum</maintainer>
 
-  <license>BSD</license>
+  <license>MIT</license>
 
-  <url type="website">https://novarover.space</url>
+  <url type="website"></url>
   <author email="bailey.chessum1@gmail.com">Bailey Chessum</author>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>generate_parameter_library</buildtool_depend>
-
 
   <depend>geometry_msgs</depend>
   <depend>rclcpp</depend>

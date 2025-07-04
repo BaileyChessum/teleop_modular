@@ -138,4 +138,5 @@ std::shared_ptr<Command> CommandManager::operator[](const std::string& index) {
 void CommandManager::add(const std::string& key, const std::shared_ptr<Command>& value) {
   items_.insert({key, value});
 }
+
 } // teleop

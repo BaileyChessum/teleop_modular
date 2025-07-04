@@ -4,7 +4,7 @@
 
 #include "teleop/input_sources/InputSourceManager.hpp"
 
-#include "colors.h"
+#include "colors.hpp"
 #include "utils.hpp"
 
 namespace teleop {

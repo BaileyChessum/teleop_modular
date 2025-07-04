@@ -3,7 +3,7 @@
 //
 
 #include "../../include/teleop/commands/LogCommand.hpp"
-#include "colors.h"
+#include "colors.hpp"
 
 namespace teleop {
 

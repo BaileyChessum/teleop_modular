@@ -6,7 +6,6 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   geometry_msgs
   sensor_msgs
   controller_manager_msgs
-  input_interfaces
   nova_interfaces
   pluginlib
   rclcpp
@@ -25,9 +24,7 @@ include_directories(
   include
 )
 
-###################
-## C++ Libraries ##
-###################
+# -- Libraries
 
 # Generate parameter library
 generate_parameter_library(
@@ -142,9 +139,7 @@ install(FILES plugins.xml
   ament_lint_auto_find_test_dependencies()
 #endif()
 
-#############
-## Install ##
-#############
+# -- Intall
 
 # Install the executable
 install(

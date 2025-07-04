@@ -6,7 +6,6 @@
 
 namespace teleop {
 
-
 EventCollection::EventCollection(std::weak_ptr<EventListenerQueue> listener_queue)
   : listener_queue_(std::move(listener_queue)) {}
 
@@ -29,4 +28,5 @@ size_t EventCollection::size() const {
   }
   return count;
 }
+
 } // teleop

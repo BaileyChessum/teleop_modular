@@ -2,7 +2,7 @@
 #include "teleop/control_modes/ControlModeManager.hpp"
 
 #include <controller_manager_msgs/srv/detail/switch_controller__struct.hpp>
-#include "colors.h"
+#include "colors.hpp"
 #include "utils.hpp"
 
 namespace teleop {
