@@ -8,6 +8,7 @@
 #include <rclcpp/node.hpp>
 
 #include "teleop/inputs/InputManager.hpp"
+#include "teleop/inputs/state/StateManager.hpp"
 
 namespace teleop {
 
@@ -23,8 +24,9 @@ public:
 
   virtual ~CommandDelegate() = default;
 
-  [[nodiscard]] virtual std::shared_ptr<const rclcpp::Node> get_node() const = 0;
+  [[nodiscard]] virtual std::shared_ptr<rclcpp::Node> get_node() const = 0;
   [[nodiscard]] virtual const InputManager& get_inputs() const = 0;
+  [[nodiscard]] virtual StateManager& get_states() const = 0;
   [[nodiscard]] virtual const std::shared_ptr<ControlModeManager> get_control_modes() const = 0;
 };
 

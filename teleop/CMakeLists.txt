@@ -62,6 +62,11 @@ add_executable(${PROJECT_NAME}_node
   src/inputs/Button.cpp
   src/inputs/Axis.cpp
   src/inputs/InputCollection.cpp
+
+  # State
+  src/inputs/state/StateManager.cpp
+  src/inputs/state/StateCollection.cpp
+  src/inputs/state/State.cpp
 )
 
 # Add plugin implementations here!
@@ -71,6 +76,7 @@ add_library(${PROJECT_NAME} SHARED
   src/input_sources/joy/JoyInputSource.cpp
   src/commands/SwitchControlModeCommand.cpp
   src/commands/LogCommand.cpp
+  src/commands/SetButtonCommand.cpp
 
   # These are also need to do unit tests
   src/inputs/InputCommonSpecializations.cpp
@@ -85,6 +91,12 @@ add_library(${PROJECT_NAME} SHARED
   src/inputs/InputCollection.cpp
 
   src/input_sources/InputSource.cpp
+
+  # State
+  src/inputs/state/StateManager.cpp
+  src/inputs/state/StateCollection.cpp
+  src/inputs/state/State.cpp
+
 )
 
 target_link_libraries(${PROJECT_NAME}_node
@@ -123,6 +135,7 @@ install(FILES plugins.xml
   # Add tests
   ament_add_gtest(test_inputs
     test/test_inputs.cpp
+    test/test_state.cpp
   )
   target_link_libraries(test_inputs
     ${PROJECT_NAME}
