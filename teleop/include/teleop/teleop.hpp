@@ -33,17 +33,16 @@ namespace teleop
     ~Teleop() override;
 
     void initialize(const std::weak_ptr<rclcpp::Executor>& executor);
-
     void log_all_inputs();
 
     /**
      * Infinite loop that repeatedly services updates from input sources. The heart of the program.
      */
-    [[noreturn]] void service_input_updates();
+    void service_input_updates();
 
     [[nodiscard]] std::shared_ptr<rclcpp::Node> get_node() const override;
     [[nodiscard]] const InputManager& get_inputs() const override;
-    [[nodiscard]] StateManager& get_states() const override;
+    [[nodiscard]] StateManager& get_states() override;
     [[nodiscard]] const std::shared_ptr<ControlModeManager> get_control_modes() const override;
 
     /**
@@ -63,8 +62,6 @@ namespace teleop
     std::shared_ptr<ControlModeManager> control_mode_manager_ = nullptr;
     std::shared_ptr<InputSourceManager> input_source_manager_ = nullptr;
     std::shared_ptr<CommandManager> commands_ = nullptr;
-
-    bool locked_ = true;
 
     std::atomic<bool> program_running_ = true;
   };

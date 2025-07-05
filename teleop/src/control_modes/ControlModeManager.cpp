@@ -21,10 +21,27 @@ void ControlModeManager::configure(InputManager& inputs) {
   // Create service clients
   switch_controller_client_ = node_->create_client<controller_manager_msgs::srv::SwitchController>("/controller_manager/switch_controller");
 
+  auto names_descriptor = rcl_interfaces::msg::ParameterDescriptor{};
+  names_descriptor.name = "control_modes.names";
+  names_descriptor.description = "The names of all control modes to create, from parameters under control_modes.name.* "
+                                 "for all names provided. Teleop won't know that parameters in the form "
+                                 "control_modes.name.* exist if name is not in this array.";
+
   // Declare and get parameter for control modes to spawn by default
-  node_->declare_parameter("control_modes.names", rclcpp::ParameterType::PARAMETER_STRING_ARRAY);
+  node_->declare_parameter(names_descriptor.name, rclcpp::ParameterType::PARAMETER_STRING_ARRAY, names_descriptor);;
   rclcpp::Parameter control_modes_param;
-  node_->get_parameter("control_modes.names", control_modes_param);
+  node_->get_parameter(names_descriptor.name, control_modes_param);
+
+  if (control_modes_param.get_type() == rclcpp::ParameterType::PARAMETER_NOT_SET) {
+    RCLCPP_ERROR(logger, "control_modes.names was not set.");
+  }
+  else if (control_modes_param.get_type() != rclcpp::ParameterType::PARAMETER_STRING_ARRAY) {
+    RCLCPP_ERROR(logger, "control_modes.names parameter must be a string array, but a %s was given.",
+                 control_modes_param.get_type_name().c_str());
+  }
+
+  const auto control_mode_names = control_modes_param.get_type() == rclcpp::ParameterType::PARAMETER_STRING_ARRAY
+    ? control_modes_param.as_string_array() : std::vector<std::string>();
 
   // Pluginlib for loading control modes dynamically
   control_mode_loader_ = std::make_unique<pluginlib::ClassLoader<ControlMode>>(
@@ -49,7 +66,6 @@ void ControlModeManager::configure(InputManager& inputs) {
 
   // Create each control mode according to the given params
   std::stringstream registered_modes_log{};
-  const auto control_mode_names = control_modes_param.as_string_array();
   for (auto& control_mode_name : control_mode_names) {
     std::string control_mode_type;
     const std::string pretty_name = snake_to_title(control_mode_name);
