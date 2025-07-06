@@ -1,11 +1,18 @@
 teleop:
   ros__parameters:
-    update_rate: 100.0
+    update_rate: 1.0
     min_update_rate: 0.5
 
     # Set this true to display all the inputs. Very useful when trying to make a config!
     log_inputs: true
 
+    input_sources:
+      # Declare the names of your input sources here
+      names: [
+        "joy_input_source"
+      ]
+      joy_input_source:
+        type: "teleop/JoyInputSource"
 
     control_modes:
       # Declare the names of your control modes here
@@ -24,14 +31,6 @@ teleop:
           "nova_arm_position_controller",
           "nova_twistmapper"
         ]
-
-    input_sources:
-      # Declare the names of your input sources here
-      names: [
-        "joy_input_source"
-      ]
-      joy_input_source:
-        type: "teleop/JoyInputSource"
 
     commands:
       # Declare the names of your commands here
@@ -64,18 +63,33 @@ teleop:
 
 joy_input_source:
   ros__parameters:
+    topic: "/joy"
     axis_definitions: [
       "left_stick_x",
       "left_stick_y",
       "right_stick_x",
-      "right_stick_y"
+      "right_stick_y",
+      "left_trigger",
+      "right_trigger"
     ]
     button_definitions: [
-      "twist_mode",
-      "limit_on",
-      "limit_off",
-      "lock",
-      "unlock"
+      "cross",
+      "circle",
+      "square",
+      "triangle",
+      "share",
+      "power",
+      "start",
+      "left_stick_click",
+      "right_stick_click",
+      "left_bumper",
+      "right_bumper",
+      "dpad_up",
+      "dpad_down",
+      "dpad_left",
+      "dpad_right",
+      "trackpad_click",
+      "mute"
     ]
 
     # Convert input source names to meaningful mapped names
@@ -86,30 +100,31 @@ joy_input_source:
     #
     # TODO: Should modification be made to the inputs directly?
     remap:
-      J1:
-        from: "left_stick_x"
-      J2:
-        from: "left_stick_y"
-        invert: true
-        # Remap the range of the input from [-1, 1] to [0, 1]
-        range:
-          in: [-1, 1]
-          out: [0, 1]
-          # Optionally, clamp the value
-          limit: true
-      J3:
-        from: "left_stick_x"
-        # Remap the range of the input from [-1, 1] to [0, 1]
-        range:
-          in: [-1.0, 1.0]
-          # You can also clamp the value without remapping the output range
-          limit: true
-      J4:
-        from: "right_stick_x"
-        in: -1.0
-        out_min: 0.0
-      J5:
-        from: "left_stick_x"
+      axes:
+        J1:
+          from: "left_stick_x"
+        J2:
+          from: "left_stick_y"
+          invert: true
+          # Remap the range of the input from [-1, 1] to [0, 1]
+          range:
+            in: [-1, 1]
+            out: [0, 1]
+            # Optionally, clamp the value
+            limit: true
+        J3:
+          from: "left_stick_x"
+          # Remap the range of the input from [-1, 1] to [0, 1]
+          range:
+            in: [-1.0, 1.0]
+            # You can also clamp the value without remapping the output range
+            limit: true
+        J4:
+          from: "right_stick_x"
+          in: -1.0
+          out_min: 0.0
+        J5:
+          from: "left_stick_x"
 
 joint_space_control:
   ros__parameters:

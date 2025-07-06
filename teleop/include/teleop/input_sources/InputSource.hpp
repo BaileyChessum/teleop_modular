@@ -12,40 +12,49 @@
 #include "teleop/inputs/InputCommon.hpp"
 #include "teleop/inputs/InputManager.hpp"
 #include "teleop/inputs/InputDeclaration.hpp"
+#include "teleop/input_sources/InputDeclarationList.hpp"
 
 namespace teleop
 {
 /**
  * A base class for various sources of inputs and event invokers, such as joysticks, keyboards, the GUI, etc.
  */
-class InputSource {
-
+class InputSource
+{
 public:
   virtual ~InputSource() = default;
 
-  void initialize(const std::shared_ptr<rclcpp::Node>& node, const std::string& name, const std::weak_ptr<InputSourceUpdateDelegate>& delegate);
+  void initialize(const std::shared_ptr<rclcpp::Node>& node, const std::string& name,
+                  const std::weak_ptr<InputSourceUpdateDelegate>& delegate);
   void update(const rclcpp::Time& now);
 
   // Accessors
-  [[nodiscard]] const std::string& get_name() const {
+  [[nodiscard]] const std::string& get_name() const
+  {
     return name_;
   }
 
-  [[nodiscard]] std::shared_ptr<rclcpp::Node> get_node() const {
+  [[nodiscard]] std::shared_ptr<rclcpp::Node> get_node() const
+  {
     return node_;
   }
-  [[nodiscard]] std::shared_ptr<rclcpp::Node> get_node() {
+  [[nodiscard]] std::shared_ptr<rclcpp::Node> get_node()
+  {
     return node_;
   }
 
   // TODO: Better access control!
 
+  // TODO: Replace this with a thing that allows for SIMD instructions
+
   /// Should only be called by InputSourceManager!
-  void _export_buttons(std::vector<InputDeclaration<bool>>& declarations) {
+  void _export_buttons(std::vector<InputDeclaration<bool>>& declarations)
+  {
     export_buttons(declarations);
   }
   /// Should only be called by InputSourceManager!
-  void _export_axes(std::vector<InputDeclaration<double>>& declarations) {
+  void _export_axes(std::vector<InputDeclaration<double>>& declarations)
+  {
     export_axes(declarations);
   }
 
@@ -115,6 +124,6 @@ private:
   std::weak_ptr<InputSourceUpdateDelegate> delegate_{};
 };
 
-}
+}  // namespace teleop
 
-#endif // TELEOP_INPUTSOURCE_HPP
+#endif  // TELEOP_INPUTSOURCE_HPP

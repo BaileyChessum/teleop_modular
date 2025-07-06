@@ -96,7 +96,6 @@ add_library(${PROJECT_NAME} SHARED
   src/inputs/state/StateManager.cpp
   src/inputs/state/StateCollection.cpp
   src/inputs/state/State.cpp
-
 )
 
 target_link_libraries(${PROJECT_NAME}_node

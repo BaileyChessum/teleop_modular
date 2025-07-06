@@ -7,22 +7,25 @@
 
 #include "Command.hpp"
 
-namespace teleop {
+namespace teleop
+{
 
-class SwitchControlModeCommand final : public Command {
+class SwitchControlModeCommand final : public Command
+{
 public:
   void on_initialize(const std::string& prefix, const ParameterInterface::SharedPtr& parameters) override;
 
   void execute(CommandDelegate& context, const rclcpp::Time& now) override;
 
 protected:
-  struct Params {
+  struct Params
+  {
     std::string to = "";
   };
 
   Params params_{};
 };
 
-} // teleop
+}  // namespace teleop
 
-#endif //TELEOP_SWITCHCONTROLMODECOMMAND_HPP
+#endif  // TELEOP_SWITCHCONTROLMODECOMMAND_HPP

@@ -14,8 +14,9 @@
 namespace teleop
 {
 
-template<typename T>
-class InputCommon {
+template <typename T>
+class InputCommon
+{
 public:
   virtual ~InputCommon() = default;
 
@@ -23,7 +24,8 @@ public:
   virtual void export_events(EventCollection& events) {};
   virtual void update_events(const rclcpp::Time& now) {};
 
-  void debounce(const rclcpp::Time& now) {
+  void debounce(const rclcpp::Time& now)
+  {
     previous_debounce_value_ = current_debounce_value_;
     current_debounce_value_ = value();
   };
@@ -34,30 +36,32 @@ public:
   [[nodiscard]] bool changed() const;
 
   // Accessors
-  [[nodiscard]] const std::string& get_name() const {
+  [[nodiscard]] const std::string& get_name() const
+  {
     return name_;
   }
 
   // Type conversion
-  operator T() {
+  operator T()
+  {
     return value();
   }
 
   /**
    * Adds the given definition to the input
    */
-  void add_definition(const std::reference_wrapper<T>& definition) {
+  void add_definition(const std::reference_wrapper<T>& definition)
+  {
     definitions_.emplace_back(definition);
   }
 
   /**
    * Removes the first instance of the given definition
    */
-  void remove_definition(const std::reference_wrapper<T>& definition) {
+  void remove_definition(const std::reference_wrapper<T>& definition)
+  {
     using Ref = std::reference_wrapper<T>;
-    auto same_object = [&](const Ref& ref) {
-      return std::addressof(ref.get()) == std::addressof(definition.get());
-    };
+    auto same_object = [&](const Ref& ref) { return std::addressof(ref.get()) == std::addressof(definition.get()); };
 
     // Erases all instances
     // definitions_.erase(
@@ -71,11 +75,14 @@ public:
 
 protected:
   // Constructor is protected, as to ensure plugin classes don't accidentally use this type directly
-  explicit InputCommon(std::string name) : name_(std::move(name)) {}
+  explicit InputCommon(std::string name) : name_(std::move(name))
+  {
+  }
 
 private:
   // Consolidates multiple definitions into a single value
-  inline T accumulate_value() {
+  inline T accumulate_value()
+  {
     if (definitions_.empty())
       return params_.default_value;
 
@@ -83,7 +90,8 @@ private:
     T accumulator = *it;
     it++;
 
-    while (it != definitions_.end()) {
+    while (it != definitions_.end())
+    {
       accumulator += *it;
       it++;
     }
@@ -91,7 +99,8 @@ private:
     return accumulator;
   }
 
-  struct Params {
+  struct Params
+  {
     T default_value;
   };
 
@@ -106,11 +115,12 @@ private:
   std::vector<std::reference_wrapper<T>> definitions_{};
 };
 
-template<typename T>
-bool InputCommon<T>::changed() const {
+template <typename T>
+bool InputCommon<T>::changed() const
+{
   return previous_debounce_value_ != current_debounce_value_;
 }
 
-}
+}  // namespace teleop
 
-#endif // TELEOP_INPUTCOMMON_HPP
+#endif  // TELEOP_INPUTCOMMON_HPP

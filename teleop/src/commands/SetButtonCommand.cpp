@@ -4,9 +4,11 @@
 
 #include "teleop/commands/SetButtonCommand.hpp"
 
-namespace teleop {
+namespace teleop
+{
 
-void SetButtonCommand::on_initialize(const std::string& prefix, const ParameterInterface::SharedPtr& parameters) {
+void SetButtonCommand::on_initialize(const std::string& prefix, const ParameterInterface::SharedPtr& parameters)
+{
   Params params{};
 
   auto name_descriptor = rcl_interfaces::msg::ParameterDescriptor{};
@@ -26,11 +28,12 @@ void SetButtonCommand::on_initialize(const std::string& prefix, const ParameterI
   params_ = params;
 }
 
-void SetButtonCommand::execute(CommandDelegate& context, const rclcpp::Time& now) {
+void SetButtonCommand::execute(CommandDelegate& context, const rclcpp::Time& now)
+{
   context.get_states().get_buttons().set(params_.name, params_.value);
 }
 
-} // teleop
+}  // namespace teleop
 
 #include <pluginlib/class_list_macros.hpp>
 

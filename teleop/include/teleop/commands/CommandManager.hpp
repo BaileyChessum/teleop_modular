@@ -15,12 +15,16 @@
 #include <pluginlib/class_loader.hpp>
 #include <rclcpp/node.hpp>
 
-namespace teleop {
+namespace teleop
+{
 
-class CommandManager final {
+class CommandManager final
+{
 public:
   explicit CommandManager(const std::shared_ptr<rclcpp::Node>& node, CommandDelegate::WeakPtr context)
-    : node_(node), context_(std::move(context)) {}
+    : node_(node), context_(std::move(context))
+  {
+  }
 
   /**
    * Tries to create and add a command of a given name, using parameters in node_
@@ -42,7 +46,8 @@ public:
    * @param[out] invocation_event_names The names of the events the command should be invoked by.
    * @return True if the type name was found. False otherwise.
    */
-  bool get_type_for_command(const std::string& name, std::string& source_type, std::vector<std::string>& invocation_event_names) const;
+  bool get_type_for_command(const std::string& name, std::string& source_type,
+                            std::vector<std::string>& invocation_event_names) const;
 
   std::shared_ptr<Command> operator[](const std::string& index);
 
@@ -51,19 +56,23 @@ public:
   using iterator = typename std::map<std::string, std::shared_ptr<Command>>::iterator;
   using const_iterator = typename std::map<std::string, std::shared_ptr<Command>>::const_iterator;
 
-  iterator begin() {
+  iterator begin()
+  {
     return items_.begin();
   }
 
-  iterator end() {
+  iterator end()
+  {
     return items_.end();
   }
 
-  [[nodiscard]] const_iterator begin() const {
+  [[nodiscard]] const_iterator begin() const
+  {
     return items_.begin();
   }
 
-  [[nodiscard]] const_iterator end() const {
+  [[nodiscard]] const_iterator end() const
+  {
     return items_.end();
   }
 
@@ -79,6 +88,6 @@ private:
   CommandDelegate::WeakPtr context_;
 };
 
-} // teleop
+}  // namespace teleop
 
-#endif //TELEOP_COMMANDMANAGER_HPP
+#endif  // TELEOP_COMMANDMANAGER_HPP

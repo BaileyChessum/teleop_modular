@@ -4,15 +4,13 @@
 
 #include "../../include/teleop/commands/Command.hpp"
 
-namespace teleop {
+namespace teleop
+{
 
-void Command::initialize(
-  const CommandDelegate::WeakPtr& context,
-  const std::string& name,
-  const std::vector<Event::SharedPtr>& on,
-  const LoggingInterface::SharedPtr& logging,
-  const ParameterInterface::SharedPtr& parameters) {
-
+void Command::initialize(const CommandDelegate::WeakPtr& context, const std::string& name,
+                         const std::vector<Event::SharedPtr>& on, const LoggingInterface::SharedPtr& logging,
+                         const ParameterInterface::SharedPtr& parameters)
+{
   context_ = context;
   name_ = name;
   on_ = on;
@@ -22,9 +20,10 @@ void Command::initialize(
   on_initialize("commands." + name + ".", parameters);
 }
 
-void Command::on_event_invoked(const rclcpp::Time& now) {
+void Command::on_event_invoked(const rclcpp::Time& now)
+{
   if (const auto context = context_.lock())
     execute(*context, now);
 }
 
-} // teleop
+}  // namespace teleop

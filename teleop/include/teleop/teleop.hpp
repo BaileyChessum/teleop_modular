@@ -17,55 +17,56 @@
 
 namespace teleop
 {
+/**
+ * @class Teleop
+ * @brief TODO
+ */
+class Teleop : public CommandDelegate, public std::enable_shared_from_this<Teleop>
+{
+public:
   /**
-   * @class Teleop
-   * @brief TODO
+   * @brief Constructor for Teleop.
+   * @param node The ROS2 node to use for parameters, topics, and services
+   * @param options Node options for the ROS2 node.
    */
-  class Teleop : public CommandDelegate, public std::enable_shared_from_this<Teleop> {
-  public:
-    /**
-     * @brief Constructor for Teleop.
-     * @param node The ROS2 node to use for parameters, topics, and services
-     * @param options Node options for the ROS2 node.
-     */
-    explicit Teleop(const std::shared_ptr<rclcpp::Node>& node);
+  explicit Teleop(const std::shared_ptr<rclcpp::Node>& node);
 
-    ~Teleop() override;
+  ~Teleop() override;
 
-    void initialize(const std::weak_ptr<rclcpp::Executor>& executor);
-    void log_all_inputs();
+  void initialize(const std::weak_ptr<rclcpp::Executor>& executor);
+  void log_all_inputs();
 
-    /**
-     * Infinite loop that repeatedly services updates from input sources. The heart of the program.
-     */
-    void service_input_updates();
+  /**
+   * Infinite loop that repeatedly services updates from input sources. The heart of the program.
+   */
+  void service_input_updates();
 
-    [[nodiscard]] std::shared_ptr<rclcpp::Node> get_node() const override;
-    [[nodiscard]] const InputManager& get_inputs() const override;
-    [[nodiscard]] StateManager& get_states() override;
-    [[nodiscard]] const std::shared_ptr<ControlModeManager> get_control_modes() const override;
+  [[nodiscard]] std::shared_ptr<rclcpp::Node> get_node() const override;
+  [[nodiscard]] const InputManager& get_inputs() const override;
+  [[nodiscard]] StateManager& get_states() override;
+  [[nodiscard]] const std::shared_ptr<ControlModeManager> get_control_modes() const override;
 
-    /**
-     * Ends any running threads
-     */
-    void stop();
+  /**
+   * Ends any running threads
+   */
+  void stop();
 
-  private:
-    std::shared_ptr<rclcpp::Node> node_;
+private:
+  std::shared_ptr<rclcpp::Node> node_;
 
-    std::shared_ptr<ParamListener> param_listener_;
-    Params params_;
+  std::shared_ptr<ParamListener> param_listener_;
+  Params params_;
 
-    InputManager inputs_;
-    StateManager states_;
+  InputManager inputs_;
+  StateManager states_;
 
-    std::shared_ptr<ControlModeManager> control_mode_manager_ = nullptr;
-    std::shared_ptr<InputSourceManager> input_source_manager_ = nullptr;
-    std::shared_ptr<CommandManager> commands_ = nullptr;
+  std::shared_ptr<ControlModeManager> control_mode_manager_ = nullptr;
+  std::shared_ptr<InputSourceManager> input_source_manager_ = nullptr;
+  std::shared_ptr<CommandManager> commands_ = nullptr;
 
-    std::atomic<bool> program_running_ = true;
-  };
+  std::atomic<bool> program_running_ = true;
+};
 
-} // namespace teleop
+}  // namespace teleop
 
-#endif // TELEOP_HPP
+#endif  // TELEOP_HPP

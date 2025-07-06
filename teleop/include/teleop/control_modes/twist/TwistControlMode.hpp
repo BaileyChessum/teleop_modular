@@ -11,12 +11,13 @@
 #include "teleop/inputs/Button.hpp"
 #include "teleop/inputs/Axis.hpp"
 
-namespace teleop {
+namespace teleop
+{
 /**
  * Control mode for moving joint velocities directly
  */
-class TwistControlMode final : public ControlMode {
-
+class TwistControlMode final : public ControlMode
+{
 public:
   explicit TwistControlMode() = default;
 
@@ -56,6 +57,6 @@ protected:
   rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr publisher_;
 };
 
-} // teleop
+}  // namespace teleop
 
-#endif //TELEOP_TWISTIKCONTROLMODE_HPP
+#endif  // TELEOP_TWISTIKCONTROLMODE_HPP

@@ -8,30 +8,35 @@
 #include <utility>
 #include "Input.hpp"
 
-namespace teleop {
+namespace teleop
+{
 
-class Button final : public InputCommon<bool> {
+class Button final : public InputCommon<bool>
+{
 public:
   using SharedPtr = std::shared_ptr<Button>;
   using WeakPtr = std::weak_ptr<Button>;
 
-  explicit Button(std::string name) : InputCommon<bool>(std::move(name)) {}
+  explicit Button(std::string name) : InputCommon<bool>(std::move(name))
+  {
+  }
 
-  ~Button() {
+  ~Button()
+  {
     // Clear event pointers
     on_pressed_down.reset();
     on_pressed.reset();
     on_pressed_up.reset();
   }
 
-  void export_events(teleop::EventCollection &events) override;
-  void update_events(const rclcpp::Time &now) override;
+  void export_events(teleop::EventCollection& events) override;
+  void update_events(const rclcpp::Time& now) override;
 
   Event::SharedPtr on_pressed;
   Event::SharedPtr on_pressed_down;
   Event::SharedPtr on_pressed_up;
 };
 
-} // teleop
+}  // namespace teleop
 
-#endif //TELEOP_BUTTON_HPP
+#endif  // TELEOP_BUTTON_HPP

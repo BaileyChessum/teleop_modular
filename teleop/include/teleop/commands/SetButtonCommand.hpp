@@ -10,15 +10,18 @@
 #include <rclcpp/time.hpp>
 #include "CommandDelegate.hpp"
 
-namespace teleop {
+namespace teleop
+{
 
-class SetButtonCommand final : public Command {
+class SetButtonCommand final : public Command
+{
 public:
   void on_initialize(const std::string& prefix, const ParameterInterface::SharedPtr& parameters) override;
   void execute(CommandDelegate& context, const rclcpp::Time& now) override;
 
 protected:
-  struct Params {
+  struct Params
+  {
     std::string name;
     bool value = true;
   };
@@ -26,6 +29,6 @@ protected:
   Params params_{};
 };
 
-} // teleop
+}  // namespace teleop
 
-#endif //TELEOP_SETBUTTONCOMMAND_HPP
+#endif  // TELEOP_SETBUTTONCOMMAND_HPP

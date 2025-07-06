@@ -9,20 +9,23 @@
 
 #include "CommandDelegate.hpp"
 
-namespace teleop {
+namespace teleop
+{
 
 /**
  * Abstract base class for a generic invokable action (by an Event) that would change something in teleop
  */
-class Command : public EventListener {
-
+class Command : public EventListener
+{
 public:
   using LoggingInterface = rclcpp::node_interfaces::NodeLoggingInterface;
   using ParameterInterface = rclcpp::node_interfaces::NodeParametersInterface;
 
   virtual ~Command() = default;
   Command() = default;
-  explicit Command(std::string name) : name_(std::move(name)) {}
+  explicit Command(std::string name) : name_(std::move(name))
+  {
+  }
 
   /**
    * Sets up the command. Alternative to the constructor, which works with pluginlib.
@@ -31,15 +34,13 @@ public:
    * @param logging    The logging interface to use.
    * @param parameters The parameter interface to use when configuring the command.
    */
-  void initialize(
-    const CommandDelegate::WeakPtr& context,
-    const std::string& name,
-    const std::vector<Event::SharedPtr>& on,
-    const LoggingInterface::SharedPtr& logging,
-    const ParameterInterface::SharedPtr& parameters);
+  void initialize(const CommandDelegate::WeakPtr& context, const std::string& name,
+                  const std::vector<Event::SharedPtr>& on, const LoggingInterface::SharedPtr& logging,
+                  const ParameterInterface::SharedPtr& parameters);
 
   /**
-   * Allows command implementations to perform implementation specific configuration through the given parameters interface.
+   * Allows command implementations to perform implementation specific configuration through the given parameters
+   * interface.
    * @param prefix[in]      The prefix string to prepend to all parameter definitions. E.g. "commands.name."
    * @param parameters[in]  Interface to allow the command to get parameters
    */
@@ -59,13 +60,15 @@ public:
   void on_event_invoked(const rclcpp::Time& now) override;
 
   /// accessor for the name of the command
-  [[nodiscard]] const std::string& get_name() const {
+  [[nodiscard]] const std::string& get_name() const
+  {
     return name_;
   }
 
 protected:
   /// Accessor for the commands held copied logger object. prevents implementations from modifying the logger
-  [[nodiscard]] const rclcpp::Logger& get_logger() {
+  [[nodiscard]] const rclcpp::Logger& get_logger()
+  {
     if (logger_.has_value())
       return logger_.value();
     logger_ = rclcpp::get_logger(name_);
@@ -82,6 +85,6 @@ private:
 
   CommandDelegate::WeakPtr context_;
 };
-} // teleop
+}  // namespace teleop
 
-#endif //TELEOP_COMMAND_HPP
+#endif  // TELEOP_COMMAND_HPP

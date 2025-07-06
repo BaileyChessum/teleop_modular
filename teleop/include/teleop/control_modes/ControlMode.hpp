@@ -14,15 +14,18 @@
 #include "teleop/inputs/InputCommon.hpp"
 #include "teleop/inputs/InputManager.hpp"
 
-namespace teleop {
+namespace teleop
+{
 /**
  * Base class for a control mode used in teleoperation
  */
-class ControlMode {
+class ControlMode
+{
 public:
   virtual ~ControlMode() = default;
 
-  enum State {
+  enum State
+  {
     INACTIVE = 0,
     CONFIGURING = 1,
     ACTIVE = 2
@@ -31,7 +34,8 @@ public:
   /**
    * Params common to all ControlModes
    */
-  struct Params {
+  struct Params
+  {
     std::vector<std::string> controllers{};
   };
 
@@ -49,23 +53,26 @@ public:
 
   // Accessors
   /// Name of the control mode, which the control mode is indexed by
-  [[nodiscard]] const std::string& get_name() const {
+  [[nodiscard]] const std::string& get_name() const
+  {
     return name_;
   }
   /// Params, from the base ControlMode type, populated by the ControlMode base class.
-  [[nodiscard]] const Params& get_base_params() const {
+  [[nodiscard]] const Params& get_base_params() const
+  {
     return base_params_;
   }
-  const std::shared_ptr<rclcpp::Node>& get_node() const {
+  const std::shared_ptr<rclcpp::Node>& get_node() const
+  {
     return node_;
   }
 
 protected:
-
   virtual void on_initialize() {};
 
   // Lifecycle methods
-  virtual void on_configure(InputManager& inputs/* TODO: Give node, params, and any necessary context to set itself up */) {};
+  virtual void
+  on_configure(InputManager& inputs /* TODO: Give node, params, and any necessary context to set itself up */) {};
   virtual void on_activate() {};
   virtual void on_deactivate() {};
 
@@ -80,6 +87,6 @@ private:
   std::string name_;
 };
 
-} // teleop
+}  // namespace teleop
 
-#endif //TELEOP_CONTROLMODE_HPP
+#endif  // TELEOP_CONTROLMODE_HPP

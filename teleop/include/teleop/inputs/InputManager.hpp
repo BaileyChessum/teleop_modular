@@ -13,28 +13,37 @@
 #include "teleop/inputs/Axis.hpp"
 #include "InputCollection.hpp"
 
-namespace teleop {
+namespace teleop
+{
 
 /**
  * Class responsible for owning the various maps between input name and input object.
  */
-class InputManager {
+class InputManager
+{
 public:
   InputManager()
-  : event_listener_queue_(std::make_shared<EventListenerQueue>()),
-    events_(event_listener_queue_), buttons_(events_), axes_(events_)
-  {}
+    : event_listener_queue_(std::make_shared<EventListenerQueue>())
+    , events_(event_listener_queue_)
+    , buttons_(events_)
+    , axes_(events_)
+  {
+  }
 
   // Add move constructor
   InputManager(InputManager&& other) noexcept
     : event_listener_queue_(std::move(other.event_listener_queue_))
     , events_(std::move(other.events_))
     , buttons_(std::move(other.buttons_))
-    , axes_(std::move(other.axes_)) {}
+    , axes_(std::move(other.axes_))
+  {
+  }
 
   // Add move assignment
-  InputManager& operator=(InputManager&& other) noexcept {
-    if (this != &other) {
+  InputManager& operator=(InputManager&& other) noexcept
+  {
+    if (this != &other)
+    {
       event_listener_queue_ = std::move(other.event_listener_queue_);
       events_ = std::move(other.events_);
       buttons_ = std::move(other.buttons_);
@@ -48,13 +57,16 @@ public:
   InputManager& operator=(const InputManager&) = delete;
 
   // Accessors
-  [[nodiscard]] InputCollection<Button>& get_buttons() {
+  [[nodiscard]] InputCollection<Button>& get_buttons()
+  {
     return buttons_;
   }
-  [[nodiscard]] InputCollection<Axis>& get_axes() {
+  [[nodiscard]] InputCollection<Axis>& get_axes()
+  {
     return axes_;
   }
-  [[nodiscard]] EventCollection& get_events() {
+  [[nodiscard]] EventCollection& get_events()
+  {
     return events_;
   }
 
@@ -80,21 +92,21 @@ protected:
    * All events referenced by an input source or control mode. This collection only holds weak references, and allows
    * Events to be dropped.
    */
-  EventCollection events_{event_listener_queue_};
+  EventCollection events_{ event_listener_queue_ };
 
   /**
    * All boolean inputs referenced by an input source or control mode. This collection only holds weak references, and
    * allows Events to be dropped.
    */
-  InputCollection<Button> buttons_{events_};
+  InputCollection<Button> buttons_{ events_ };
 
   /**
    * All double inputs referenced by an input source or control mode. This collection only holds weak references, and
    * allows Events to be dropped.
    */
-  InputCollection<Axis> axes_{events_};
+  InputCollection<Axis> axes_{ events_ };
 };
 
-} // teleop
+}  // namespace teleop
 
-#endif //TELEOP_INPUTMANAGER_HPP
+#endif  // TELEOP_INPUTMANAGER_HPP

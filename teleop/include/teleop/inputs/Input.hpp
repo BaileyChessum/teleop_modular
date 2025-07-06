@@ -7,4 +7,4 @@
 
 #include "InputCommon.hpp"
 
-#endif //TELEOP_INPUT_HPP
+#endif  // TELEOP_INPUT_HPP

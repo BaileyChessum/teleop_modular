@@ -12,12 +12,14 @@
 #include "Event.hpp"
 #include "../WeakMapIterator.hpp"
 
-namespace teleop {
+namespace teleop
+{
 
 /**
  * A container of Events, where events that don't yet exist are created when an attempt is made to retrieve them.
  */
-class EventCollection {
+class EventCollection
+{
 public:
   EventCollection() = default;
   explicit EventCollection(std::weak_ptr<EventListenerQueue> listener_queue);
@@ -25,18 +27,22 @@ public:
   using iterator = WeakMapIterator<Event, false>;
   using const_iterator = WeakMapIterator<Event, true>;
 
-  Event::SharedPtr operator[](const std::string& index) {
+  Event::SharedPtr operator[](const std::string& index)
+  {
     auto it = items_.find(index);
     Event::SharedPtr ptr;
 
-    if (it != items_.end()) {
+    if (it != items_.end())
+    {
       ptr = it->second.lock();
-      if (!ptr) {
+      if (!ptr)
+      {
         items_.erase(it);
       }
     }
 
-    if (!ptr) {
+    if (!ptr)
+    {
       ptr = std::make_shared<Event>(index, listener_queue_);
       items_[index] = ptr;
     }
@@ -44,12 +50,30 @@ public:
     return ptr;
   }
 
-  iterator begin() { return iterator(items_.begin(), &items_); }
-  iterator end() { return iterator(items_.end(), &items_); }
-  const_iterator begin() const { return const_iterator(items_.begin(), &items_); }
-  const_iterator end() const { return const_iterator(items_.end(), &items_); }
-  const_iterator cbegin() const { return const_iterator(items_.begin(), &items_); }
-  const_iterator cend() const { return const_iterator(items_.end(), &items_); }
+  iterator begin()
+  {
+    return iterator(items_.begin(), &items_);
+  }
+  iterator end()
+  {
+    return iterator(items_.end(), &items_);
+  }
+  const_iterator begin() const
+  {
+    return const_iterator(items_.begin(), &items_);
+  }
+  const_iterator end() const
+  {
+    return const_iterator(items_.end(), &items_);
+  }
+  const_iterator cbegin() const
+  {
+    return const_iterator(items_.begin(), &items_);
+  }
+  const_iterator cend() const
+  {
+    return const_iterator(items_.end(), &items_);
+  }
 
   void clean_up();
 
@@ -63,6 +87,6 @@ private:
   std::weak_ptr<EventListenerQueue> listener_queue_;
 };
 
-} // teleop
+}  // namespace teleop
 
-#endif //TELEOP_EVENTCOLLECTION_H
+#endif  // TELEOP_EVENTCOLLECTION_H

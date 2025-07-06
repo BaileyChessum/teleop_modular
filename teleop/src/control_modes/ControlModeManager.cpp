@@ -5,54 +5,62 @@
 #include "colors.hpp"
 #include "utils.hpp"
 
-namespace teleop {
+namespace teleop
+{
 
-//ControlModeManager::~ControlModeManager() {
-//  switch_controller_client_.reset();
-//  node_.reset();
-//  current_control_mode_.reset();
-//  control_modes_.clear();
-//  control_mode_loader_.reset();
-//}
+// ControlModeManager::~ControlModeManager() {
+//   switch_controller_client_.reset();
+//   node_.reset();
+//   current_control_mode_.reset();
+//   control_modes_.clear();
+//   control_mode_loader_.reset();
+// }
 
-void ControlModeManager::configure(InputManager& inputs) {
+void ControlModeManager::configure(InputManager& inputs)
+{
   const auto logger = node_->get_logger();
 
   // Create service clients
-  switch_controller_client_ = node_->create_client<controller_manager_msgs::srv::SwitchController>("/controller_manager/switch_controller");
+  switch_controller_client_ =
+      node_->create_client<controller_manager_msgs::srv::SwitchController>("/controller_manager/switch_controller");
 
   auto names_descriptor = rcl_interfaces::msg::ParameterDescriptor{};
   names_descriptor.name = "control_modes.names";
-  names_descriptor.description = "The names of all control modes to create, from parameters under control_modes.name.* "
-                                 "for all names provided. Teleop won't know that parameters in the form "
-                                 "control_modes.name.* exist if name is not in this array.";
+  names_descriptor.description =
+      "The names of all control modes to create, from parameters under control_modes.name.* "
+      "for all names provided. Teleop won't know that parameters in the form "
+      "control_modes.name.* exist if name is not in this array.";
 
   // Declare and get parameter for control modes to spawn by default
-  node_->declare_parameter(names_descriptor.name, rclcpp::ParameterType::PARAMETER_STRING_ARRAY, names_descriptor);;
+  node_->declare_parameter(names_descriptor.name, rclcpp::ParameterType::PARAMETER_STRING_ARRAY, names_descriptor);
+  ;
   rclcpp::Parameter control_modes_param;
   node_->get_parameter(names_descriptor.name, control_modes_param);
 
-  if (control_modes_param.get_type() == rclcpp::ParameterType::PARAMETER_NOT_SET) {
+  if (control_modes_param.get_type() == rclcpp::ParameterType::PARAMETER_NOT_SET)
+  {
     RCLCPP_ERROR(logger, "control_modes.names was not set.");
   }
-  else if (control_modes_param.get_type() != rclcpp::ParameterType::PARAMETER_STRING_ARRAY) {
+  else if (control_modes_param.get_type() != rclcpp::ParameterType::PARAMETER_STRING_ARRAY)
+  {
     RCLCPP_ERROR(logger, "control_modes.names parameter must be a string array, but a %s was given.",
                  control_modes_param.get_type_name().c_str());
   }
 
-  const auto control_mode_names = control_modes_param.get_type() == rclcpp::ParameterType::PARAMETER_STRING_ARRAY
-    ? control_modes_param.as_string_array() : std::vector<std::string>();
+  const auto control_mode_names = control_modes_param.get_type() == rclcpp::ParameterType::PARAMETER_STRING_ARRAY ?
+                                      control_modes_param.as_string_array() :
+                                      std::vector<std::string>();
 
   // Pluginlib for loading control modes dynamically
-  control_mode_loader_ = std::make_unique<pluginlib::ClassLoader<ControlMode>>(
-    "teleop", "teleop::ControlMode");
+  control_mode_loader_ = std::make_unique<pluginlib::ClassLoader<ControlMode>>("teleop", "teleop::ControlMode");
 
   // List available control mode plugins
   try
   {
     std::stringstream available_plugins_log{};
     const auto plugins = control_mode_loader_->getDeclaredClasses();
-    for (const auto& plugin : plugins) {
+    for (const auto& plugin : plugins)
+    {
       available_plugins_log << "\n\t- " << plugin;
     }
 
@@ -66,15 +74,20 @@ void ControlModeManager::configure(InputManager& inputs) {
 
   // Create each control mode according to the given params
   std::stringstream registered_modes_log{};
-  for (auto& control_mode_name : control_mode_names) {
+  for (auto& control_mode_name : control_mode_names)
+  {
     std::string control_mode_type;
     const std::string pretty_name = snake_to_title(control_mode_name);
 
     // Get the control mode's plugin type name
-    if (!get_type_for_control_mode(control_mode_name, control_mode_type)) {
-      RCLCPP_ERROR(logger, "Failed to find type for control mode \"%s\" in params. Have you defined %s.type in your "
-                           "parameter file?", control_mode_name.c_str(), control_mode_name.c_str());
-      registered_modes_log << C_FAIL_QUIET << "\n\t- " << pretty_name << C_FAIL_QUIET << "\t(failed - " << control_mode_name << ".type param missing) " << C_RESET;
+    if (!get_type_for_control_mode(control_mode_name, control_mode_type))
+    {
+      RCLCPP_ERROR(logger,
+                   "Failed to find type for control mode \"%s\" in params. Have you defined %s.type in your "
+                   "parameter file?",
+                   control_mode_name.c_str(), control_mode_name.c_str());
+      registered_modes_log << C_FAIL_QUIET << "\n\t- " << pretty_name << C_FAIL_QUIET << "\t(failed - "
+                           << control_mode_name << ".type param missing) " << C_RESET;
       continue;
     }
 
@@ -88,13 +101,14 @@ void ControlModeManager::configure(InputManager& inputs) {
     {
       RCLCPP_ERROR(logger, "Failed to find control mode plugin \"%s\" for mode \"%s\"!\nwhat(): %s",
                    control_mode_type.c_str(), control_mode_name.c_str(), ex.what());
-      registered_modes_log << C_FAIL_QUIET << "\n\t- " << pretty_name << C_FAIL_QUIET << "\t(failed - can't find plugin " << control_mode_type << ") " << C_RESET;
+      registered_modes_log << C_FAIL_QUIET << "\n\t- " << pretty_name << C_FAIL_QUIET
+                           << "\t(failed - can't find plugin " << control_mode_type << ") " << C_RESET;
       continue;
     }
 
     // Create a node for the control mode
-    const auto options = rclcpp::NodeOptions(node_->get_node_options())
-      .context(node_->get_node_base_interface()->get_context());
+    const auto options =
+        rclcpp::NodeOptions(node_->get_node_options()).context(node_->get_node_base_interface()->get_context());
     const auto node_name = control_mode_name;
     const auto control_mode_node = std::make_shared<rclcpp::Node>(node_name, node_->get_namespace(), options);
 
@@ -110,7 +124,8 @@ void ControlModeManager::configure(InputManager& inputs) {
   auto executor = executor_.lock();
 
   // Configure each control mode
-  for (const auto& [name, control_mode] : control_modes_) {
+  for (const auto& [name, control_mode] : control_modes_)
+  {
     if (!control_mode)
       continue;
     control_mode->configure(inputs);
@@ -125,23 +140,27 @@ void ControlModeManager::configure(InputManager& inputs) {
     set_control_mode(control_mode_names[0]);
 }
 
-bool ControlModeManager::set_control_mode(const std::string& name) {
+bool ControlModeManager::set_control_mode(const std::string& name)
+{
   const auto logger = node_->get_logger();
   RCLCPP_INFO(logger, C_MODE "%s activated" C_RESET, snake_to_title(name).c_str());
 
   // Find the control mode from the name
-  const auto new_control_mode_it = std::find_if(control_modes_.begin(), control_modes_.end(),
-    [name](const std::pair<std::string, std::shared_ptr<ControlMode>>& pair){ return pair.first == name; });
+  const auto new_control_mode_it = std::find_if(
+      control_modes_.begin(), control_modes_.end(),
+      [name](const std::pair<std::string, std::shared_ptr<ControlMode>>& pair) { return pair.first == name; });
 
   // Ensure the given control mode exists
   if (new_control_mode_it == control_modes_.end() || !new_control_mode_it->second)
     return false;
 
   // Whether we successfully switch controllers in ros2_control
-  bool switch_result = false;;
+  bool switch_result = false;
+  ;
 
   // Deactivate the previous control mode, then switch
-  if (current_control_mode_) {
+  if (current_control_mode_)
+  {
     current_control_mode_->deactivate();
 
     const auto previous_control_mode_ = current_control_mode_;
@@ -150,11 +169,13 @@ bool ControlModeManager::set_control_mode(const std::string& name) {
     // Disable and enable controllers by calling controller manager
     switch_result = switch_controllers(*previous_control_mode_, *new_control_mode_it->second);
   }
-  else {
+  else
+  {
     switch_result = switch_controllers(*new_control_mode_it->second);
   }
 
-  if (!switch_result) {
+  if (!switch_result)
+  {
     // TODO: Error recovery here
     return false;
   }
@@ -166,8 +187,10 @@ bool ControlModeManager::set_control_mode(const std::string& name) {
   return true;
 }
 
-void ControlModeManager::update(const rclcpp::Time& now, const rclcpp::Duration& period) const {
-  if (!current_control_mode_) {
+void ControlModeManager::update(const rclcpp::Time& now, const rclcpp::Duration& period) const
+{
+  if (!current_control_mode_)
+  {
     RCLCPP_WARN(node_->get_logger(), "ControlModeManager::update(): No mode is active!");
     return;
   }
@@ -175,26 +198,28 @@ void ControlModeManager::update(const rclcpp::Time& now, const rclcpp::Duration&
   current_control_mode_->update(now, period);
 }
 
-std::shared_ptr<ControlMode> ControlModeManager::operator[](const std::string& index) {
+std::shared_ptr<ControlMode> ControlModeManager::operator[](const std::string& index)
+{
   return control_modes_[index];
 }
 
-void ControlModeManager::add(const std::string& key, const std::shared_ptr<ControlMode>& value) {
+void ControlModeManager::add(const std::string& key, const std::shared_ptr<ControlMode>& value)
+{
   // TODO: Implement
   throw std::logic_error("ControlModeManager::add() is not yet implemented. Sorry. Extract it from configure().");
 }
 
-void ControlModeManager::reset() {
+void ControlModeManager::reset()
+{
   switch_controller_client_ = nullptr;
 }
 
-bool ControlModeManager::switch_controllers(const ControlMode& previous, const ControlMode& next) const {
+bool ControlModeManager::switch_controllers(const ControlMode& previous, const ControlMode& next) const
+{
   if (previous.get_name() == next.get_name())
     return false;
 
-  RCLCPP_INFO(node_->get_logger(), "Changing from %s to %s",
-              previous.get_name().c_str(),
-              next.get_name().c_str());
+  RCLCPP_INFO(node_->get_logger(), "Changing from %s to %s", previous.get_name().c_str(), next.get_name().c_str());
 
   // The order of deactivation needs to be opposite to the activation order. This is the reverse to the final order.
   std::vector<std::string> deactivate_controllers_reversed = previous.get_base_params().controllers;
@@ -209,7 +234,8 @@ bool ControlModeManager::switch_controllers(const ControlMode& previous, const C
   if (activate_controllers.empty() && deactivate_controllers.empty())
     return true;
 
-  if (!switch_controller_client_->service_is_ready()) {
+  if (!switch_controller_client_->service_is_ready())
+  {
     RCLCPP_ERROR(node_->get_logger(), "Controller manager service not available.");
     return false;
   }
@@ -226,13 +252,15 @@ bool ControlModeManager::switch_controllers(const ControlMode& previous, const C
   return true;
 }
 
-bool ControlModeManager::switch_controllers(const ControlMode& next) const {
+bool ControlModeManager::switch_controllers(const ControlMode& next) const
+{
   const std::vector<std::string> activate_controllers = next.get_base_params().controllers;
 
   if (activate_controllers.empty())
     return true;
 
-  if (!switch_controller_client_->service_is_ready()) {
+  if (!switch_controller_client_->service_is_ready())
+  {
     RCLCPP_ERROR(node_->get_logger(), "Controller manager service not available.");
     return false;
   }
@@ -248,7 +276,8 @@ bool ControlModeManager::switch_controllers(const ControlMode& next) const {
   return true;
 }
 
-bool ControlModeManager::get_type_for_control_mode(const std::string& name, std::string& control_mode_type) const {
+bool ControlModeManager::get_type_for_control_mode(const std::string& name, std::string& control_mode_type) const
+{
   // TODO: Check that the parameter hasn't already been defined
   // TODO: Display names
   node_->declare_parameter("control_modes." + name + ".type", rclcpp::ParameterType::PARAMETER_STRING);
@@ -262,4 +291,4 @@ bool ControlModeManager::get_type_for_control_mode(const std::string& name, std:
   return result;
 }
 
-} // namespace teleop
+}  // namespace teleop

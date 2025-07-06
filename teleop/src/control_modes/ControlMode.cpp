@@ -1,8 +1,7 @@
 
 #include "teleop/control_modes/ControlMode.hpp"
 
-void teleop::ControlMode::initialize(const std::shared_ptr<rclcpp::Node>& node,
-                                             const std::string& name)
+void teleop::ControlMode::initialize(const std::shared_ptr<rclcpp::Node>& node, const std::string& name)
 {
   node_ = node;
   name_ = name;
@@ -11,8 +10,10 @@ void teleop::ControlMode::initialize(const std::shared_ptr<rclcpp::Node>& node,
   on_initialize();
 }
 
-void teleop::ControlMode::configure(InputManager& inputs) {
-  if (!node_) {
+void teleop::ControlMode::configure(InputManager& inputs)
+{
+  if (!node_)
+  {
     return;
   }
 
@@ -22,16 +23,20 @@ void teleop::ControlMode::configure(InputManager& inputs) {
   on_configure(inputs);
 }
 
-void teleop::ControlMode::activate() {
-  if (!node_) {
+void teleop::ControlMode::activate()
+{
+  if (!node_)
+  {
     return;
   }
 
   on_activate();
 }
 
-void teleop::ControlMode::deactivate() {
-  if (!node_) {
+void teleop::ControlMode::deactivate()
+{
+  if (!node_)
+  {
     return;
   }
 

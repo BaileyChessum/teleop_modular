@@ -6,16 +6,19 @@
 #include "teleop/inputs/Button.hpp"
 #include "teleop/inputs/Axis.hpp"
 
-namespace teleop {
+namespace teleop
+{
 
-template<>
-bool InputCommon<bool>::value() {
+template <>
+bool InputCommon<bool>::value()
+{
   return accumulate_value();
 }
 
-template<>
-double InputCommon<double>::value() {
+template <>
+double InputCommon<double>::value()
+{
   return accumulate_value();
 }
 
-} // namespace teleop
+}  // namespace teleop

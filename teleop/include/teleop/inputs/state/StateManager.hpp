@@ -6,20 +6,25 @@
 #define STATEMANAGER_HPP
 #include "StateCollection.hpp"
 
-namespace teleop {
+namespace teleop
+{
 /**
  * A class to manage input values that don't originate from an input source. This could be from ROS2, or commands
  */
-class StateManager {
+class StateManager
+{
 public:
-  explicit StateManager(InputManager& inputs)
-    : buttons_(inputs.get_buttons()), axes_(inputs.get_axes()) {}
+  explicit StateManager(InputManager& inputs) : buttons_(inputs.get_buttons()), axes_(inputs.get_axes())
+  {
+  }
 
   // Accessors
-  [[nodiscard]] StateCollection<bool, Button>& get_buttons() {
+  [[nodiscard]] StateCollection<bool, Button>& get_buttons()
+  {
     return buttons_;
   }
-  [[nodiscard]] StateCollection<double, Axis>& get_axes() {
+  [[nodiscard]] StateCollection<double, Axis>& get_axes()
+  {
     return axes_;
   }
 
@@ -28,6 +33,6 @@ private:
   StateCollection<double, Axis> axes_;
 };
 
-} // teleop
+}  // namespace teleop
 
-#endif //STATEMANAGER_HPP
+#endif  // STATEMANAGER_HPP

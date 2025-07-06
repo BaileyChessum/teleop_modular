@@ -4,5 +4,6 @@
 
 #include "../../../include/teleop/inputs/state/StateCollection.hpp"
 
-namespace teleop {
-} // teleop
+namespace teleop
+{
+}  // namespace teleop

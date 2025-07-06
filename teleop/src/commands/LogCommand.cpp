@@ -5,9 +5,11 @@
 #include "../../include/teleop/commands/LogCommand.hpp"
 #include "colors.hpp"
 
-namespace teleop {
+namespace teleop
+{
 
-void LogCommand::on_initialize(const std::string& prefix, const ParameterInterface::SharedPtr& parameters) {
+void LogCommand::on_initialize(const std::string& prefix, const ParameterInterface::SharedPtr& parameters)
+{
   Params params{};
 
   auto message_descriptor = rcl_interfaces::msg::ParameterDescriptor{};
@@ -20,11 +22,12 @@ void LogCommand::on_initialize(const std::string& prefix, const ParameterInterfa
   params_ = params;
 }
 
-void LogCommand::execute(CommandDelegate& context, const rclcpp::Time& now) {
+void LogCommand::execute(CommandDelegate& context, const rclcpp::Time& now)
+{
   RCLCPP_INFO(get_logger(), "%s" C_RESET, params_.message.c_str());
 }
 
-} // teleop
+}  // namespace teleop
 
 #include <pluginlib/class_list_macros.hpp>
 

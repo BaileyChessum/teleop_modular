@@ -10,14 +10,16 @@
 #include "teleop/inputs/InputManager.hpp"
 #include "teleop/inputs/state/StateManager.hpp"
 
-namespace teleop {
+namespace teleop
+{
 
 class ControlModeManager;  // Forward declaration
 
 /**
  * Delegate interface allowing Actions to access the internals of the teleop node in a controlled manner.
  */
-class CommandDelegate {
+class CommandDelegate
+{
 public:
   using WeakPtr = std::weak_ptr<CommandDelegate>;
   using SharedPtr = std::shared_ptr<CommandDelegate>;
@@ -30,6 +32,6 @@ public:
   [[nodiscard]] virtual const std::shared_ptr<ControlModeManager> get_control_modes() const = 0;
 };
 
-} // teleop
+}  // namespace teleop
 
-#endif //TELEOP_COMMANDDELEGATE_HPP
+#endif  // TELEOP_COMMANDDELEGATE_HPP

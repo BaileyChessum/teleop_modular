@@ -7,22 +7,26 @@
 #include "teleop/inputs/Axis.hpp"
 #include "teleop/inputs/InputManager.hpp"
 
-using teleop::Button;
 using teleop::Axis;
+using teleop::Button;
 using teleop::InputManager;
 
-class InputTest : public ::testing::Test {
+class InputTest : public ::testing::Test
+{
 protected:
-  void SetUp() override {
+  void SetUp() override
+  {
     // Setup code that will be called before each test
   }
 
-  void TearDown() override {
+  void TearDown() override
+  {
     // Cleanup code that will be called after each test
   }
 };
 
-TEST_F(InputTest, ButtonSimple) {
+TEST_F(InputTest, ButtonSimple)
+{
   Button button("test_button");
   EXPECT_FALSE(button.value());
 
@@ -34,7 +38,8 @@ TEST_F(InputTest, ButtonSimple) {
   EXPECT_TRUE(button.value());
 }
 
-TEST_F(InputTest, ButtonDependencyAccumulation) {
+TEST_F(InputTest, ButtonDependencyAccumulation)
+{
   Button button("test_button");
   EXPECT_FALSE(button.value());
 
@@ -46,7 +51,8 @@ TEST_F(InputTest, ButtonDependencyAccumulation) {
   EXPECT_TRUE(button.value());
 }
 
-TEST_F(InputTest, AxisSimple) {
+TEST_F(InputTest, AxisSimple)
+{
   Axis axis("test_axis");
   EXPECT_NEAR(axis.value(), 0.0, 1e-10);
 
@@ -61,7 +67,8 @@ TEST_F(InputTest, AxisSimple) {
   EXPECT_NEAR(axis.value(), 0.5, 1e-10);
 }
 
-TEST_F(InputTest, AxisDependencyAccumulation) {
+TEST_F(InputTest, AxisDependencyAccumulation)
+{
   Axis axis("test_axis");
   EXPECT_NEAR(axis.value(), 0.0, 1e-10);
 
@@ -81,7 +88,8 @@ TEST_F(InputTest, AxisDependencyAccumulation) {
   EXPECT_NEAR(axis.value(), 0.0, 1e-10);
 }
 
-TEST_F(InputTest, InputManagerButtonScope) {
+TEST_F(InputTest, InputManagerButtonScope)
+{
   std::cout << "Starting test" << std::endl;
   {
     InputManager inputs;
@@ -138,7 +146,8 @@ TEST_F(InputTest, InputManagerButtonScope) {
   std::cout << "InputManager out of scope" << std::endl;
 }
 
-TEST_F(InputTest, InputManagerAxisScope) {
+TEST_F(InputTest, InputManagerAxisScope)
+{
   InputManager inputs;
 
   double axis_value = 1.0;
@@ -155,12 +164,13 @@ TEST_F(InputTest, InputManagerAxisScope) {
   {
     // This should theoretically be a different axis, since we let it go out of scope
     auto axis = inputs.get_axes()["test_axis"];
-    EXPECT_NEAR(axis->value(), 0.0, 1e-10)
-            << "The InputCollection remembered the axis, even though it went out of scope";
+    EXPECT_NEAR(axis->value(), 0.0, 1e-10) << "The InputCollection remembered the axis, even though it went out of "
+                                              "scope";
   }
 }
 
-TEST_F(InputTest, InputManagerButtonEvents) {
+TEST_F(InputTest, InputManagerButtonEvents)
+{
   InputManager inputs;
   inputs.update(rclcpp::Time(0));
 

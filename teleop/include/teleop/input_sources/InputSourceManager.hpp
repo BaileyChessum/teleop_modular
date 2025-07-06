@@ -13,18 +13,23 @@
 
 #include "InputSource.hpp"
 #include "InputSourceUpdateDelegate.hpp"
-//#include "../teleop_parameters.hpp"
+// #include "../teleop_parameters.hpp"
 #include "teleop_parameters.hpp"
+#include "teleop/SpawnableLog.hpp"
 
 namespace teleop
 {
 
-class InputSourceManager final : public InputSourceUpdateDelegate, public std::enable_shared_from_this<InputSourceUpdateDelegate> {
-
+class InputSourceManager final : public InputSourceUpdateDelegate,
+                                 public std::enable_shared_from_this<InputSourceUpdateDelegate>
+{
 public:
   InputSourceManager() = default;
-  explicit InputSourceManager(const std::shared_ptr<rclcpp::Node>& node, const std::weak_ptr<rclcpp::Executor>& executor, InputManager& inputs)
-    : node_(node), executor_(executor), inputs_(std::ref(inputs)) {}
+  explicit InputSourceManager(const std::shared_ptr<rclcpp::Node>& node,
+                              const std::weak_ptr<rclcpp::Executor>& executor, InputManager& inputs)
+    : node_(node), executor_(executor), inputs_(std::ref(inputs))
+  {
+  }
 
   /**
    * Populates the sources_ from the params in node_.
@@ -49,24 +54,28 @@ public:
 
   void update(const rclcpp::Time& now) const;
 
-
   bool create_input_source(const std::string& input_source_name);
 
 private:
   /// Used to associate any additional information with handles (such as for remapping)
-  template<typename T>
-  struct InputDeclarationHandle {
+  template <typename T, typename InputT>
+  struct InputDeclarationHandle
+  {
     InputDeclaration<T> declaration;
+    std::shared_ptr<InputT> input;
   };
 
   /// For each InputSource we store, we associate some extra metadata.
-  struct InputSourceHandle {
+  struct InputSourceHandle
+  {
     std::shared_ptr<InputSource> source;
 
-    std::vector<InputDeclarationHandle<bool>> button_handles{};
-    std::vector<InputDeclarationHandle<double>> axis_handles{};
+    std::vector<InputDeclarationHandle<bool, Button>> button_handles{};
+    std::vector<InputDeclarationHandle<double, Axis>> axis_handles{};
 
-    explicit InputSourceHandle(const std::shared_ptr<InputSource>& source) : source(source) {}
+    explicit InputSourceHandle(const std::shared_ptr<InputSource>& source) : source(source)
+    {
+    }
   };
 
   InputSourceHandle create_input_source_handle(const std::shared_ptr<InputSource>& input_source_class) const;
@@ -99,8 +108,11 @@ private:
   std::atomic<bool> should_update_ = false;
   std::queue<std::weak_ptr<InputSource>> sources_to_update_;
   rclcpp::Time update_time_ = rclcpp::Time();
+
+  /// Used to log the spawned input sources
+  std::vector<SpawnableLog> logs_{};
 };
 
-}
+}  // namespace teleop
 
-#endif // TELEOP_INPUTSOURCEMANAGER_HPP
+#endif  // TELEOP_INPUTSOURCEMANAGER_HPP

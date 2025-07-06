@@ -5,7 +5,8 @@
 #include "../../include/teleop/commands/SwitchControlModeCommand.hpp"
 #include "teleop/control_modes/ControlModeManager.hpp"
 
-namespace teleop {
+namespace teleop
+{
 
 void SwitchControlModeCommand::on_initialize(const std::string& prefix, const ParameterInterface::SharedPtr& parameters)
 {
@@ -21,11 +22,12 @@ void SwitchControlModeCommand::on_initialize(const std::string& prefix, const Pa
   params_ = params;
 }
 
-void SwitchControlModeCommand::execute(CommandDelegate& context, const rclcpp::Time& now) {
+void SwitchControlModeCommand::execute(CommandDelegate& context, const rclcpp::Time& now)
+{
   context.get_control_modes()->set_control_mode(params_.to);
 }
 
-} // teleop
+}  // namespace teleop
 
 #include <pluginlib/class_list_macros.hpp>
 

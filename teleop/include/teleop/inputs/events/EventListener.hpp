@@ -6,11 +6,13 @@
 #define EVENTLISTENER_HPP
 #include <memory>
 
-namespace teleop {
+namespace teleop
+{
 /**
  * Interface providing a means for events to alert things that depend on them that they have been invoked.
  */
-class EventListener {
+class EventListener
+{
 public:
   virtual ~EventListener() = default;
 
@@ -20,6 +22,6 @@ public:
   virtual void on_event_invoked(const rclcpp::Time& now) = 0;
 };
 
-} // teleop
+}  // namespace teleop
 
-#endif //EVENTLISTENER_HPP
+#endif  // EVENTLISTENER_HPP

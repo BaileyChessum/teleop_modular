@@ -15,15 +15,20 @@
 #include "ControlMode.hpp"
 #include "teleop/inputs/InputManager.hpp"
 
-namespace teleop {
+namespace teleop
+{
 
 /**
  * Class responsible for managing the registered control modes, the current control mode, and switching between them.
  */
-class ControlModeManager final {
+class ControlModeManager final
+{
 public:
-  explicit ControlModeManager(const std::shared_ptr<rclcpp::Node>& node, const std::weak_ptr<rclcpp::Executor>& executor)
-    : node_(node), executor_(executor) {}
+  explicit ControlModeManager(const std::shared_ptr<rclcpp::Node>& node,
+                              const std::weak_ptr<rclcpp::Executor>& executor)
+    : node_(node), executor_(executor)
+  {
+  }
 
   /**
    * Populates the control_modes_ from the params in node_.
@@ -48,10 +53,22 @@ public:
   using iterator = typename std::map<std::string, std::shared_ptr<ControlMode>>::iterator;
   using const_iterator = typename std::map<std::string, std::shared_ptr<ControlMode>>::const_iterator;
 
-  iterator begin() { return control_modes_.begin(); };
-  [[nodiscard]] const_iterator begin() const { return control_modes_.begin(); };
-  iterator end() { return control_modes_.end(); };
-  [[nodiscard]] const_iterator end() const { return control_modes_.end(); };
+  iterator begin()
+  {
+    return control_modes_.begin();
+  };
+  [[nodiscard]] const_iterator begin() const
+  {
+    return control_modes_.begin();
+  };
+  iterator end()
+  {
+    return control_modes_.end();
+  };
+  [[nodiscard]] const_iterator end() const
+  {
+    return control_modes_.end();
+  };
 
   void add(const std::string& key, const std::shared_ptr<ControlMode>& value);
 
@@ -104,6 +121,6 @@ private:
   rclcpp::Client<controller_manager_msgs::srv::SwitchController>::SharedPtr switch_controller_client_ = nullptr;
 };
 
-}
+}  // namespace teleop
 
-#endif //TELEOP_CONTROLMODEMANAGER_HPP
+#endif  // TELEOP_CONTROLMODEMANAGER_HPP

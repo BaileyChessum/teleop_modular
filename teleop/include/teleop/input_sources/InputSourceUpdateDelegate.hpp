@@ -6,13 +6,15 @@
 #define TELEOP_INPUTSOURCEUPDATEDELEGATE_HPP
 #include <rclcpp/time.hpp>
 
-namespace teleop {
+namespace teleop
+{
 
 /**
  * An abstract base class which exposes a method allowing InputSources to notify its owner that it has received new
  * data. The owner can then use this to invoke a new update.
  */
-class InputSourceUpdateDelegate {
+class InputSourceUpdateDelegate
+{
 public:
   virtual ~InputSourceUpdateDelegate() = default;
 
@@ -23,6 +25,6 @@ public:
   virtual void on_input_source_requested_update(const rclcpp::Time& now) = 0;
 };
 
-} // teleop
+}  // namespace teleop
 
-#endif //TELEOP_INPUTSOURCEUPDATEDELEGATE_HPP
+#endif  // TELEOP_INPUTSOURCEUPDATEDELEGATE_HPP

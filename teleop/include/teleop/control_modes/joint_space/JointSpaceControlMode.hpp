@@ -10,14 +10,16 @@
 #include "nova_interfaces/msg/arm_fk_velocity_targets.hpp"
 #include "teleop/inputs/Button.hpp"
 #include "teleop/inputs/Axis.hpp"
-// generate_parameter_library_cpp include/teleop/control_modes/joint_space/joint_space_control_mode_parameters.hpp src/control_modes/joint_space/joint_space_control_mode_parameters.yaml
+// generate_parameter_library_cpp include/teleop/control_modes/joint_space/joint_space_control_mode_parameters.hpp
+// src/control_modes/joint_space/joint_space_control_mode_parameters.yaml
 
-namespace teleop {
+namespace teleop
+{
 /**
  * Control mode for moving joint velocities directly
  */
-class JointSpaceControlMode final : public ControlMode {
-
+class JointSpaceControlMode final : public ControlMode
+{
 public:
   explicit JointSpaceControlMode() = default;
 
@@ -32,7 +34,8 @@ public:
   void update(const rclcpp::Time& now, const rclcpp::Duration& period) override;
 
 protected:
-  struct JointHandle {
+  struct JointHandle
+  {
     std::string name;
     joint_space_control_mode::Params::Joints::MapJointDefinitions config;
     Axis::SharedPtr input;
@@ -55,6 +58,6 @@ protected:
   rclcpp::Publisher<nova_interfaces::msg::ArmFkVelocityTargets>::SharedPtr publisher_;
 };
 
-} // teleop
+}  // namespace teleop
 
-#endif //TELEOP_JOINTSPACECONTROLMODE_HPP
+#endif  // TELEOP_JOINTSPACECONTROLMODE_HPP

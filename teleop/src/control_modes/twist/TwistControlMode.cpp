@@ -4,25 +4,28 @@
 
 #include "teleop/control_modes/twist/TwistControlMode.hpp"
 
-namespace teleop {
+namespace teleop
+{
 
-void TwistControlMode::on_initialize() {
+void TwistControlMode::on_initialize()
+{
   param_listener_ = std::make_shared<twist_control_mode::ParamListener>(node_);
   params_ = param_listener_->get_params();
 }
 
-void TwistControlMode::on_configure(InputManager& inputs) {
+void TwistControlMode::on_configure(InputManager& inputs)
+{
   const auto logger = get_node()->get_logger();
 
   if (param_listener_->is_old(params_))
     params_ = param_listener_->get_params();
 
   // Create publisher
-  const rclcpp::QoS qos_profile = rclcpp::QoS(
-    rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data)
-  ).best_effort().transient_local().keep_last(1);
-  publisher_ = get_node()->create_publisher<geometry_msgs::msg::TwistStamped>(
-    params_.topic, qos_profile);
+  const rclcpp::QoS qos_profile = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data))
+                                      .best_effort()
+                                      .transient_local()
+                                      .keep_last(1);
+  publisher_ = get_node()->create_publisher<geometry_msgs::msg::TwistStamped>(params_.topic, qos_profile);
 
   // Get interested inputs
   auto& axes = inputs.get_axes();
@@ -34,30 +37,34 @@ void TwistControlMode::on_configure(InputManager& inputs) {
   x_ = axes[params_.input_names.twist_x];
   y_ = axes[params_.input_names.twist_y];
   z_ = axes[params_.input_names.twist_z];
-  roll_  = axes[params_.input_names.twist_roll];
+  roll_ = axes[params_.input_names.twist_roll];
   pitch_ = axes[params_.input_names.twist_pitch];
-  yaw_   = axes[params_.input_names.twist_yaw];
+  yaw_ = axes[params_.input_names.twist_yaw];
 }
 
-void TwistControlMode::on_activate() {
-
+void TwistControlMode::on_activate()
+{
 }
 
-void TwistControlMode::on_deactivate() {
+void TwistControlMode::on_deactivate()
+{
   publish_halt_message(get_node()->now());
 }
 
-void TwistControlMode::publish_halt_message(const rclcpp::Time &now) const {
+void TwistControlMode::publish_halt_message(const rclcpp::Time& now) const
+{
   auto msg = std::make_unique<geometry_msgs::msg::TwistStamped>();
   msg->header.stamp = now;
   publisher_->publish(std::move(msg));
 }
 
-void TwistControlMode::update(const rclcpp::Time &now, const rclcpp::Duration &period) {
+void TwistControlMode::update(const rclcpp::Time& now, const rclcpp::Duration& period)
+{
   auto logger = get_node()->get_logger();
 
   // Don't move when locked
-  if (*locked_) {
+  if (*locked_)
+  {
     publish_halt_message(now);
     return;
   }
@@ -69,20 +76,23 @@ void TwistControlMode::update(const rclcpp::Time &now, const rclcpp::Duration &p
   msg->twist.linear.x = x_->value() * speed_coefficient * params_.max_speed.linear;
   msg->twist.linear.y = y_->value() * speed_coefficient * params_.max_speed.linear;
   msg->twist.linear.z = z_->value() * speed_coefficient * params_.max_speed.linear;
-  msg->twist.angular.x = roll_->value()  * speed_coefficient * params_.max_speed.angular;
+  msg->twist.angular.x = roll_->value() * speed_coefficient * params_.max_speed.angular;
   msg->twist.angular.y = pitch_->value() * speed_coefficient * params_.max_speed.angular;
-  msg->twist.angular.z = yaw_->value()   * speed_coefficient * params_.max_speed.angular;
+  msg->twist.angular.z = yaw_->value() * speed_coefficient * params_.max_speed.angular;
 
-  if (params_.max_speed.normalized) {
+  if (params_.max_speed.normalized)
+  {
     auto linear_input_norm = norm(x_->value(), y_->value(), z_->value());
-    if (linear_input_norm > 1.0) {
+    if (linear_input_norm > 1.0)
+    {
       msg->twist.linear.x /= linear_input_norm;
       msg->twist.linear.y /= linear_input_norm;
       msg->twist.linear.z /= linear_input_norm;
     }
 
     auto angular_input_norm = norm(x_->value(), y_->value(), z_->value());
-    if (angular_input_norm > 1.0) {
+    if (angular_input_norm > 1.0)
+    {
       msg->twist.angular.x /= angular_input_norm;
       msg->twist.angular.y /= angular_input_norm;
       msg->twist.angular.z /= angular_input_norm;
@@ -94,12 +104,12 @@ void TwistControlMode::update(const rclcpp::Time &now, const rclcpp::Duration &p
   publisher_->publish(std::move(msg));
 }
 
-double TwistControlMode::norm(double x, double y, double z) {
+double TwistControlMode::norm(double x, double y, double z)
+{
   return std::sqrt(x * x + y * y + z * z);
 }
 
-
-}
+}  // namespace teleop
 
 #include "class_loader/register_macro.hpp"
 

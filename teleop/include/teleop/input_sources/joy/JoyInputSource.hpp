@@ -9,10 +9,13 @@
 #include <utility>
 #include "teleop/input_sources/InputSource.hpp"
 #include "joy_input_source_parameters.hpp"
+#include "teleop/inputs/state/State.hpp"
 
-namespace teleop {
+namespace teleop
+{
 
-class JoyInputSource final : public InputSource {
+class JoyInputSource final : public InputSource
+{
 protected:
   void on_initialize() override;
   void on_update(const rclcpp::Time& now) override;
@@ -26,34 +29,17 @@ private:
   std::shared_ptr<joy_input_source::ParamListener> param_listener_;
   joy_input_source::Params params_;
 
-  struct JoyAxis {
-    using AxisParams = joy_input_source::Params::Axes::MapAxisDefinitions;
+  std::vector<std::string> button_names;
+  std::vector<bool> button_names;
 
-    double value{};
-    std::string name;
-    AxisParams params;
-
-    JoyAxis(std::string  name, AxisParams _params) : name(std::move(name)), params(_params) {}
-  };
-
-  struct JoyButton {
-    using ButtonParams = joy_input_source::Params::Buttons::MapButtonDefinitions;
-
-    bool value{};
-    std::string name;
-    ButtonParams params;
-
-    JoyButton(std::string  name, ButtonParams _params) : name(std::move(name)), params(_params) {}
-  };
-
-  std::vector<JoyAxis> axes_;
-  std::vector<JoyButton> buttons_;
+  std::vector<State<double>> axes_;
+  std::vector<State<bool>> buttons_;
 
   rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr subscription_;
   sensor_msgs::msg::Joy::SharedPtr joy_msg_ = nullptr;
   std::mutex joy_msg_mutex_{};
 };
 
-} // teleop
+}  // namespace teleop
 
-#endif //TELEOP_JOYINPUTSOURCE_HPP
+#endif  // TELEOP_JOYINPUTSOURCE_HPP

@@ -10,21 +10,27 @@
 #include "InputCommon.hpp"
 #include <functional>
 
-namespace teleop {
+namespace teleop
+{
 
-template<typename InputT>
-class InputCollection {
+template <typename InputT>
+class InputCollection
+{
 public:
-  explicit InputCollection(EventCollection& events) : events_(events) {}
+  explicit InputCollection(EventCollection& events) : events_(events)
+  {
+  }
 
   // Add move constructor
-  InputCollection(InputCollection&& other) noexcept
-    : items_(std::move(other.items_))
-    , events_(other.events_) {}
+  InputCollection(InputCollection&& other) noexcept : items_(std::move(other.items_)), events_(other.events_)
+  {
+  }
 
   // Add move assignment
-  InputCollection& operator=(InputCollection&& other) noexcept {
-    if (this != &other) {
+  InputCollection& operator=(InputCollection&& other) noexcept
+  {
+    if (this != &other)
+    {
       items_ = std::move(other.items_);
       events_ = other.events_;
     }
@@ -39,20 +45,24 @@ public:
   using iterator = WeakMapIterator<InputT, false>;
   using const_iterator = WeakMapIterator<InputT, true>;
 
-  std::shared_ptr<InputT> operator[](const std::string& key) {
+  std::shared_ptr<InputT> operator[](const std::string& key)
+  {
     // Find the element
     auto it = items_.find(key);
     std::shared_ptr<InputT> ptr;
 
-    if (it != items_.end()) {
+    if (it != items_.end())
+    {
       ptr = it->second.lock();
-      if (!ptr) {
+      if (!ptr)
+      {
         // If the weak_ptr expired, remove it from the map
         items_.erase(it);
       }
     }
 
-    if (!ptr) {
+    if (!ptr)
+    {
       // Create new input if we don't have a valid one
       ptr = std::make_shared<InputT>(key);
       setup_new_item(ptr);
@@ -62,21 +72,44 @@ public:
     return ptr;
   }
 
-  iterator begin() { return iterator(items_.begin(), &items_); }
-  iterator end() { return iterator(items_.end(), &items_); }
-  const_iterator begin() const { return const_iterator(items_.begin(), &items_); }
-  const_iterator end() const { return const_iterator(items_.end(), &items_); }
-  const_iterator cbegin() const { return const_iterator(items_.begin(), &items_); }
-  const_iterator cend() const { return const_iterator(items_.end(), &items_); }
+  iterator begin()
+  {
+    return iterator(items_.begin(), &items_);
+  }
+  iterator end()
+  {
+    return iterator(items_.end(), &items_);
+  }
+  const_iterator begin() const
+  {
+    return const_iterator(items_.begin(), &items_);
+  }
+  const_iterator end() const
+  {
+    return const_iterator(items_.end(), &items_);
+  }
+  const_iterator cbegin() const
+  {
+    return const_iterator(items_.begin(), &items_);
+  }
+  const_iterator cend() const
+  {
+    return const_iterator(items_.end(), &items_);
+  }
 
   /**
    * Utility method to delete expired weak pointers from the internal map
    */
-  void clean_up() {
-    for (auto it = items_.begin(); it != items_.end();) {
-      if (it->second.expired()) {
+  void clean_up()
+  {
+    for (auto it = items_.begin(); it != items_.end();)
+    {
+      if (it->second.expired())
+      {
         it = items_.erase(it);
-      } else {
+      }
+      else
+      {
         ++it;
       }
     }
@@ -85,10 +118,13 @@ public:
   /**
    * Gets the number of non-expired inputs
    */
-  [[nodiscard]] size_t size() const {
+  [[nodiscard]] size_t size() const
+  {
     size_t count = 0;
-    for (const auto& item : items_) {
-      if (!item.second.expired()) {
+    for (const auto& item : items_)
+    {
+      if (!item.second.expired())
+      {
         ++count;
       }
     }
@@ -98,16 +134,16 @@ public:
 private:
   void setup_new_item(const std::shared_ptr<InputT>& item);
   std::map<std::string, std::weak_ptr<InputT>> items_{};
-//  std::reference_wrapper<EventCollection> events_;
+  //  std::reference_wrapper<EventCollection> events_;
   EventCollection& events_;
 };
 
-template<>
-void InputCollection<Button>::setup_new_item(const std::shared_ptr<Button> &item);
+template <>
+void InputCollection<Button>::setup_new_item(const std::shared_ptr<Button>& item);
 
-template<>
-void InputCollection<Axis>::setup_new_item(const std::shared_ptr<Axis> &item);
+template <>
+void InputCollection<Axis>::setup_new_item(const std::shared_ptr<Axis>& item);
 
-} // teleop
+}  // namespace teleop
 
-#endif //TELEOP_INPUTCOLLECTION_HPP
+#endif  // TELEOP_INPUTCOLLECTION_HPP

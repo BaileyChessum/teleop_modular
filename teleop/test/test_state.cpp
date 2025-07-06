@@ -10,27 +10,31 @@
 #include "teleop/inputs/state/StateCollection.hpp"
 #include "teleop/inputs/state/StateManager.hpp"
 
-using teleop::Button;
 using teleop::Axis;
+using teleop::Button;
 using teleop::InputManager;
 using teleop::State;
 using teleop::StateCollection;
 using teleop::StateManager;
 
-class StateTest : public ::testing::Test {
+class StateTest : public ::testing::Test
+{
 protected:
-  void SetUp() override {
+  void SetUp() override
+  {
     // Setup code that will be called before each test
   }
 
-  void TearDown() override {
+  void TearDown() override
+  {
     // Cleanup code that will be called after each test
   }
 };
 
-TEST_F(StateTest, StateButton) {
+TEST_F(StateTest, StateButton)
+{
   InputManager inputs;
-  StateCollection<bool, Button> states{inputs.get_buttons()};
+  StateCollection<bool, Button> states{ inputs.get_buttons() };
 
   EXPECT_FALSE(inputs.get_buttons()["test_button"]->value());
   inputs.update(rclcpp::Time(0));
@@ -54,9 +58,10 @@ TEST_F(StateTest, StateButton) {
   EXPECT_FALSE(inputs.get_buttons()["test_button"]->value());
 }
 
-TEST_F(StateTest, StateAxis) {
+TEST_F(StateTest, StateAxis)
+{
   InputManager inputs;
-  StateCollection<double, Axis> states{inputs.get_axes()};
+  StateCollection<double, Axis> states{ inputs.get_axes() };
 
   EXPECT_NEAR(inputs.get_axes()["test_axis"]->value(), 0.0, 1e-10);
   inputs.update(rclcpp::Time(0));

@@ -9,12 +9,14 @@
 
 #include "EventListener.hpp"
 
-namespace teleop {
+namespace teleop
+{
 /**
  * Any event listeners to be invoked are added to this queue, and the execution of EventListener::on_event_invoked is
  * deferred until teleop services the queue
  */
-class EventListenerQueue {
+class EventListenerQueue
+{
 public:
   /**
    * Clears the queue, after calling on_event_invoked for elements in the queue
@@ -31,6 +33,6 @@ private:
   std::queue<EventListener::WeakPtr> queue_{};
 };
 
-} // teleop
+}  // namespace teleop
 
-#endif //EVENTLISTENERQUEUE_HPP
+#endif  // EVENTLISTENERQUEUE_HPP

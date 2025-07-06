@@ -4,10 +4,11 @@
 
 #include "teleop/input_sources/InputSource.hpp"
 
-namespace teleop {
+namespace teleop
+{
 
 void InputSource::initialize(const std::shared_ptr<rclcpp::Node>& node, const std::string& name,
-  const std::weak_ptr<InputSourceUpdateDelegate>& delegate)
+                             const std::weak_ptr<InputSourceUpdateDelegate>& delegate)
 {
   node_ = node;
   name_ = name;
@@ -16,14 +17,17 @@ void InputSource::initialize(const std::shared_ptr<rclcpp::Node>& node, const st
   on_initialize();
 }
 
-void InputSource::update(const rclcpp::Time& now) {
+void InputSource::update(const rclcpp::Time& now)
+{
   on_update(now);
 }
 
-bool InputSource::request_update(const rclcpp::Time& now) const {
+bool InputSource::request_update(const rclcpp::Time& now) const
+{
   const auto delegate = delegate_.lock();
 
-  if (!delegate) {
+  if (!delegate)
+  {
     RCLCPP_FATAL(node_->get_logger(), "InputSource %s's delegate weak_ptr is invalid!", name_.c_str());
     return false;
   }
@@ -32,4 +36,4 @@ bool InputSource::request_update(const rclcpp::Time& now) const {
   delegate->on_input_source_requested_update(time_to_send);
   return true;
 }
-} // namespace teleop
+}  // namespace teleop

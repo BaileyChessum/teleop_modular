@@ -4,28 +4,35 @@
 
 #include "teleop/inputs/InputManager.hpp"
 
-namespace teleop {
+namespace teleop
+{
 
-void InputManager::update(const rclcpp::Time& now) {
-  for (auto& button : buttons_) {
+void InputManager::update(const rclcpp::Time& now)
+{
+  for (auto& button : buttons_)
+  {
     button->debounce(now);
   }
 
-  for (auto& axis : axes_) {
+  for (auto& axis : axes_)
+  {
     axis->debounce(now);
   }
 
   // Update events
-  for (const auto& button : buttons_) {
+  for (const auto& button : buttons_)
+  {
     button->update_events(now);
   }
-  for (const auto& axis : axes_) {
+  for (const auto& axis : axes_)
+  {
     axis->update_events(now);
   }
-  for (auto& event : events_) {
+  for (auto& event : events_)
+  {
     event->update();
   }
 
   event_listener_queue_->service(now);
 }
-} // namespace teleop
+}  // namespace teleop
