@@ -31,16 +31,26 @@ public:
   void declare_and_link_inputs();
 
 private:
-  struct RemapButtonParams
+  struct ButtonTransformParams
+  {
+
+  };
+  struct AxisTransformParams
+  {
+
+  };
+
+  template <typename T>
+  struct RemapRenameParams
   {
     std::string name;
     std::string from;
+    std::optional<T> transform;
   };
-  struct RemapAxisParams
-  {
-    std::string name;
-    std::string from;
-  };
+
+  using RemapButtonParams = RemapRenameParams<ButtonTransformParams>;
+  using RemapAxisParams = RemapRenameParams<ButtonTransformParams>;
+
   struct RemapParams
   {
     std::vector<RemapButtonParams> buttons;
