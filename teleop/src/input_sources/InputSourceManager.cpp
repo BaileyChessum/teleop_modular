@@ -76,65 +76,65 @@ rclcpp::Time InputSourceManager::wait_for_update()
 
 void InputSourceManager::update(const rclcpp::Time& now) const
 {
-  for (const auto& source : sources_)
+  for (const internal::InputSourceHandle& source : sources_)
   {
-    source.source->update(now);
+    source.update(now);
   }
 }
 
-InputSourceManager::InputSourceHandle
-InputSourceManager::create_input_source_handle(const std::shared_ptr<InputSource>& input_source_class) const
-{
-  InputSourceHandle handle{ input_source_class };
-
-  // Export input declarations
-  std::vector<InputDeclaration<bool>> button_declarations{};
-  input_source_class->_export_buttons(button_declarations);
-
-  std::vector<InputDeclaration<double>> axis_declarations{};
-  input_source_class->_export_axes(axis_declarations);
-
-  // Create input declaration handles for all the input declarations
-  handle.button_handles.reserve(button_declarations.size());
-  for (const auto& declaration : button_declarations)
-  {
-    InputDeclarationHandle<bool, Button> button_handle{ declaration, inputs_.get().get_buttons()[declaration.name] };
-    handle.button_handles.emplace_back(button_handle);
-  }
-
-  handle.axis_handles.reserve(axis_declarations.size());
-  for (const auto& declaration : axis_declarations)
-  {
-    InputDeclarationHandle<double, Axis> axis_handle{ declaration, inputs_.get().get_axes()[declaration.name] };
-    handle.axis_handles.emplace_back(axis_handle);
-  }
-
-  return handle;
-}
-
-void InputSourceManager::add_input_source_input_definitions(InputSourceHandle& handle) const
-{
-  // Export to inputs
-  auto& inputs = inputs_.get();
-
-  for (const auto& [declaration, input] : handle.axis_handles)
-    inputs.get_axes()[declaration.name]->add_definition(declaration.reference);
-
-  for (const auto& [declaration, input] : handle.button_handles)
-    inputs.get_buttons()[declaration.name]->add_definition(declaration.reference);
-}
-
-void InputSourceManager::remove_input_source_input_definitions(InputSourceHandle& handle) const
-{
-  // Unexport to inputs
-  auto& inputs = inputs_.get();
-
-  for (const auto& [declaration, input] : handle.axis_handles)
-    inputs.get_axes()[declaration.name]->remove_definition(declaration.reference);
-
-  for (const auto& [declaration, input] : handle.button_handles)
-    inputs.get_buttons()[declaration.name]->remove_definition(declaration.reference);
-}
+//InputSourceManager::InputSourceHandle
+//InputSourceManager::create_input_source_handle(const std::shared_ptr<InputSource>& input_source_class) const
+//{
+//  InputSourceHandle handle{ input_source_class };
+//
+//  // Export input declarations
+//  std::vector<InputDeclaration<bool>> button_declarations{};
+//  input_source_class->_export_buttons(button_declarations);
+//
+//  std::vector<InputDeclaration<double>> axis_declarations{};
+//  input_source_class->_export_axes(axis_declarations);
+//
+//  // Create input declaration handles for all the input declarations
+//  handle.button_handles.reserve(button_declarations.size());
+//  for (const auto& declaration : button_declarations)
+//  {
+//    InputDeclarationHandle<bool, Button> button_handle{ declaration, inputs_.get().get_buttons()[declaration.name] };
+//    handle.button_handles.emplace_back(button_handle);
+//  }
+//
+//  handle.axis_handles.reserve(axis_declarations.size());
+//  for (const auto& declaration : axis_declarations)
+//  {
+//    InputDeclarationHandle<double, Axis> axis_handle{ declaration, inputs_.get().get_axes()[declaration.name] };
+//    handle.axis_handles.emplace_back(axis_handle);
+//  }
+//
+//  return handle;
+//}
+//
+//void InputSourceManager::add_input_source_input_definitions(InputSourceHandle& handle) const
+//{
+//  // Export to inputs
+//  auto& inputs = inputs_.get();
+//
+//  for (const auto& [declaration, input] : handle.axis_handles)
+//    inputs.get_axes()[declaration.name]->add_definition(declaration.reference);
+//
+//  for (const auto& [declaration, input] : handle.button_handles)
+//    inputs.get_buttons()[declaration.name]->add_definition(declaration.reference);
+//}
+//
+//void InputSourceManager::remove_input_source_input_definitions(InputSourceHandle& handle) const
+//{
+//  // Unexport to inputs
+//  auto& inputs = inputs_.get();
+//
+//  for (const auto& [declaration, input] : handle.axis_handles)
+//    inputs.get_axes()[declaration.name]->remove_definition(declaration.reference);
+//
+//  for (const auto& [declaration, input] : handle.button_handles)
+//    inputs.get_buttons()[declaration.name]->remove_definition(declaration.reference);
+//}
 
 bool InputSourceManager::create_input_source(const std::string& input_source_name)
 {
@@ -180,10 +180,9 @@ bool InputSourceManager::create_input_source(const std::string& input_source_nam
 
   // Initialize the control mode
   input_source_class->initialize(input_source_node, input_source_name, shared_from_this());
-  auto& handle = sources_.emplace_back(create_input_source_handle(input_source_class));
 
   // Export the inputs
-  add_input_source_input_definitions(handle);
+  sources_.emplace_back(inputs_.get(), input_source_class);
 
   if (const auto executor = executor_.lock())
   {

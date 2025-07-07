@@ -12,6 +12,7 @@
 
 namespace teleop
 {
+
 /**
  * A collection of stateful input declarations, for use for input values created from things other than an input source.
  * @tparam T The type of value held in the state.

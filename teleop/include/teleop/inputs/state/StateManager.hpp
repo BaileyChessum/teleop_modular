@@ -8,6 +8,7 @@
 
 namespace teleop
 {
+
 /**
  * A class to manage input values that don't originate from an input source. This could be from ROS2, or commands
  */
@@ -19,18 +20,18 @@ public:
   }
 
   // Accessors
-  [[nodiscard]] StateCollection<bool, Button>& get_buttons()
+  [[nodiscard]] StateCollection<uint8_t, Button>& get_buttons()
   {
     return buttons_;
   }
-  [[nodiscard]] StateCollection<double, Axis>& get_axes()
+  [[nodiscard]] StateCollection<float, Axis>& get_axes()
   {
     return axes_;
   }
 
 private:
-  StateCollection<bool, Button> buttons_;
-  StateCollection<double, Axis> axes_;
+  StateCollection<uint8_t, Button> buttons_;
+  StateCollection<float, Axis> axes_;
 };
 
 }  // namespace teleop

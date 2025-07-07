@@ -18,22 +18,16 @@ class JoyInputSource final : public InputSource
 {
 protected:
   void on_initialize() override;
-  void on_update(const rclcpp::Time& now) override;
+  void on_update(const rclcpp::Time& now, InputValueSpans values) override;
 
-  void export_buttons(std::vector<InputDeclaration<bool>>& declarations) override;
-  void export_axes(std::vector<InputDeclaration<double>>& definitions) override;
+  void export_buttons(InputDeclarationList<uint8_t>& declarations) override;
+  void export_axes(InputDeclarationList<float>& declarations) override;
 
 private:
   void joy_callback(sensor_msgs::msg::Joy::SharedPtr msg);
 
   std::shared_ptr<joy_input_source::ParamListener> param_listener_;
   joy_input_source::Params params_;
-
-  std::vector<std::string> button_names;
-  std::vector<bool> button_names;
-
-  std::vector<State<double>> axes_;
-  std::vector<State<bool>> buttons_;
 
   rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr subscription_;
   sensor_msgs::msg::Joy::SharedPtr joy_msg_ = nullptr;

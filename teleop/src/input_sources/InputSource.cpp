@@ -19,7 +19,9 @@ void InputSource::initialize(const std::shared_ptr<rclcpp::Node>& node, const st
 
 void InputSource::update(const rclcpp::Time& now)
 {
-  on_update(now);
+  InputValueSpans spans{ span(button_values_), span(axis_values_) };
+
+  on_update(now, spans);
 }
 
 bool InputSource::request_update(const rclcpp::Time& now) const
@@ -36,4 +38,20 @@ bool InputSource::request_update(const rclcpp::Time& now) const
   delegate->on_input_source_requested_update(time_to_send);
   return true;
 }
+
+InputSource::InputDeclarationSpans InputSource::export_inputs()
+{
+  button_names_.clear();
+  button_values_.clear();
+  InputDeclarationList button_declarations(button_names_, button_values_);
+  export_buttons(button_declarations);
+
+  axis_names_.clear();
+  axis_values_.clear();
+  InputDeclarationList axis_declarations(axis_names_, axis_values_);
+  export_axes(axis_declarations);
+
+  return InputDeclarationSpans{ span(button_values_), span(axis_values_), span(button_names_), span(axis_names_) };
+}
+
 }  // namespace teleop

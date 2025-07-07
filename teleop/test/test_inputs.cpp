@@ -30,7 +30,7 @@ TEST_F(InputTest, ButtonSimple)
   Button button("test_button");
   EXPECT_FALSE(button.value());
 
-  bool value = false;
+  uint8_t value = false;
   button.add_definition(std::ref(value));
   EXPECT_FALSE(button.value());
 
@@ -43,7 +43,7 @@ TEST_F(InputTest, ButtonDependencyAccumulation)
   Button button("test_button");
   EXPECT_FALSE(button.value());
 
-  bool value = false;
+  uint8_t value = false;
   button.add_definition(std::ref(value));
   EXPECT_FALSE(button.value());
 
@@ -56,7 +56,7 @@ TEST_F(InputTest, AxisSimple)
   Axis axis("test_axis");
   EXPECT_NEAR(axis.value(), 0.0, 1e-10);
 
-  double value = 1.0;
+  float value = 1.0f;
   axis.add_definition(std::ref(value));
   EXPECT_NEAR(axis.value(), 1.0, 1e-10);
 
@@ -72,12 +72,12 @@ TEST_F(InputTest, AxisDependencyAccumulation)
   Axis axis("test_axis");
   EXPECT_NEAR(axis.value(), 0.0, 1e-10);
 
-  double value = 1.0;
+  float value = 1.0;
   axis.add_definition(std::ref(value));
   EXPECT_NEAR(axis.value(), 1.0, 1e-10);
 
   value = 3.0;
-  double value2 = 2.0;
+  float value2 = 2.0;
   axis.add_definition(std::ref(value2));
   EXPECT_NEAR(axis.value(), 5.0, 1e-10);
 
@@ -95,7 +95,7 @@ TEST_F(InputTest, InputManagerButtonScope)
     InputManager inputs;
     std::cout << "Created InputManager" << std::endl;
 
-    bool button_value = true;
+    uint8_t button_value = true;
 
     ASSERT_EQ(inputs.get_buttons().size(), 0);
     ASSERT_EQ(inputs.get_events().size(), 0);
@@ -150,7 +150,7 @@ TEST_F(InputTest, InputManagerAxisScope)
 {
   InputManager inputs;
 
-  double axis_value = 1.0;
+  float axis_value = 1.0f;
 
   {
     // Get an axis, then let it go out of scope
@@ -174,7 +174,7 @@ TEST_F(InputTest, InputManagerButtonEvents)
   InputManager inputs;
   inputs.update(rclcpp::Time(0));
 
-  bool button_value = false;
+  uint8_t button_value = false;
 
   auto button = inputs.get_buttons()["test_button"];
 

@@ -5,14 +5,14 @@
 #ifndef TELEOP_INPUTDECLARATIONLIST_HPP
 #define TELEOP_INPUTDECLARATIONLIST_HPP
 
-#include "VectorRef.hpp"
+#include "teleop/utilities/VectorRef.hpp"
 
 namespace teleop
 {
 
 /**
  * A class to be given to InputSource implementation to declare their buttons and axes, in a way that allows button
- * values to be placed next to each other
+ * values to be placed next to each other in memory
  */
 template <typename T>
 class InputDeclarationList
@@ -30,12 +30,35 @@ public:
    * `operator=` during on_update() to change the value of the declared input. Alternatively, you can set the value
    * directly in your InputSource by assigning `this->buttons_[i]` or `this->axes_[i]` to avoid a layer of indirection.
    */
-  VectorRef<T> add(const std::string& name)
+  inline VectorRef<T> add(const std::string& name) noexcept
   {
+    auto idx = values_.size();
     names_.emplace_back(name);
+    values_.emplace_back(0);
+    return VectorRef<T>(values_, idx);
   }
 
-  void reserve(size_t n)
+  /**
+   * @brief Declares a button/axis to exist with the given name, at an index equal to the number of declarations before
+   * calling this method.
+   * @param[in] name    The name of the button/axis being declared.
+   * @param[in] initial_value The initial value to give to this input. This is usually very unnecessary to specify.
+   * @returns   A reference to the value of the declared button/axis. Assign the value stored in this VectorRef with
+   * `operator=` during on_update() to change the value of the declared input. Alternatively, you can set the value
+   * directly in your InputSource by assigning `this->buttons_[i]` or `this->axes_[i]` to avoid a layer of indirection.
+   */
+  inline VectorRef<T> add(const std::string& name, T initial_value) noexcept
+  {
+    auto idx = values_.size();
+    names_.emplace_back(name);
+    values_.emplace_back(initial_value);
+    return VectorRef<T>(values_, idx);
+  }
+
+  /**
+   * This attempts to reserve enough memory for the name and value vectors. Please call this before adding values.
+   */
+  inline void reserve(size_t n) noexcept
   {
     names_.reserve(n);
     values_.reserve(n);

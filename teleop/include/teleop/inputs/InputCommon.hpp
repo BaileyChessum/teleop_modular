@@ -101,7 +101,7 @@ private:
 
   struct Params
   {
-    T default_value;
+    T default_value = 0;
   };
 
   Params params_;

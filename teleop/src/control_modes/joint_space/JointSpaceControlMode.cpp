@@ -92,7 +92,7 @@ void JointSpaceControlMode::update(const rclcpp::Time& now, const rclcpp::Durati
   }
 
   // Publish a message
-  const double speed_coefficient = std::clamp(speed_coefficient_->value(), 0.0, 1.0);
+  const float speed_coefficient = std::clamp(speed_coefficient_->value(), 0.0f, 1.0f);
   auto msg = std::make_unique<nova_interfaces::msg::ArmFkVelocityTargets>();
   msg->header.stamp = now;
 
@@ -109,6 +109,6 @@ void JointSpaceControlMode::update(const rclcpp::Time& now, const rclcpp::Durati
 
 }  // namespace teleop
 
-#include "class_loader/register_macro.hpp"
+#include <pluginlib/class_list_macros.hpp>
 
 CLASS_LOADER_REGISTER_CLASS(teleop::JointSpaceControlMode, teleop::ControlMode);

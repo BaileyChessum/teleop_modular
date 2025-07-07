@@ -11,13 +11,13 @@
 namespace teleop
 {
 
-class Button final : public InputCommon<bool>
+class Button final : public InputCommon<uint8_t>
 {
 public:
   using SharedPtr = std::shared_ptr<Button>;
   using WeakPtr = std::weak_ptr<Button>;
 
-  explicit Button(std::string name) : InputCommon<bool>(std::move(name))
+  explicit Button(std::string name) : InputCommon<uint8_t>(std::move(name))
   {
   }
 

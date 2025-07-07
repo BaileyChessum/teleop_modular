@@ -69,16 +69,16 @@ void TwistControlMode::update(const rclcpp::Time& now, const rclcpp::Duration& p
     return;
   }
 
-  const double speed_coefficient = std::clamp(speed_coefficient_->value(), 0.0, 1.0);
+  const float speed_coefficient = std::clamp(speed_coefficient_->value(), 0.0f, 1.0f);
   auto msg = std::make_unique<geometry_msgs::msg::TwistStamped>();
   msg->header.stamp = now;
 
   msg->twist.linear.x = x_->value() * speed_coefficient * params_.max_speed.linear;
   msg->twist.linear.y = y_->value() * speed_coefficient * params_.max_speed.linear;
   msg->twist.linear.z = z_->value() * speed_coefficient * params_.max_speed.linear;
-  msg->twist.angular.x = roll_->value() * speed_coefficient * params_.max_speed.angular;
+  msg->twist.angular.x = roll_->value()  * speed_coefficient * params_.max_speed.angular;
   msg->twist.angular.y = pitch_->value() * speed_coefficient * params_.max_speed.angular;
-  msg->twist.angular.z = yaw_->value() * speed_coefficient * params_.max_speed.angular;
+  msg->twist.angular.z = yaw_->value()   * speed_coefficient * params_.max_speed.angular;
 
   if (params_.max_speed.normalized)
   {
@@ -111,6 +111,6 @@ double TwistControlMode::norm(double x, double y, double z)
 
 }  // namespace teleop
 
-#include "class_loader/register_macro.hpp"
+#include <pluginlib/class_list_macros.hpp>
 
 CLASS_LOADER_REGISTER_CLASS(teleop::TwistControlMode, teleop::ControlMode);

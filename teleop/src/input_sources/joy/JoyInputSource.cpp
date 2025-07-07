@@ -11,47 +11,35 @@ namespace teleop
 
 void JoyInputSource::on_initialize()
 {
-  param_listener_ = std::make_shared<joy_input_source::ParamListener>(node_);
+  param_listener_ = std::make_shared<joy_input_source::ParamListener>(get_node());
   params_ = param_listener_->get_params();
 
   subscription_ = get_node()->create_subscription<sensor_msgs::msg::Joy>(
       params_.topic, rclcpp::QoS(10), std::bind(&JoyInputSource::joy_callback, this, std::placeholders::_1));
 }
 
-void JoyInputSource::export_buttons(std::vector<InputDeclaration<bool>>& declarations)
+void JoyInputSource::export_buttons(InputDeclarationList<uint8_t>& declarations)
 {
   const auto logger = get_node()->get_logger();
   RCLCPP_DEBUG(logger, "Registered Buttons:");
 
-  buttons_.clear();
+  declarations.reserve(params_.button_definitions.size());
   for (auto& name : params_.button_definitions)
   {
     RCLCPP_DEBUG(logger, "  %s", name.c_str());
-
-    auto& button = buttons_.emplace_back(name, false);
-    //    declarations.emplace_back(button.name, button.value);
-    declarations.emplace_back(button.name, std::ref(button.value));
+    declarations.add(name, false);
   }
 }
 
-void JoyInputSource::export_button_names(std::vector<std::string>& declarations)
-{
-  declarations = params_.button_definitions;
-}
-
-void JoyInputSource::export_axes(std::vector<InputDeclaration<double>>& declarations)
+void JoyInputSource::export_axes(InputDeclarationList<float>& declarations)
 {
   const auto logger = get_node()->get_logger();
   RCLCPP_DEBUG(logger, "Registered Axes:");
 
-  axes_.clear();
-  for (auto& name : params_.axis_definitions)
-  {
+  declarations.reserve(params_.axis_definitions.size());
+  for (auto& name : params_.axis_definitions) {
     RCLCPP_DEBUG(logger, "  %s", name.c_str());
-
-    auto& axis = axes_.emplace_back(name, 0.0);
-    //    declarations.emplace_back(axis.name, axis.value);
-    declarations.emplace_back(axis);
+    declarations.add(name, 0.0);
   }
 }
 
@@ -64,7 +52,7 @@ void JoyInputSource::joy_callback(sensor_msgs::msg::Joy::SharedPtr msg)
   }
 }
 
-void JoyInputSource::on_update(const rclcpp::Time& now)
+void JoyInputSource::on_update(const rclcpp::Time& now, InputValueSpans values)
 {
   sensor_msgs::msg::Joy::SharedPtr joy_msg;
 
@@ -78,21 +66,16 @@ void JoyInputSource::on_update(const rclcpp::Time& now)
 
   const auto logger = get_node()->get_logger();
 
-  RCLCPP_DEBUG(logger, "Updating Buttons:");
-  size_t button_count = std::min(joy_msg->buttons.size(), buttons_.size());
+  // Copy values from joy_msg->buttons to values.buttons one by one
+  size_t button_count = std::min(joy_msg->buttons.size(), values.buttons.size());
   for (size_t i = 0; i < button_count; i++)
   {
-    buttons_[i].value = joy_msg->buttons[i];
-    RCLCPP_DEBUG(logger, "  [%d] %s \t%s <- %s", i, buttons_[i].name.c_str(), buttons_[i].value ? "true" : "false",
-                 joy_msg->buttons[i] ? "true" : "false");
+    values.buttons[i] = static_cast<uint8_t>(joy_msg->buttons[i] != 0);
   }
 
-  size_t axis_count = std::min(joy_msg->axes.size(), axes_.size());
-  for (size_t i = 0; i < axis_count; i++)
-  {
-    axes_[i].value = joy_msg->axes[i];
-    RCLCPP_DEBUG(logger, "  [%d] %s \t%f <- %f", i, axes_[i].name.c_str(), axes_[i].value, joy_msg->axes[i]);
-  }
+  // Copy values from joy_msg->axes to values.axes using std::copy
+  size_t axis_count = std::min(joy_msg->axes.size(), values.axes.size());
+  std::copy(joy_msg->axes.begin(), joy_msg->axes.begin() + static_cast<std::ptrdiff_t>(axis_count), values.axes.begin());
 }
 
 }  // namespace teleop

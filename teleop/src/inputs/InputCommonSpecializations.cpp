@@ -16,7 +16,19 @@ bool InputCommon<bool>::value()
 }
 
 template <>
+uint8_t InputCommon<uint8_t>::value()
+{
+  return accumulate_value();
+}
+
+template <>
 double InputCommon<double>::value()
+{
+  return accumulate_value();
+}
+
+template <>
+float InputCommon<float>::value()
 {
   return accumulate_value();
 }

@@ -34,8 +34,10 @@ protected:
 TEST_F(StateTest, StateButton)
 {
   InputManager inputs;
-  StateCollection<bool, Button> states{ inputs.get_buttons() };
+  StateCollection<uint8_t, Button> states{ inputs.get_buttons() };
 
+  EXPECT_EQ(inputs.get_buttons()["test_button"]->value(), 0);
+  EXPECT_EQ(inputs.get_buttons()["test_button"]->value(), false);
   EXPECT_FALSE(inputs.get_buttons()["test_button"]->value());
   inputs.update(rclcpp::Time(0));
   EXPECT_FALSE(inputs.get_buttons()["test_button"]->value());
@@ -61,7 +63,7 @@ TEST_F(StateTest, StateButton)
 TEST_F(StateTest, StateAxis)
 {
   InputManager inputs;
-  StateCollection<double, Axis> states{ inputs.get_axes() };
+  StateCollection<float, Axis> states{ inputs.get_axes() };
 
   EXPECT_NEAR(inputs.get_axes()["test_axis"]->value(), 0.0, 1e-10);
   inputs.update(rclcpp::Time(0));

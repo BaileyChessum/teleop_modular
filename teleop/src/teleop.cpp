@@ -23,13 +23,15 @@ void Teleop::initialize(const std::weak_ptr<rclcpp::Executor>& executor)
   const auto logger = get_node()->get_logger();
   RCLCPP_DEBUG(logger, "Teleop::initialize(): Creating inputs");
 
-  RCLCPP_DEBUG(logger, "Teleop::initialize(): Creating input sources.");
-  input_source_manager_ = std::make_shared<InputSourceManager>(get_node(), executor, inputs_);
-  input_source_manager_->configure(param_listener_, inputs_);
-
   RCLCPP_DEBUG(logger, "Teleop::initialize(): Creating control modes.");
   control_mode_manager_ = std::make_shared<ControlModeManager>(get_node(), executor);
   control_mode_manager_->configure(inputs_);
+
+  log_existing_inputs();
+
+  RCLCPP_DEBUG(logger, "Teleop::initialize(): Creating input sources.");
+  input_source_manager_ = std::make_shared<InputSourceManager>(get_node(), executor, inputs_);
+  input_source_manager_->configure(param_listener_, inputs_);
 
   RCLCPP_DEBUG(logger, "Teleop::initialize(): Creating commands.");
   commands_ = std::make_shared<CommandManager>(get_node(), shared_from_this());
@@ -74,6 +76,29 @@ void Teleop::log_all_inputs()
       RCLCPP_INFO(logger, C_QUIET "  %s invoked!", event->get_name().c_str());
     }
   }
+}
+
+void Teleop::log_existing_inputs()
+{
+  std::stringstream log;
+
+  if (inputs_.get_axes().size() > 0) {
+    log << C_INPUT "\tAxes:\n" C_RESET;
+
+    for (const auto& axis : inputs_.get_axes()) {
+      log << C_INPUT "\t  " << axis->get_name() << "\t" << axis->value() << "\n" C_RESET;
+    }
+  }
+
+  if (inputs_.get_buttons().size() > 0) {
+    log << C_INPUT "\tButtons:\n" C_RESET;
+
+    for (const auto& button : inputs_.get_buttons()) {
+      log << C_INPUT "\t  " << button->get_name() << "\t" << button->value() << "\n" C_RESET;
+    }
+  }
+
+  RCLCPP_INFO(get_node()->get_logger(), C_TITLE "Registered inputs:\n" C_RESET "%s", log.str().c_str());
 }
 
 void Teleop::service_input_updates()

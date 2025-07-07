@@ -13,9 +13,9 @@
 
 #include "InputSource.hpp"
 #include "InputSourceUpdateDelegate.hpp"
-// #include "../teleop_parameters.hpp"
 #include "teleop_parameters.hpp"
 #include "teleop/SpawnableLog.hpp"
+#include "InputSourceHandle.hpp"
 
 namespace teleop
 {
@@ -58,30 +58,17 @@ public:
 
 private:
   /// Used to associate any additional information with handles (such as for remapping)
-  template <typename T, typename InputT>
-  struct InputDeclarationHandle
-  {
-    InputDeclaration<T> declaration;
-    std::shared_ptr<InputT> input;
-  };
+//  template <typename T, typename InputT>
+//  struct InputDeclarationHandle
+//  {
+//    InputDeclaration<T> declaration;
+//    std::shared_ptr<InputT> input;
+//  };
 
-  /// For each InputSource we store, we associate some extra metadata.
-  struct InputSourceHandle
-  {
-    std::shared_ptr<InputSource> source;
-
-    std::vector<InputDeclarationHandle<bool, Button>> button_handles{};
-    std::vector<InputDeclarationHandle<double, Axis>> axis_handles{};
-
-    explicit InputSourceHandle(const std::shared_ptr<InputSource>& source) : source(source)
-    {
-    }
-  };
-
-  InputSourceHandle create_input_source_handle(const std::shared_ptr<InputSource>& input_source_class) const;
-  void add_input_source_input_definitions(InputSourceHandle& handle) const;
-  /// Takes away the inputs added by add_input_source_input_definitions from inputs_.
-  void remove_input_source_input_definitions(InputSourceHandle& handle) const;
+//  internal::InputSourceHandle create_input_source_handle(const std::shared_ptr<InputSource>& input_source_class) const;
+//  void add_input_source_input_definitions(internal::InputSourceHandle& handle) const;
+//  /// Takes away the inputs added by add_input_source_input_definitions from inputs_.
+//  void remove_input_source_input_definitions(internal::InputSourceHandle& handle) const;
   void setup_input_sources();
 
   /// The owning teleop ROS2 node.
@@ -98,7 +85,7 @@ private:
   std::unique_ptr<pluginlib::ClassLoader<InputSource>> source_loader_;
 
   /// The structure that holds all the tests
-  std::vector<InputSourceHandle> sources_{};
+  std::vector<internal::InputSourceHandle> sources_{};
 
   /// Mutex for handling input update requests made by nodes for each input source running on different threads to the
   /// main update thread.
