@@ -119,9 +119,7 @@ void Teleop::service_input_updates()
 
     // Log inputs
     if (params_.log_inputs)
-    {
       log_all_inputs();
-    }
 
     control_mode_manager_->update(now, period);
 
@@ -129,10 +127,8 @@ void Teleop::service_input_updates()
     previous = now;
 
     // Enforce max update rate
-    if (params_.update_rate > 0)
-    {
+    if (params_.update_rate > 0 && program_running_)
       rate.sleep();
-    }
   }
 }
 

@@ -76,9 +76,32 @@ InputSourceHandle::TransformedRemapValue<float, InputSourceHandle::TransformedRe
   if (!transform.has_value())
     return;
 
+  const auto params = transform.value();
+
   // Apply transformations
-  if (transform.value().invert)
+  if (params.invert)
     value = -value;
+
+  if (params.range.has_value())
+  {
+    const auto in = params.range.value().in;
+
+    if (params.range->clamp)
+    {
+      value = std::clamp(value, in[0], in[1]);
+    }
+
+    if (params.range->out.has_value())
+    {
+      const auto out = params.range.value().out.value();
+
+      // Inverse lerp to get interpolator in the input range
+      const auto in_scale = in[1] - in[0];
+      const auto t = (value - in[0]) / in_scale;
+      // Lerp to map to output range
+      value = (1 - t) * out[0] + t * out[1];
+    }
+  }
 }
 
 void InputSourceHandle::update(const rclcpp::Time& now)
@@ -206,6 +229,10 @@ std::optional<InputSourceHandle::RemapAxisParams> InputSourceHandle::get_remap_a
 
   const auto transform_params = get_axis_transform_params(name);
 
+  if (!transform_params.has_value()) {
+    RCLCPP_WARN(logger, "Remapped axis %s is missing a transform", name.c_str());
+  }
+
   return RemapAxisParams{ name, from.value(), transform_params, from_buttons_params };
 }
 
@@ -224,7 +251,6 @@ InputSourceHandle::get_axis_transform_params(const std::string& name)
   auto range_clamp = get_parameter_or_default<bool>(parameters_, prefix + "range.clamp",
                                                     "Whether to clamp values to the specified range.", false);
 
-  std::optional<AxisTransformParams::Range> range = std::nullopt;
   if (range_clamp || range_out.has_value())
   {
     auto range_in =
@@ -240,7 +266,7 @@ InputSourceHandle::get_axis_transform_params(const std::string& name)
       range_in = std::nullopt;
     }
 
-    // Enforce range_in must have 2 elements
+    // Enforce range_out must have 2 elements
     if (range_out.has_value() && range_out.value().size() != 2)
     {
       RCLCPP_ERROR(logger,
@@ -254,13 +280,17 @@ InputSourceHandle::get_axis_transform_params(const std::string& name)
     if (!range_in.has_value())
       range_in = std::vector<double>{ -1.0, 1.0 };
 
-    range = AxisTransformParams::Range{ std::array<float, 2>{ static_cast<float>(range_in.value()[0]),
-                                                              static_cast<float>(range_in.value()[1]) },
-                                        std::nullopt, range_clamp };
-
+    auto in = std::array<float, 2>{ static_cast<float>(range_in.value()[0]), static_cast<float>(range_in.value()[1]) };
+    std::optional<std::array<float, 2>> out;
     if (range_out.has_value())
-      range.value().out =
-          std::array<float, 2>{ static_cast<float>(range_out.value()[0]), static_cast<float>(range_out.value()[1]) };
+      out = std::array<float, 2>{ static_cast<float>(range_out.value()[0]), static_cast<float>(range_out.value()[1]) };
+
+    params.range = AxisTransformParams::Range{ in, out, range_clamp };
+  }
+
+  if (!params.invert && !params.range.has_value()) {
+    RCLCPP_WARN(logger, "Remapped axis %s does not define a transform", name.c_str());
+    return std::nullopt;
   }
 
   return params;
@@ -333,7 +363,7 @@ void InputSourceHandle::remap(InputSource::InputDeclarationSpans declarations, R
     }
 
     // Create the transform, but defer registration to after all the transformed buttons have been created.
-    transformed_buttons_.emplace_back(0, reference, from_axis_transform);
+    transformed_buttons_.emplace_back(0, reference, from_axis_transform, transform);
     transformed_buttons_deferred_registration.emplace_back(buttons[name]);
   }
 
@@ -422,7 +452,7 @@ void InputSourceHandle::remap(InputSource::InputDeclarationSpans declarations, R
     }
 
     // Create the transform, but defer registration to after all the transformed axes have been created.
-    transformed_axes_.emplace_back(0.0f, reference, from_buttons_transform);
+    transformed_axes_.emplace_back(0.0f, reference, from_buttons_transform, transform);
     transformed_axes_deferred_registration.emplace_back(axes[name]);
   }
 

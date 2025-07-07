@@ -36,14 +36,13 @@ private:
     bool invert = false;
   };
 
-
   struct AxisTransformParams
   {
     bool invert = false;
 
     struct Range
     {
-      std::array<float, 2> in = {-1.0f, 1.0f};
+      std::array<float, 2> in = { -1.0f, 1.0f };
       std::optional<std::array<float, 2>> out;
       bool clamp = false;
     };
@@ -89,8 +88,9 @@ private:
     std::optional<fromOtherT> from_other;
     std::optional<transformT> transform;
 
-    TransformedRemapValue(T value, std::optional<std::reference_wrapper<T>> from, std::optional<fromOtherT> from_other)
-      : value(value), from(from), from_other(from_other)
+    TransformedRemapValue(T value, std::optional<std::reference_wrapper<T>> from, std::optional<fromOtherT> from_other,
+                          std::optional<transformT> transform)
+      : value(value), from(from), from_other(from_other), transform(transform)
     {
     }
 
