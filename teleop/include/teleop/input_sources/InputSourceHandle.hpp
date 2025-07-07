@@ -31,31 +31,71 @@ public:
   void declare_and_link_inputs();
 
 private:
+  struct ButtonFromAxisParams
+  {
+    std::string name;
+    float threshold = 0.0;
+  };
   struct ButtonTransformParams
   {
+    bool invert = false;
+  };
 
+  struct AxisFromButtonsParams
+  {
+    std::optional<std::string> positive;
+    std::optional<std::string> negative;
   };
   struct AxisTransformParams
   {
-
+    bool invert = false;
   };
 
-  template <typename T>
+  template <typename transformT, typename fromOtherParamsT>
   struct RemapRenameParams
   {
     std::string name;
-    std::string from;
-    std::optional<T> transform;
+    std::optional<std::string> from;
+    std::optional<transformT> transform;
+    std::optional<fromOtherParamsT> from_other;
   };
 
-  using RemapButtonParams = RemapRenameParams<ButtonTransformParams>;
-  using RemapAxisParams = RemapRenameParams<ButtonTransformParams>;
+  using RemapButtonParams = RemapRenameParams<ButtonTransformParams, ButtonFromAxisParams>;
+  using RemapAxisParams = RemapRenameParams<AxisTransformParams, AxisFromButtonsParams>;
 
   struct RemapParams
   {
     std::vector<RemapButtonParams> buttons;
     std::vector<RemapAxisParams> axes;
   };
+
+  /// The thing that actually holds the result of remap transformations in memory
+  template <typename T, typename fromOtherT>
+  struct TransformedRemapValue
+  {
+    T value;
+    std::optional<std::reference_wrapper<T>> from;
+    std::optional<fromOtherT> from_other;
+
+    TransformedRemapValue(T value, std::optional<std::reference_wrapper<T>> from, std::optional<fromOtherT> from_other)
+      : value(value), from(from), from_other(from_other)
+    {
+    }
+  };
+
+  struct TransformedRemapButtonFromAxis
+  {
+    std::reference_wrapper<float> axis;
+    float threshold = 0.0f;
+  };
+  using TransformedRemapButton = TransformedRemapValue<uint8_t, TransformedRemapButtonFromAxis>;
+
+  struct TransformedRemapAxisFromButtons
+  {
+    std::optional<std::reference_wrapper<uint8_t>> negative;
+    std::optional<std::reference_wrapper<uint8_t>> positive;
+  };
+  using TransformedRemapAxis = TransformedRemapValue<float, TransformedRemapAxisFromButtons>;
 
   template <typename T, typename InputT>
   struct Definition
@@ -75,11 +115,18 @@ private:
 
   void remap(InputSource::InputDeclarationSpans declarations, RemapParams remap_params);
   RemapParams get_remap_params();
+
   std::optional<RemapButtonParams> get_remap_button_params(const std::string& name);
+  std::optional<ButtonTransformParams> get_button_transform_params(const std::string& name);
+
   std::optional<RemapAxisParams> get_remap_axis_params(const std::string& name);
+  std::optional<AxisTransformParams> get_axis_transform_params(const std::string& name);
 
   std::vector<Definition<uint8_t, Button>> button_definitions_;
   std::vector<Definition<float, Axis>> axis_definitions_;
+
+  std::vector<TransformedRemapButton> transformed_buttons_;
+  std::vector<TransformedRemapAxis> transformed_axes_;
 
   std::shared_ptr<InputSource> source_;
   std::reference_wrapper<InputManager> inputs_;
