@@ -26,7 +26,7 @@ InputSourceHandle::InputSourceHandle(InputManager& inputs, const std::shared_ptr
 
 template <>
 inline void
-InputSourceHandle::TransformedRemapValue<uint8_t, InputSourceHandle::TransformedRemapButtonFromAxis>::update(
+InputSourceHandle::TransformedRemapValue<uint8_t, InputSourceHandle::TransformedRemapButtonFromAxis, InputSourceHandle::ButtonTransformParams>::update(
     const rclcpp::Time& now)
 {
   value = 0;
@@ -42,10 +42,17 @@ InputSourceHandle::TransformedRemapValue<uint8_t, InputSourceHandle::Transformed
     if (from_axis.axis.get() < from_axis.threshold)
       value = 1;
   }
+
+  if (!transform.has_value())
+    return;
+
+  // Apply transformations
+  if (transform.value().invert)
+    value = !value;
 }
 
 template <>
-inline void InputSourceHandle::TransformedRemapValue<float, InputSourceHandle::TransformedRemapAxisFromButtons>::update(
+inline void InputSourceHandle::TransformedRemapValue<float, InputSourceHandle::TransformedRemapAxisFromButtons, InputSourceHandle::AxisTransformParams>::update(
     const rclcpp::Time& now)
 {
   value = 0.0f;
@@ -64,6 +71,13 @@ inline void InputSourceHandle::TransformedRemapValue<float, InputSourceHandle::T
     if (from_buttons.positive.has_value() && from_buttons.positive.value().get())
       value += 1.0f;
   }
+
+  if (!transform.has_value())
+    return;
+
+  // Apply transformations
+  if (transform.value().invert)
+    value = -value;
 }
 
 void InputSourceHandle::update(const rclcpp::Time& now)

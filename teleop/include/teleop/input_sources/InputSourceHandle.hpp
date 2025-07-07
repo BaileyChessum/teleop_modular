@@ -70,12 +70,13 @@ private:
   };
 
   /// The thing that actually holds the result of remap transformations in memory
-  template <typename T, typename fromOtherT>
+  template <typename T, typename fromOtherT, typename transformT>
   struct TransformedRemapValue
   {
     T value;
     std::optional<std::reference_wrapper<T>> from;
     std::optional<fromOtherT> from_other;
+    std::optional<transformT> transform;
 
     TransformedRemapValue(T value, std::optional<std::reference_wrapper<T>> from, std::optional<fromOtherT> from_other)
       : value(value), from(from), from_other(from_other)
@@ -96,9 +97,10 @@ private:
     std::optional<std::reference_wrapper<uint8_t>> positive;
   };
 
-  using TransformedRemapButton = TransformedRemapValue<uint8_t, TransformedRemapButtonFromAxis>;
-  using TransformedRemapAxis = TransformedRemapValue<float, TransformedRemapAxisFromButtons>;
+  using TransformedRemapButton = TransformedRemapValue<uint8_t, TransformedRemapButtonFromAxis, ButtonTransformParams>;
+  using TransformedRemapAxis = TransformedRemapValue<float, TransformedRemapAxisFromButtons, AxisTransformParams>;
 
+  /// This is an actual connection of an input to a defining value
   template <typename T, typename InputT>
   struct Definition
   {
