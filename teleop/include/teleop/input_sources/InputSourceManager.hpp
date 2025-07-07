@@ -52,7 +52,7 @@ public:
    */
   rclcpp::Time wait_for_update();
 
-  void update(const rclcpp::Time& now) const;
+  void update(const rclcpp::Time& now);
 
   bool create_input_source(const std::string& input_source_name);
 

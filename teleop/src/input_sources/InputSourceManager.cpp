@@ -74,9 +74,9 @@ rclcpp::Time InputSourceManager::wait_for_update()
   return update_time_;
 }
 
-void InputSourceManager::update(const rclcpp::Time& now) const
+void InputSourceManager::update(const rclcpp::Time& now)
 {
-  for (const internal::InputSourceHandle& source : sources_)
+  for (internal::InputSourceHandle& source : sources_)
   {
     source.update(now);
   }

@@ -24,31 +24,31 @@ public:
 
   explicit InputSourceHandle(InputManager& inputs, const std::shared_ptr<InputSource>& source);
 
-  void update(const rclcpp::Time& now) const;
+  void update(const rclcpp::Time& now);
 
   void add_definitions_to_inputs() const;
 
   void declare_and_link_inputs();
 
 private:
+  struct ButtonTransformParams
+  {
+    bool invert = false;
+  };
+  struct AxisTransformParams
+  {
+    bool invert = false;
+  };
+
   struct ButtonFromAxisParams
   {
     std::string name;
     float threshold = 0.0;
   };
-  struct ButtonTransformParams
-  {
-    bool invert = false;
-  };
-
   struct AxisFromButtonsParams
   {
     std::optional<std::string> positive;
     std::optional<std::string> negative;
-  };
-  struct AxisTransformParams
-  {
-    bool invert = false;
   };
 
   template <typename transformT, typename fromOtherParamsT>
@@ -81,6 +81,8 @@ private:
       : value(value), from(from), from_other(from_other)
     {
     }
+
+    inline void update(const rclcpp::Time& now);
   };
 
   struct TransformedRemapButtonFromAxis
@@ -88,13 +90,13 @@ private:
     std::reference_wrapper<float> axis;
     float threshold = 0.0f;
   };
-  using TransformedRemapButton = TransformedRemapValue<uint8_t, TransformedRemapButtonFromAxis>;
-
   struct TransformedRemapAxisFromButtons
   {
     std::optional<std::reference_wrapper<uint8_t>> negative;
     std::optional<std::reference_wrapper<uint8_t>> positive;
   };
+
+  using TransformedRemapButton = TransformedRemapValue<uint8_t, TransformedRemapButtonFromAxis>;
   using TransformedRemapAxis = TransformedRemapValue<float, TransformedRemapAxisFromButtons>;
 
   template <typename T, typename InputT>

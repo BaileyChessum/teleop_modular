@@ -24,9 +24,57 @@ InputSourceHandle::InputSourceHandle(InputManager& inputs, const std::shared_ptr
   declare_and_link_inputs();
 }
 
-void InputSourceHandle::update(const rclcpp::Time& now) const
+template <>
+inline void
+InputSourceHandle::TransformedRemapValue<uint8_t, InputSourceHandle::TransformedRemapButtonFromAxis>::update(
+    const rclcpp::Time& now)
+{
+  value = 0;
+
+  if (from.has_value())
+    value = from.value().get();
+
+  // Apply button from axis
+  if (from_other.has_value())
+  {
+    auto& from_axis = from_other.value();
+
+    if (from_axis.axis.get() < from_axis.threshold)
+      value = 1;
+  }
+}
+
+template <>
+inline void InputSourceHandle::TransformedRemapValue<float, InputSourceHandle::TransformedRemapAxisFromButtons>::update(
+    const rclcpp::Time& now)
+{
+  value = 0.0f;
+
+  if (from.has_value())
+    value = from.value().get();
+
+  // Apply axis from buttons
+  if (from_other.has_value())
+  {
+    auto& from_buttons = from_other.value();
+
+    if (from_buttons.negative.has_value() && from_buttons.negative.value().get())
+      value -= 1.0f;
+
+    if (from_buttons.positive.has_value() && from_buttons.positive.value().get())
+      value += 1.0f;
+  }
+}
+
+void InputSourceHandle::update(const rclcpp::Time& now)
 {
   source_->update(now);
+
+  for (auto& button : transformed_buttons_)
+    button.update(now);
+
+  for (auto& axis : transformed_axes_)
+    axis.update(now);
 }
 
 void InputSourceHandle::add_definitions_to_inputs() const
@@ -217,6 +265,7 @@ void InputSourceHandle::remap(InputSource::InputDeclarationSpans declarations, R
         const size_t axis_index = std::distance(declarations.axis_names.begin(), axis_it);
         const auto axis_reference = std::ref(declarations.axes[axis_index]);
         from_axis_transform = TransformedRemapButtonFromAxis{ axis_reference, from_axis.value().threshold };
+        is_axis_remapped[axis_index] = true;
       }
     }
 
@@ -284,6 +333,7 @@ void InputSourceHandle::remap(InputSource::InputDeclarationSpans declarations, R
         {
           const size_t negative_index = std::distance(declarations.button_names.begin(), negative_it);
           negative_reference = std::ref(declarations.buttons[negative_index]);
+          is_button_remapped[negative_index] = true;
         }
       }
 
@@ -297,6 +347,7 @@ void InputSourceHandle::remap(InputSource::InputDeclarationSpans declarations, R
         {
           const size_t positive_index = std::distance(declarations.button_names.begin(), positive_it);
           positive_reference = std::ref(declarations.buttons[positive_index]);
+          is_button_remapped[positive_index] = true;
         }
       }
 
