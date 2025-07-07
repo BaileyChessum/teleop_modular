@@ -186,7 +186,7 @@ std::optional<InputSourceHandle::RemapAxisParams> InputSourceHandle::get_remap_a
   std::optional<AxisFromButtonsParams> from_buttons_params = std::nullopt;
   if (from_button_negative.has_value() || from_button_positive.has_value())
   {
-    from_buttons_params = AxisFromButtonsParams{ from_button_negative, from_button_positive };
+    from_buttons_params = AxisFromButtonsParams{ from_button_positive, from_button_negative };
   }
 
   const auto transform_params = get_axis_transform_params(name);

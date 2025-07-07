@@ -8,7 +8,8 @@
 
 namespace
 {
-constexpr float EPSILON = 1e-6f;
+/// This value determines the difference in values in an axis that causes changed() to return true
+constexpr float EPSILON = 1e-1f;
 }
 
 namespace teleop

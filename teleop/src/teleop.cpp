@@ -107,7 +107,7 @@ void Teleop::service_input_updates()
   RCLCPP_DEBUG(logger, "Teleop::service_input_updates(): Starting input update servicing loop.");
 
   rclcpp::Time previous = get_node()->now();
-  rclcpp::Rate rate(params_.update_rate);
+  rclcpp::Rate rate(params_.update_rate > 0 ? params_.update_rate : 1000);
 
   while (program_running_)
   {
