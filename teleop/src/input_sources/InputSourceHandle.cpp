@@ -26,8 +26,8 @@ InputSourceHandle::InputSourceHandle(InputManager& inputs, const std::shared_ptr
 
 template <>
 inline void
-InputSourceHandle::TransformedRemapValue<uint8_t, InputSourceHandle::TransformedRemapButtonFromAxis, InputSourceHandle::ButtonTransformParams>::update(
-    const rclcpp::Time& now)
+InputSourceHandle::TransformedRemapValue<uint8_t, InputSourceHandle::TransformedRemapButtonFromAxis,
+                                         InputSourceHandle::ButtonTransformParams>::update(const rclcpp::Time& now)
 {
   value = 0;
 
@@ -52,8 +52,9 @@ InputSourceHandle::TransformedRemapValue<uint8_t, InputSourceHandle::Transformed
 }
 
 template <>
-inline void InputSourceHandle::TransformedRemapValue<float, InputSourceHandle::TransformedRemapAxisFromButtons, InputSourceHandle::AxisTransformParams>::update(
-    const rclcpp::Time& now)
+inline void
+InputSourceHandle::TransformedRemapValue<float, InputSourceHandle::TransformedRemapAxisFromButtons,
+                                         InputSourceHandle::AxisTransformParams>::update(const rclcpp::Time& now)
 {
   value = 0.0f;
 
@@ -218,6 +219,50 @@ InputSourceHandle::get_axis_transform_params(const std::string& name)
 
   params.invert = get_parameter_or_default<bool>(parameters_, prefix + "invert", "Invert the axis value.", false);
 
+  auto range_out = get_parameter<std::vector<double>>(parameters_, prefix + "range.out",
+                                                      "What range.in should be linearly mapped to.");
+  auto range_clamp = get_parameter_or_default<bool>(parameters_, prefix + "range.clamp",
+                                                    "Whether to clamp values to the specified range.", false);
+
+  std::optional<AxisTransformParams::Range> range = std::nullopt;
+  if (range_clamp || range_out.has_value())
+  {
+    auto range_in =
+        get_parameter<std::vector<double>>(parameters_, prefix + "range.in", "The original range of input values.");
+
+    // Enforce range_in must have 2 elements
+    if (range_in.has_value() && range_in.value().size() != 2)
+    {
+      RCLCPP_ERROR(logger,
+                   "Parameter %s.range.in should have exactly two elements, representing the upper and lower bound "
+                   "respectively.",
+                   prefix.c_str());
+      range_in = std::nullopt;
+    }
+
+    // Enforce range_in must have 2 elements
+    if (range_out.has_value() && range_out.value().size() != 2)
+    {
+      RCLCPP_ERROR(logger,
+                   "Parameter %s.range.out should have exactly two elements, representing the upper and lower bound "
+                   "respectively.",
+                   prefix.c_str());
+      range_in = std::nullopt;
+    }
+
+    // Enforce default value for range_in
+    if (!range_in.has_value())
+      range_in = std::vector<double>{ -1.0, 1.0 };
+
+    range = AxisTransformParams::Range{ std::array<float, 2>{ static_cast<float>(range_in.value()[0]),
+                                                              static_cast<float>(range_in.value()[1]) },
+                                        std::nullopt, range_clamp };
+
+    if (range_out.has_value())
+      range.value().out =
+          std::array<float, 2>{ static_cast<float>(range_out.value()[0]), static_cast<float>(range_out.value()[1]) };
+  }
+
   return params;
 }
 
@@ -254,6 +299,10 @@ void InputSourceHandle::remap(InputSource::InputDeclarationSpans declarations, R
         is_button_remapped[index] = true;
 
         reference = std::ref(declarations.buttons[index]);
+      }
+      else
+      {
+        // TODO: Recursively declare the missing 'from', merging transforms until reaching a valid original input
       }
     }
 
@@ -320,6 +369,10 @@ void InputSourceHandle::remap(InputSource::InputDeclarationSpans declarations, R
         is_axis_remapped[index] = true;
 
         reference = std::ref(declarations.axes[index]);
+      }
+      else
+      {
+        // TODO: Recursively declare the missing 'from', merging transforms until reaching a valid original input
       }
     }
 

@@ -111,14 +111,14 @@ joy_input_source:
             in: [-1, 1]
             out: [0, 1]
             # Optionally, clamp the value
-            limit: true
+            clamp: true
         J3:
           from: "left_stick_x"
           # Remap the range of the input from [-1, 1] to [0, 1]
           range:
             in: [-1.0, 1.0]
             # You can also clamp the value without remapping the output range
-            limit: true
+            clamp: true
         J4:
           from: "right_stick_x"
           in: -1.0
