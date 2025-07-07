@@ -6,6 +6,11 @@
 #include "teleop/inputs/Button.hpp"
 #include "teleop/inputs/Axis.hpp"
 
+namespace
+{
+constexpr float EPSILON = 1e-6f;
+}
+
 namespace teleop
 {
 
@@ -32,5 +37,21 @@ float InputCommon<float>::value()
 {
   return accumulate_value();
 }
+
+template <>
+void InputCommon<uint8_t>::debounce(const rclcpp::Time& now)
+{
+  previous_debounce_value_ = current_debounce_value_;
+  current_debounce_value_ = value();
+};
+
+template <>
+void InputCommon<float>::debounce(const rclcpp::Time& now)
+{
+  previous_debounce_value_ = current_debounce_value_;
+  // Only change if the change is big enough
+  if (const float new_value = value(); std::abs(previous_debounce_value_ - new_value) > EPSILON)
+    current_debounce_value_ = new_value;
+};
 
 }  // namespace teleop

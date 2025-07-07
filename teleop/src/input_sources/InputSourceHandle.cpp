@@ -4,10 +4,12 @@
 
 #include "teleop/input_sources/InputSourceHandle.hpp"
 #include <functional>
+#include <set>
+
+#include "colors.hpp"
 
 namespace teleop::internal
 {
-
 InputSourceHandle::InputSourceHandle(const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr& parameters,
                                      InputManager& inputs, const std::shared_ptr<InputSource>& source)
   : inputs_(std::ref(inputs)), parameters_(parameters), source_(source)
@@ -26,37 +28,28 @@ void InputSourceHandle::update(const rclcpp::Time& now) const
   source_->update(now);
 }
 
+void InputSourceHandle::add_definitions_to_inputs() const
+{
+  // Add declarations to inputs
+  for (auto& button : button_definitions_)
+    for (auto& definition : button.references)
+      button.input->add_definition(definition);
+
+  for (auto& axis : axis_definitions_)
+    for (auto& definition : axis.references)
+      axis.input->add_definition(definition);
+}
+
 void InputSourceHandle::declare_and_link_inputs()
 {
+  const auto logger = source_->get_node()->get_logger();
   // TODO: Check if inputs are already linked, and unlink them
 
   auto declarations = source_->export_inputs();
   const auto remap_params = get_remap_params();
-  const auto remapping = remap(declarations, remap_params);
+  remap(declarations, remap_params);
 
-  auto& inputs = inputs_.get();
-
-  button_definitions_.clear();
-  button_definitions_.reserve(remapping.buttons.remapped_names.size());
-  for (size_t i = 0; i < remapping.buttons.remapped_names.size(); i++)
-  {
-    const auto& name = remapping.buttons.remapped_names[i];
-    auto& reference = remapping.buttons.references[i];
-
-    button_definitions_.emplace_back(inputs.get_buttons()[name], reference);
-    inputs.get_buttons()[name]->add_definition(reference);
-  }
-
-  axis_definitions_.clear();
-  axis_definitions_.reserve(remapping.axes.remapped_names.size());
-  for (size_t i = 0; i < remapping.axes.remapped_names.size(); i++)
-  {
-    const auto& name = remapping.axes.remapped_names[i];
-    auto& reference = remapping.axes.references[i];
-
-    axis_definitions_.emplace_back(inputs.get_axes()[name], reference);
-    inputs.get_axes()[name]->add_definition(reference);
-  }
+  add_definitions_to_inputs();
 }
 
 InputSourceHandle::RemapParams InputSourceHandle::get_remap_params()
@@ -64,12 +57,12 @@ InputSourceHandle::RemapParams InputSourceHandle::get_remap_params()
   RemapParams remap_params;
   auto& inputs = inputs_.get();
 
-  for (auto& button : inputs.get_buttons())
-    if (auto params = get_remap_button_params(button->get_name()))
+  for (const auto& button : inputs.get_buttons())
+    if (auto params = get_remap_button_params(button->get_name()); params.has_value())
       remap_params.buttons.emplace_back(*params);
 
-  for (auto& axis : inputs.get_axes())
-    if (auto params = get_remap_axis_params(axis->get_name()))
+  for (const auto& axis : inputs.get_axes())
+    if (auto params = get_remap_axis_params(axis->get_name()); params.has_value())
       remap_params.axes.emplace_back(*params);
 
   return remap_params;
@@ -77,6 +70,7 @@ InputSourceHandle::RemapParams InputSourceHandle::get_remap_params()
 
 std::optional<InputSourceHandle::RemapButtonParams> InputSourceHandle::get_remap_button_params(const std::string& name)
 {
+  const auto logger = source_->get_node()->get_logger();
   const auto prefix = "remap.buttons." + name + ".";
 
   // Declare from param
@@ -89,13 +83,18 @@ std::optional<InputSourceHandle::RemapButtonParams> InputSourceHandle::get_remap
   auto type_result = parameters_->get_parameter(from_descriptor.name, from_param);
 
   if (!type_result || from_param.get_type() != rclcpp::ParameterType::PARAMETER_STRING)
+  {
+    RCLCPP_DEBUG(logger, "  %s not remapped", from_descriptor.name.c_str());
     return std::nullopt;
+  }
 
-  return RemapButtonParams{ from_param.as_string() };
+  RCLCPP_DEBUG(logger, C_INPUT "  %s = %s" C_RESET, from_descriptor.name.c_str(), from_param.as_string().c_str());
+  return RemapButtonParams{ name, from_param.as_string() };
 }
 
 std::optional<InputSourceHandle::RemapAxisParams> InputSourceHandle::get_remap_axis_params(const std::string& name)
 {
+  const auto logger = source_->get_node()->get_logger();
   const auto prefix = "remap.axes." + name + ".";
 
   // Declare from param
@@ -108,77 +107,87 @@ std::optional<InputSourceHandle::RemapAxisParams> InputSourceHandle::get_remap_a
   auto type_result = parameters_->get_parameter(from_descriptor.name, from_param);
 
   if (!type_result || from_param.get_type() != rclcpp::ParameterType::PARAMETER_STRING)
+  {
+    RCLCPP_DEBUG(logger, "  %s not remapped", from_descriptor.name.c_str());
     return std::nullopt;
+  }
 
-  return RemapAxisParams{ from_param.as_string() };
+  RCLCPP_DEBUG(logger, C_INPUT "  %s.from = %s" C_RESET, from_descriptor.name.c_str(), from_param.as_string().c_str());
+  return RemapAxisParams{ name, from_param.as_string() };
 }
 
-InputSourceHandle::Remapping InputSourceHandle::remap(InputSource::InputDeclarationSpans declarations,
-                                                      InputSourceHandle::RemapParams remap_params)
+void InputSourceHandle::remap(InputSource::InputDeclarationSpans declarations, RemapParams remap_params)
 {
   const auto logger = source_->get_node()->get_logger();
-  Remapping remapping{};
+  auto& inputs = inputs_.get();
 
-  RCLCPP_DEBUG(logger, "Remapping inputs for %s", source_->get_name().c_str());
+  // Stores, for each exported button, whether the button is remapped
+  std::vector<bool> is_button_remapped(declarations.button_names.size(), false);
 
-  std::map<std::string, std::string> button_name_remap;
-  for (auto& button : remap_params.buttons)
+  // Reset definitions
+  button_definitions_.clear();
+  button_definitions_.reserve(declarations.button_names.size());
+
+  // Create definitions for each remapped input, marking which ones have been remapped
+  auto& buttons = inputs.get_buttons();
+  for (auto& [name, from] : remap_params.buttons)
   {
-    button_name_remap[button.from] = button.name;
+    // Find the index for the 'from'
+    const auto it = std::find(declarations.button_names.begin(), declarations.button_names.end(), from);
+    const size_t index = std::distance(declarations.button_names.begin(), it);
+
+    const auto reference = std::ref(declarations.buttons[index]);
+
+    button_definitions_.emplace_back(buttons[name], std::vector{ reference });
+    is_button_remapped[index] = true;
   }
 
-  std::map<std::string, std::string> axis_name_remap;
-  for (auto& axis : remap_params.axes)
+  // Create definitions for unmapped inputs
+  for (size_t i = 0; i < declarations.button_names.size(); ++i)
   {
-    axis_name_remap[axis.from] = axis.name;
+    if (is_button_remapped[i])
+      continue;
+
+    const auto& name = declarations.button_names[i];
+    const auto reference = std::ref(declarations.buttons[i]);
+
+    button_definitions_.emplace_back(buttons[name], std::vector{ reference });
   }
 
-  remapping.buttons.references.reserve(declarations.button_names.size());
-  remapping.buttons.remapped_names.reserve(declarations.button_names.size());
-  for (size_t i = 0; i < declarations.button_names.size(); i++)
+  // Do the same thing again, but for axes
+  // TODO: Do a template function or something to remove duplicate code
+
+  // Stores, for each exported axis, whether the axis is remapped
+  std::vector<bool> is_axis_remapped(declarations.axis_names.size(), false);
+
+  // Reset definitions
+  axis_definitions_.clear();
+  axis_definitions_.reserve(declarations.axis_names.size());
+
+  // Create definitions for each remapped input, marking which ones have been remapped
+  auto& axes = inputs.get_axes();
+  for (auto& [name, from] : remap_params.axes)
   {
-    const auto& button_name = declarations.button_names[i];
-    auto& button_value = declarations.buttons[i];
+    // Find the index for the 'from'
+    const auto it = std::find(declarations.axis_names.begin(), declarations.axis_names.end(), from);
+    const size_t index = std::distance(declarations.axis_names.begin(), it);
 
-    // Determine remapped name
-    if (auto it = button_name_remap.find(button_name); it != button_name_remap.end())
-    {
-      RCLCPP_DEBUG(logger, "  Remapping button %s to %s", button_name.c_str(), it->second.c_str());
-      remapping.buttons.remapped_names.emplace_back(it->second);
-    }
-    else
-    {
-      remapping.buttons.remapped_names.emplace_back(button_name);
-    }
+    const auto reference = std::ref(declarations.axes[index]);
 
-    // Determined remapped value reference
-    remapping.buttons.references.emplace_back(std::ref(button_value));
+    axis_definitions_.emplace_back(axes[name], std::vector{ reference });
+    is_axis_remapped[index] = true;
   }
 
-  remapping.axes.references.reserve(declarations.axis_names.size());
-  remapping.axes.remapped_names.reserve(declarations.axis_names.size());
-  for (size_t i = 0; i < declarations.axis_names.size(); i++)
+  // Create definitions for unmapped inputs
+  for (size_t i = 0; i < declarations.axis_names.size(); ++i)
   {
-    const auto& axis_name = declarations.axis_names[i];
-    auto& axis_value = declarations.axes[i];
+    if (is_axis_remapped[i])
+      continue;
 
-    // Determine remapped name
-    if (auto it = axis_name_remap.find(axis_name); it != axis_name_remap.end())
-    {
-      RCLCPP_DEBUG(logger, "  Remapping axis %s to %s", axis_name.c_str(), it->second.c_str());
-      remapping.axes.remapped_names.emplace_back(it->second);
-    }
-    else
-    {
-      remapping.axes.remapped_names.emplace_back(axis_name);
-    }
+    const auto& name = declarations.axis_names[i];
+    const auto reference = std::ref(declarations.axes[i]);
 
-    // Determined remapped value reference
-    remapping.axes.references.emplace_back(std::ref(axis_value));
+    axis_definitions_.emplace_back(axes[name], std::vector{ reference });
   }
-
-  return remapping;
 }
-
-
 }  // namespace teleop::internal

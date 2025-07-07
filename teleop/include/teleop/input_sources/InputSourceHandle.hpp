@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 #include "InputSource.hpp"
+#include "teleop/utilities/better_multimap.hpp"
 
 namespace teleop::internal
 {
@@ -24,6 +25,9 @@ public:
   explicit InputSourceHandle(InputManager& inputs, const std::shared_ptr<InputSource>& source);
 
   void update(const rclcpp::Time& now) const;
+
+  void add_definitions_to_inputs() const;
+
   void declare_and_link_inputs();
 
 private:
@@ -42,18 +46,6 @@ private:
     std::vector<RemapButtonParams> buttons;
     std::vector<RemapAxisParams> axes;
   };
-  template <typename T>
-  struct InputRemappings
-  {
-    std::vector<std::string> remapped_names;
-    std::vector<std::reference_wrapper<T>> references;
-  };
-
-  struct Remapping
-  {
-    InputRemappings<uint8_t> buttons;
-    InputRemappings<float> axes;
-  };
 
   template <typename T, typename InputT>
   struct Definition
@@ -63,15 +55,15 @@ private:
 
     /// We hold a shared pointer to keep any exported input alive
     std::shared_ptr<InputT> input;
-    std::reference_wrapper<T> reference;
+    std::vector<std::reference_wrapper<T>> references;
 
-    Definition(const std::shared_ptr<InputT> input, const std::reference_wrapper<T>& reference)
-      : input(input), reference(reference)
+    Definition(const std::shared_ptr<InputT> input, const std::vector<std::reference_wrapper<T>>& references)
+      : input(input), references(references)
     {
     }
   };
 
-  Remapping remap(InputSource::InputDeclarationSpans declarations, RemapParams remap_params);
+  void remap(InputSource::InputDeclarationSpans declarations, RemapParams remap_params);
   RemapParams get_remap_params();
   std::optional<RemapButtonParams> get_remap_button_params(const std::string& name);
   std::optional<RemapAxisParams> get_remap_axis_params(const std::string& name);

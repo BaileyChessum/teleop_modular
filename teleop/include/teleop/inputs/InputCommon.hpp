@@ -24,11 +24,7 @@ public:
   virtual void export_events(EventCollection& events) {};
   virtual void update_events(const rclcpp::Time& now) {};
 
-  void debounce(const rclcpp::Time& now)
-  {
-    previous_debounce_value_ = current_debounce_value_;
-    current_debounce_value_ = value();
-  };
+  void debounce(const rclcpp::Time& now);
 
   /**
    * @returns true if the value changed since last debounce

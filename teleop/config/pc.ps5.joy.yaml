@@ -1,0 +1,30 @@
+# PS5 controller joy layout on my PC
+joy_input_source:
+  ros__parameters:
+    axis_definitions: [
+      "left_stick_x",
+      "left_stick_y",
+      "right_stick_x",
+      "right_stick_y",
+      "left_trigger",
+      "right_trigger"
+    ]
+    button_definitions: [
+      "cross",
+      "circle",
+      "square",
+      "triangle",
+      "share",
+      "power",
+      "start",
+      "left_stick_click",
+      "right_stick_click",
+      "left_bumper",
+      "right_bumper",
+      "dpad_up",
+      "dpad_down",
+      "dpad_left",
+      "dpad_right",
+      "trackpad_click",
+      "mute"
+    ]
