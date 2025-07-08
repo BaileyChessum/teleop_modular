@@ -101,7 +101,7 @@ joy_input_source:
   
 ```
 
-![Example mapping of inputs in a diagram](teleop/docs/big_teleop_input_mapping_example_light.drawio.svg)
+![Example mapping of inputs in a diagram](teleop/docs/assets/big_teleop_input_mapping_example_light.drawio.svg)
 
 Remapping is entirely optional. If you don't set the parameters in `remap` for an input, the `Button` or `Axis` will 
 just use the provided bool/double reference directly. So, beyond declaring parameters, there is no additional overhead. 
