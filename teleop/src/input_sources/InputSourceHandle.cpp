@@ -82,6 +82,7 @@ InputSourceHandle::TransformedRemapValue<float, InputSourceHandle::TransformedRe
   if (params.invert)
     value = -value;
 
+  // Apply range remapping
   if (params.range.has_value())
   {
     const auto in = params.range.value().in;
@@ -101,6 +102,14 @@ InputSourceHandle::TransformedRemapValue<float, InputSourceHandle::TransformedRe
       // Lerp to map to output range
       value = (1 - t) * out[0] + t * out[1];
     }
+  }
+
+  if (params.power.has_value())
+  {
+    if (value >= 0.0f)
+      value = std::pow(value, params.power.value());
+    else
+      value = -std::pow(-value, params.power.value());
   }
 }
 
@@ -229,7 +238,8 @@ std::optional<InputSourceHandle::RemapAxisParams> InputSourceHandle::get_remap_a
 
   const auto transform_params = get_axis_transform_params(name);
 
-  if (!transform_params.has_value()) {
+  if (!transform_params.has_value())
+  {
     RCLCPP_WARN(logger, "Remapped axis %s is missing a transform", name.c_str());
   }
 
@@ -288,7 +298,12 @@ InputSourceHandle::get_axis_transform_params(const std::string& name)
     params.range = AxisTransformParams::Range{ in, out, range_clamp };
   }
 
-  if (!params.invert && !params.range.has_value()) {
+  params.power = get_parameter<float>(parameters_, prefix + "power",
+                                      "The exponent to apply to this input. Negative numbers are made "
+                                      "positive before raising to a fractional power.");
+
+  if (!params.invert && !params.range.has_value() && !params.power.has_value())
+  {
     RCLCPP_WARN(logger, "Remapped axis %s does not define a transform", name.c_str());
     return std::nullopt;
   }
@@ -333,6 +348,10 @@ void InputSourceHandle::remap(InputSource::InputDeclarationSpans declarations, R
       else
       {
         // TODO: Recursively declare the missing 'from', merging transforms until reaching a valid original input
+        RCLCPP_WARN(logger,
+                    "You tried to remap button %s to \"%s\", but it can't be found in the set of button names exported "
+                    "by the input source %s.",
+                    name.c_str(), from->c_str(), source_->get_name().c_str());
       }
     }
 
@@ -340,6 +359,9 @@ void InputSourceHandle::remap(InputSource::InputDeclarationSpans declarations, R
     const bool needs_extra_memory = transform.has_value() || from_axis.has_value();
     if (!needs_extra_memory)
     {
+      if (!reference.has_value())
+        continue;
+
       button_definitions_.emplace_back(buttons[name], reference.has_value() ?
                                                           (std::vector{ reference.value() }) :
                                                           (std::vector<std::reference_wrapper<uint8_t>>{}));
@@ -359,6 +381,13 @@ void InputSourceHandle::remap(InputSource::InputDeclarationSpans declarations, R
         const auto axis_reference = std::ref(declarations.axes[axis_index]);
         from_axis_transform = TransformedRemapButtonFromAxis{ axis_reference, from_axis.value().threshold };
         is_axis_remapped[axis_index] = true;
+      }
+      else
+      {
+        RCLCPP_WARN(logger,
+                    "You tried to remap button %s to axis \"%s\", but it can't be found in the set of axis names "
+                    "exported by the input source %s.",
+                    name.c_str(), from->c_str(), source_->get_name().c_str());
       }
     }
 
@@ -403,6 +432,10 @@ void InputSourceHandle::remap(InputSource::InputDeclarationSpans declarations, R
       else
       {
         // TODO: Recursively declare the missing 'from', merging transforms until reaching a valid original input
+        RCLCPP_WARN(logger,
+                    "You tried to remap axis %s to \"%s\", but it can't be found in the set of axis names exported by "
+                    "the input source %s.",
+                    name.c_str(), from->c_str(), source_->get_name().c_str());
       }
     }
 
@@ -410,6 +443,9 @@ void InputSourceHandle::remap(InputSource::InputDeclarationSpans declarations, R
     const bool needs_extra_memory = transform.has_value() || from_buttons.has_value();
     if (!needs_extra_memory)
     {
+      if (!reference.has_value())
+        continue;
+
       axis_definitions_.emplace_back(axes[name], reference.has_value() ?
                                                      (std::vector{ reference.value() }) :
                                                      (std::vector<std::reference_wrapper<float>>{}));
@@ -432,6 +468,14 @@ void InputSourceHandle::remap(InputSource::InputDeclarationSpans declarations, R
           negative_reference = std::ref(declarations.buttons[negative_index]);
           is_button_remapped[negative_index] = true;
         }
+        else
+        {
+          // TODO: Recursively declare the missing 'from', merging transforms until reaching a valid original input
+          RCLCPP_WARN(logger,
+                      "You tried to remap axis %s to button \"%s\", but it can't be found in the set of button names "
+                      "exported by the input source %s.",
+                      name.c_str(), from_buttons->negative->c_str(), source_->get_name().c_str());
+        }
       }
 
       std::optional<std::reference_wrapper<uint8_t>> positive_reference = std::nullopt;
@@ -445,6 +489,14 @@ void InputSourceHandle::remap(InputSource::InputDeclarationSpans declarations, R
           const size_t positive_index = std::distance(declarations.button_names.begin(), positive_it);
           positive_reference = std::ref(declarations.buttons[positive_index]);
           is_button_remapped[positive_index] = true;
+        }
+        else
+        {
+          // TODO: Recursively declare the missing 'from', merging transforms until reaching a valid original input
+          RCLCPP_WARN(logger,
+                      "You tried to remap axis %s to button \"%s\", but it can't be found in the set of button names "
+                      "exported by the input source %s.",
+                      name.c_str(), from_buttons->positive->c_str(), source_->get_name().c_str());
         }
       }
 

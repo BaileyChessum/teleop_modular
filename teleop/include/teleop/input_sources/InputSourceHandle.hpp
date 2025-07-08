@@ -35,7 +35,6 @@ private:
   {
     bool invert = false;
   };
-
   struct AxisTransformParams
   {
     bool invert = false;
@@ -48,6 +47,7 @@ private:
     };
 
     std::optional<Range> range;
+    std::optional<float> power;
   };
 
   struct ButtonFromAxisParams
