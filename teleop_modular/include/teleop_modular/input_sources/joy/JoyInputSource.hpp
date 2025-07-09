@@ -1,0 +1,39 @@
+//
+// Created by nova on 6/11/25.
+//
+
+#ifndef TELEOP_MODULAR_JOYINPUTSOURCE_HPP
+#define TELEOP_MODULAR_JOYINPUTSOURCE_HPP
+
+#include <sensor_msgs/msg/joy.hpp>
+#include <utility>
+#include "teleop_modular/input_sources/InputSource.hpp"
+#include "joy_input_source_parameters.hpp"
+#include "teleop_modular/inputs/state/State.hpp"
+
+namespace teleop_modular
+{
+
+class JoyInputSource final : public InputSource
+{
+protected:
+  void on_initialize() override;
+  void on_update(const rclcpp::Time& now, InputValueSpans values) override;
+
+  void export_buttons(InputDeclarationList<uint8_t>& declarations) override;
+  void export_axes(InputDeclarationList<float>& declarations) override;
+
+private:
+  void joy_callback(sensor_msgs::msg::Joy::SharedPtr msg);
+
+  std::shared_ptr<joy_input_source::ParamListener> param_listener_;
+  joy_input_source::Params params_;
+
+  rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr subscription_;
+  sensor_msgs::msg::Joy::SharedPtr joy_msg_ = nullptr;
+  std::mutex joy_msg_mutex_{};
+};
+
+}  // namespace teleop_modular
+
+#endif  // TELEOP_MODULAR_JOYINPUTSOURCE_HPP

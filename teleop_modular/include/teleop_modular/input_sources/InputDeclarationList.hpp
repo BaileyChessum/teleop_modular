@@ -1,0 +1,74 @@
+//
+// Created by nova on 7/6/25.
+//
+
+#ifndef TELEOP_MODULAR_INPUTDECLARATIONLIST_HPP
+#define TELEOP_MODULAR_INPUTDECLARATIONLIST_HPP
+
+#include "teleop_modular/utilities/VectorRef.hpp"
+
+namespace teleop_modular
+{
+
+/**
+ * A class to be given to InputSource implementation to declare their buttons and axes, in a way that allows button
+ * values to be placed next to each other in memory
+ */
+template <typename T>
+class InputDeclarationList
+{
+public:
+  InputDeclarationList(std::vector<std::string>& names, std::vector<T>& values) : names_(names), values_(values)
+  {
+  }
+
+  /**
+   * @brief Declares a button/axis to exist with the given name, at an index equal to the number of declarations before
+   * calling this method.
+   * @param[in] name    The name of the button/axis being declared.
+   * @returns   A reference to the value of the declared button/axis. Assign the value stored in this VectorRef with
+   * `operator=` during on_update() to change the value of the declared input. Alternatively, you can set the value
+   * directly in your InputSource by assigning `this->buttons_[i]` or `this->axes_[i]` to avoid a layer of indirection.
+   */
+  inline VectorRef<T> add(const std::string& name) noexcept
+  {
+    auto idx = values_.size();
+    names_.emplace_back(name);
+    values_.emplace_back(0);
+    return VectorRef<T>(values_, idx);
+  }
+
+  /**
+   * @brief Declares a button/axis to exist with the given name, at an index equal to the number of declarations before
+   * calling this method.
+   * @param[in] name    The name of the button/axis being declared.
+   * @param[in] initial_value The initial value to give to this input. This is usually very unnecessary to specify.
+   * @returns   A reference to the value of the declared button/axis. Assign the value stored in this VectorRef with
+   * `operator=` during on_update() to change the value of the declared input. Alternatively, you can set the value
+   * directly in your InputSource by assigning `this->buttons_[i]` or `this->axes_[i]` to avoid a layer of indirection.
+   */
+  inline VectorRef<T> add(const std::string& name, T initial_value) noexcept
+  {
+    auto idx = values_.size();
+    names_.emplace_back(name);
+    values_.emplace_back(initial_value);
+    return VectorRef<T>(values_, idx);
+  }
+
+  /**
+   * This attempts to reserve enough memory for the name and value vectors. Please call this before adding values.
+   */
+  inline void reserve(size_t n) noexcept
+  {
+    names_.reserve(n);
+    values_.reserve(n);
+  }
+
+private:
+  std::vector<std::string>& names_;
+  std::vector<T>& values_;
+};
+
+}  // namespace teleop_modular
+
+#endif  // TELEOP_MODULAR_INPUTDECLARATIONLIST_HPP

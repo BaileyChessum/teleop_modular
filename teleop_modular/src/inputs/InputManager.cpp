@@ -1,0 +1,23 @@
+//
+// Created by Bailey Chessum on 6/9/25.
+//
+
+#include "teleop_modular/inputs/InputManager.hpp"
+
+namespace teleop_modular
+{
+
+void InputManager::update(const rclcpp::Time& now)
+{
+  for (auto& button : buttons_)
+  {
+    button->debounce(now);
+  }
+
+  for (auto& axis : axes_)
+  {
+    axis->debounce(now);
+  }
+}
+
+}  // namespace teleop_modular

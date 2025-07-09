@@ -1,0 +1,218 @@
+teleop_modular:
+  ros__parameters:
+    update_rate: 50.0
+    min_update_rate: 2.0
+
+    # Set this true to display all the inputs. Very useful when trying to make a config!
+    # log_inputs: true
+
+    input_sources:
+      # Declare the names of your input sources here
+      names: [
+        "joy_input_source"
+      ]
+      joy_input_source:
+        type: "teleop_modular/JoyInputSource"
+
+    control_modes:
+      # Declare the names of your control modes here
+      names: [
+        "joint_space_control",
+        "twist_ik_control"
+      ]
+      joint_space_control:
+        type: "teleop_modular/JointSpaceControlMode"
+        controllers: [
+          "nova_arm_velocity_controller"
+        ]
+      twist_ik_control:
+        type: "teleop_modular/TwistControlMode"
+        controllers: [
+          "nova_arm_position_controller",
+          "nova_twistmapper"
+        ]
+
+    commands:
+      # Declare the names of your commands here
+      names: [
+        "enter_twist_ik_control",
+        "enter_joint_space_control",
+        "set_locked",
+        "set_unlocked",
+        "log_locked",
+        "log_unlocked"
+      ]
+
+      # Configure your commands here.
+      enter_twist_ik_control:
+        on: "twist_mode/down"
+        type: "switch_control_mode"
+        to: "twist_ik_control"
+      enter_joint_space_control:
+        on: "twist_mode/up"
+        type: "switch_control_mode"
+        to: "joint_space_control"
+
+      # Locking and unlocking
+      set_locked:
+        on_any: ["start", "lock/down"]
+        type: "set_button"
+        name: "locked"
+        value: true
+      set_unlocked:
+        on: "unlock/down"
+        type: "set_button"
+        name: "locked"
+        value: false
+      log_locked:
+        on: "locked/down"
+        type: "log"
+        message: "Locked"
+      log_unlocked:
+        on: "locked/up"
+        type: "log"
+        message: "Unlocked"
+
+joy_input_source:
+  ros__parameters:
+    topic: "/joy"
+    axis_definitions: [
+      "left_stick_x",
+      "left_stick_y",
+      "right_stick_x",
+      "right_stick_y",
+      "left_trigger",
+      "right_trigger"
+    ]
+    button_definitions: [
+      "cross",
+      "circle",
+      "square",
+      "triangle",
+      "share",
+      "power",
+      "start",
+      "left_stick_click",
+      "right_stick_click",
+      "left_bumper",
+      "right_bumper",
+      "dpad_up",
+      "dpad_down",
+      "dpad_left",
+      "dpad_right",
+      "trackpad_click",
+      "mute"
+    ]
+
+    # Convert input source names to meaningful mapped names
+    # This logic is to be provided by the InputSourceManager when adding InputDeclarations as definitions for input
+    # objects. The motivation is to share complex configuration functionality I created for joy inputs across any
+    # inputs. This makes it easier to implement other input sources in the future and reuse code in a way that allows
+    # all input sources to benefit from potential optimizations made to remapping.
+    #
+    # TODO: Should modification be made to the inputs directly?
+    remap:
+      axes:
+        speed:
+          from: "right_trigger"
+          range:
+            in: [-1.0, 1.0]
+            out: [1.0, 0.0]
+            clamp: true
+          power: 2.0
+        J1:
+          from: "left_stick_x"
+          invert: true
+          power: 2.0
+        J2:
+          from: "right_stick_y"
+        J3:
+          from: "right_stick_x"
+          range:
+            in: [-1.0, 1.0]
+            clamp: true
+        J4:
+          from: "right_stick_x"
+        J5:
+          from: "right_stick_y"
+        J6:
+          from: "dpad_x"
+          from_buttons:
+            positive: "dpad_right"
+            negative: "dpad_left"
+        twist_x:
+          from: "dpad_x"
+          from_buttons:
+            positive: "dpad_right"
+            negative: "dpad_left"
+        twist_y:
+          from: "dpad_y"
+          from_buttons:
+            positive: "dpad_up"
+            negative: "dpad_down"
+        twist_z:
+          from_buttons:
+            positive: "triangle"
+            negative: "cross"
+
+      buttons:
+        lock:
+          from: "share"
+        unlock:
+          from: "start"
+        locked:
+          from: "power"
+        twist_mode:
+          from: "left_bumper"
+
+joint_space_control:
+  ros__parameters:
+    # TODO: get the actual name from arm code
+    topic: "/todo_joint_space"
+
+    joint_definitions: [
+      "arm_j1",
+      "arm_j2",
+      "arm_j3",
+      "arm_j4",
+      "arm_j5",
+      "arm_j6"
+    ]
+
+    joints:
+      arm_j1:
+        input_name: "J1"
+        max_speed: 0.364467013889
+      arm_j2:
+        input_name: "J2"
+        max_speed: 0.364467013889
+      arm_j3:
+        input_name: "J3"
+        max_speed: 0.364467013889
+      arm_j4:
+        input_name: "J4"
+        max_speed: 0.364467013889
+      arm_j5:
+        input_name: "J5"
+        max_speed: 0.364467013889
+      arm_j6:
+        input_name: "J6"
+        max_speed: 0.364467013889
+
+twist_ik_control:
+  ros__parameters:
+    # TODO: get the actual name from arm code
+    topic: "/todo_task_space"
+    max_speed:
+      linear: 0.3
+      angular: 0.3
+
+
+# trigger:
+#   id: 0
+# top down:
+#   id: 1
+# top left:
+#   id: 2
+# top right:
+#   id: 0
