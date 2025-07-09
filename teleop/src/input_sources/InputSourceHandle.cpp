@@ -190,7 +190,7 @@ std::optional<InputSourceHandle::RemapButtonParams> InputSourceHandle::get_remap
 
   const auto transform_params = get_button_transform_params(name);
 
-  return RemapButtonParams{ name, from.value(), transform_params, from_axis_params };
+  return RemapButtonParams{ name, from, transform_params, from_axis_params };
 }
 
 std::optional<InputSourceHandle::ButtonTransformParams>
@@ -238,7 +238,7 @@ std::optional<InputSourceHandle::RemapAxisParams> InputSourceHandle::get_remap_a
 
   const auto transform_params = get_axis_transform_params(name);
 
-  return RemapAxisParams{ name, from.value(), transform_params, from_buttons_params };
+  return RemapAxisParams{ name, from, transform_params, from_buttons_params };
 }
 
 std::optional<InputSourceHandle::AxisTransformParams>
@@ -382,7 +382,7 @@ void InputSourceHandle::remap(InputSource::InputDeclarationSpans declarations, R
         RCLCPP_WARN(logger,
                     "You tried to remap button %s to axis \"%s\", but it can't be found in the set of axis names "
                     "exported by the input source %s.",
-                    name.c_str(), from->c_str(), source_->get_name().c_str());
+                    name.c_str(), from_axis.value().name.c_str(), source_->get_name().c_str());
       }
     }
 
