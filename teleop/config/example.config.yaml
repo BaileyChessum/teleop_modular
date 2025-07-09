@@ -55,7 +55,7 @@ teleop:
 
       # Locking and unlocking
       set_locked:
-        on: "lock/down"
+        on_any: ["start", "lock/down"]
         type: "set_button"
         name: "locked"
         value: true
@@ -146,7 +146,7 @@ joy_input_source:
             positive: "dpad_right"
             negative: "dpad_left"
         twist_y:
-          from: "dpad_x"
+          from: "dpad_y"
           from_buttons:
             positive: "dpad_up"
             negative: "dpad_down"
@@ -157,9 +157,9 @@ joy_input_source:
 
       buttons:
         lock:
-          from: "start"
-        unlock:
           from: "share"
+        unlock:
+          from: "start"
         locked:
           from: "power"
         twist_mode:

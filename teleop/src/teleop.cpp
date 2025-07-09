@@ -42,6 +42,10 @@ void Teleop::initialize(const std::weak_ptr<rclcpp::Executor>& executor)
   control_mode_manager_->activate_initial_control_mode();
 
   RCLCPP_DEBUG(logger, "Teleop::initialize(): Fully initialized!");
+
+  const auto now = get_node()->now();
+  events_.get_events()["start"]->invoke();
+  events_.update(now);
 }
 
 void Teleop::log_all_inputs()
@@ -102,7 +106,7 @@ void Teleop::log_existing_inputs()
     }
   }
 
-  RCLCPP_INFO(get_node()->get_logger(), C_TITLE "Registered inputs:\n" C_RESET "%s", log.str().c_str());
+  RCLCPP_DEBUG(get_node()->get_logger(), C_TITLE "Registered inputs:\n" C_RESET "%s\n", log.str().c_str());
 }
 
 void Teleop::service_input_updates()
