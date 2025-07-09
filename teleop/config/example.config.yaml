@@ -37,6 +37,8 @@ teleop:
       names: [
         "enter_twist_ik_control",
         "enter_joint_space_control",
+        "set_locked",
+        "set_unlocked",
         "log_locked",
         "log_unlocked"
       ]
@@ -52,6 +54,16 @@ teleop:
         to: "joint_space_control"
 
       # Locking and unlocking
+      set_locked:
+        on: "lock/down"
+        type: "set_button"
+        name: "locked"
+        value: true
+      set_unlocked:
+        on: "unlock/down"
+        type: "set_button"
+        name: "locked"
+        value: false
       log_locked:
         on: "locked/down"
         type: "log"
@@ -191,6 +203,9 @@ twist_ik_control:
   ros__parameters:
     # TODO: get the actual name from arm code
     topic: "/todo_task_space"
+    max_speed:
+      linear: 0.3
+      angular: 0.3
 
 
 # trigger:
