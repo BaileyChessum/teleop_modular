@@ -3,6 +3,7 @@
 //
 
 #include "../../include/teleop/commands/CommandManager.hpp"
+#include "teleop/utilities/get_parameter.hpp"
 
 namespace teleop
 {
@@ -98,6 +99,8 @@ bool CommandManager::get_type_for_command(const std::string& name, std::string& 
   // TODO: Check that the parameter hasn't already been defined
   // TODO: Remember that this parameter has already been defined
 
+  auto parameters = node_->get_node_parameters_interface();
+
   // Declare parameter and get value for source_type
   auto type_descriptor = rcl_interfaces::msg::ParameterDescriptor{};
   type_descriptor.name = "commands." + name + ".type";
@@ -109,34 +112,28 @@ bool CommandManager::get_type_for_command(const std::string& name, std::string& 
     source_type = type_param.as_string();
 
   // Declare parameter and get value for invocation_event_names
-  auto event_descriptor = rcl_interfaces::msg::ParameterDescriptor{};
-  event_descriptor.name = "commands." + name + ".on";
-  event_descriptor.description = "The name of the Event(s) that should cause the \"" + name +
-                                 "\" command to execute. "
-                                 "This could be the name of a button \"button\" to execute when pressed down, or "
-                                 "\"button/up\" when released.";
-  node_->declare_parameter(event_descriptor.name, rclcpp::ParameterType::PARAMETER_STRING, event_descriptor);
-  rclcpp::Parameter event_param;
-  const auto event_result = node_->get_parameter(event_descriptor.name, event_param);
-  if (event_result)
+  const auto on_any = get_parameter<std::vector<std::string>>(parameters, "commands." + name + ".on_any",
+                                                              "The name of the Events that should cause the \"" + name +
+                                                                  "\" command to execute. This could be the name of a "
+                                                                  "button \"button/down\" to execute when pressed "
+                                                                  "down, or \"button/up\" when released.");
+  const auto on = get_parameter<std::string>(parameters, "commands." + name + ".on",
+                                             "The name of the Event that should cause the \"" + name +
+                                                 "\" command to execute. This could be the name of a button "
+                                                 "\"button/down\" to execute when pressed down, or \"button/up\" when "
+                                                 "released.");
+
+  invocation_event_names.clear();
+  if (on_any.has_value())
   {
-    if (event_param.get_type() == rclcpp::ParameterType::PARAMETER_STRING)
-    {
-      invocation_event_names = { event_param.as_string() };
-    }
-    else if (event_param.get_type() == rclcpp::PARAMETER_STRING_ARRAY)
-    {
-      invocation_event_names = event_param.as_string_array();
-    }
-    else
-    {
-      RCLCPP_ERROR(node_->get_logger(), "command.%s.on parameter must be a string or string array, but a %s was given",
-                   name.c_str(), event_param.get_type_name().c_str());
-      invocation_event_names = std::vector<std::string>();
-    }
+    invocation_event_names = on_any.value();
+  }
+  if (on.has_value())
+  {
+    invocation_event_names.emplace_back(on.value());
   }
 
-  return type_result && event_result;
+  return type_result && !invocation_event_names.empty();
 }
 
 std::shared_ptr<Command> CommandManager::operator[](const std::string& index)
