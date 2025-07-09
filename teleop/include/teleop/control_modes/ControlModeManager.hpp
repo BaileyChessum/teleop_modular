@@ -72,6 +72,8 @@ public:
 
   void add(const std::string& key, const std::shared_ptr<ControlMode>& value);
 
+  void activate_initial_control_mode();
+
 private:
   /**
    * Resets everything for the controller manager

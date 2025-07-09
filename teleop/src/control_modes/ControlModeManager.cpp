@@ -134,10 +134,12 @@ void ControlModeManager::configure(InputManager& inputs)
   }
 
   executor.reset();
+}
 
-  // Activate the first control mode in the list
-  if (!control_mode_names.empty())
-    set_control_mode(control_mode_names[0]);
+void ControlModeManager::activate_initial_control_mode()
+{  // Activate the first control mode in the list
+  if (!control_modes_.empty())
+    set_control_mode(control_modes_.begin()->first);
 }
 
 bool ControlModeManager::set_control_mode(const std::string& name)
