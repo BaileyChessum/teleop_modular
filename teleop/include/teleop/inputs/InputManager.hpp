@@ -7,8 +7,6 @@
 
 #include <rclcpp/node_interfaces/node_logging_interface.hpp>
 
-#include "teleop/inputs/events/EventListenerQueue.hpp"
-#include "teleop/inputs/events/EventCollection.hpp"
 #include "teleop/inputs/Button.hpp"
 #include "teleop/inputs/Axis.hpp"
 #include "InputCollection.hpp"
@@ -23,18 +21,14 @@ class InputManager
 {
 public:
   InputManager()
-    : event_listener_queue_(std::make_shared<EventListenerQueue>())
-    , events_(event_listener_queue_)
-    , buttons_(events_)
-    , axes_(events_)
+    : buttons_()
+    , axes_()
   {
   }
 
   // Add move constructor
   InputManager(InputManager&& other) noexcept
-    : event_listener_queue_(std::move(other.event_listener_queue_))
-    , events_(std::move(other.events_))
-    , buttons_(std::move(other.buttons_))
+    : buttons_(std::move(other.buttons_))
     , axes_(std::move(other.axes_))
   {
   }
@@ -44,8 +38,6 @@ public:
   {
     if (this != &other)
     {
-      event_listener_queue_ = std::move(other.event_listener_queue_);
-      events_ = std::move(other.events_);
       buttons_ = std::move(other.buttons_);
       axes_ = std::move(other.axes_);
     }
@@ -65,10 +57,6 @@ public:
   {
     return axes_;
   }
-  [[nodiscard]] EventCollection& get_events()
-  {
-    return events_;
-  }
 
   /**
    * @brief polls the current input state and propagates changes:
@@ -79,32 +67,17 @@ public:
   void update(const rclcpp::Time& now);
 
 protected:
-  // Note: Order of members is important for proper destruction:
-  // 1. event_listener_queue_ must outlive events_
-  // 2. events_ must outlive buttons_ and axes_
-
-  /**
-   * A list of methods that we need to call, populated by invoked events
-   */
-  std::shared_ptr<EventListenerQueue> event_listener_queue_;
-
-  /**
-   * All events referenced by an input source or control mode. This collection only holds weak references, and allows
-   * Events to be dropped.
-   */
-  EventCollection events_{ event_listener_queue_ };
-
   /**
    * All boolean inputs referenced by an input source or control mode. This collection only holds weak references, and
    * allows Events to be dropped.
    */
-  InputCollection<Button> buttons_{ events_ };
+  InputCollection<Button> buttons_{ };
 
   /**
    * All double inputs referenced by an input source or control mode. This collection only holds weak references, and
    * allows Events to be dropped.
    */
-  InputCollection<Axis> axes_{ events_ };
+  InputCollection<Axis> axes_{ };
 };
 
 }  // namespace teleop

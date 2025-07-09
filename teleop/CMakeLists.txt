@@ -55,8 +55,8 @@ add_executable(${PROJECT_NAME}_node
   src/input_sources/InputSource.cpp
   src/commands/Command.cpp
   src/commands/CommandManager.cpp
-  src/inputs/EventListenerQueue.cpp
-  src/inputs/EventCollection.cpp
+  src/events/EventListenerQueue.cpp
+  src/events/EventCollection.cpp
   src/inputs/InputCommonSpecializations.cpp
   src/inputs/InputManager.cpp
   src/inputs/Button.cpp
@@ -69,6 +69,10 @@ add_executable(${PROJECT_NAME}_node
   src/inputs/state/State.cpp
 
   src/input_sources/InputSourceHandle.cpp
+  src/events/ButtonEvent.cpp
+  src/events/Event.cpp
+  src/events/EventManager.cpp
+  include/teleop/events/EventManager.hpp
 )
 
 # Add plugin implementations here!
@@ -88,8 +92,8 @@ add_library(${PROJECT_NAME} SHARED
   src/control_modes/ControlModeManager.cpp
   src/control_modes/ControlMode.cpp
   src/inputs/InputManager.cpp
-  src/inputs/EventCollection.cpp
-  src/inputs/EventListenerQueue.cpp
+  src/events/EventCollection.cpp
+  src/events/EventListenerQueue.cpp
   src/inputs/InputCollection.cpp
 
   src/input_sources/InputSource.cpp
@@ -100,6 +104,10 @@ add_library(${PROJECT_NAME} SHARED
   src/inputs/state/State.cpp
 
   src/input_sources/InputSourceHandle.cpp
+  src/events/ButtonEvent.cpp
+  src/events/Event.cpp
+  src/events/EventManager.cpp
+  include/teleop/events/EventManager.hpp
 )
 
 target_link_libraries(${PROJECT_NAME}_node

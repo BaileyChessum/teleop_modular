@@ -8,6 +8,7 @@
 #include <utility>
 
 #include "Command.hpp"
+#include "teleop/events/EventCollection.hpp"
 #include <map>
 #include <string>
 #include <memory>
@@ -31,12 +32,12 @@ public:
    * @param name The name of the command to add
    * @param inputs
    */
-  void create_command(const std::string& name, InputManager& inputs);
+  void create_command(const std::string& name, EventCollection& events);
 
   /**
    * Populates the sources_ from the params in node_.
    */
-  void configure(InputManager& inputs);
+  void configure(EventCollection& events);
 
   /**
    * Gets the command plugin class type name for a given command name, to be given to pluginlib to load.

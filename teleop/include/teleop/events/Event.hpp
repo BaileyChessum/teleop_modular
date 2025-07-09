@@ -15,66 +15,42 @@
 namespace teleop
 {
 
-class Event final
+/**
+ * Class to represent an event. If you want to make and expose your own event in your plugin, don't create a child
+ * class. Instead, just request an Event::SharedPtr that you can invoke() through the EventCollection.
+ */
+class Event
 {
 public:
   using SharedPtr = std::shared_ptr<Event>;
 
-  explicit Event(std::string name, std::weak_ptr<EventListenerQueue> listener_queue)
-    : name_(std::move(name)), listener_queue_(std::move(listener_queue))
-  {
-  }
+  explicit Event(std::string name, std::weak_ptr<EventListenerQueue> listener_queue);
   virtual ~Event() = default;
 
-  virtual void invoke()
-  {
-    if (const auto listener_queue = listener_queue_.lock(); listener_queue)
-    {
-      for (const auto& listener : listeners_)
-      {
-        listener_queue->enqueue(listener);
-      }
-    }
-    else
-    {
-      RCLCPP_ERROR(rclcpp::get_logger(name_), "Failed to get the listener queue.");
-    }
+  virtual void invoke();
 
-    invoked_ = true;
-  }
+  /**
+   * Makes the given listener be notified whenever the event is invoked.
+   */
+  void subscribe(const EventListener::WeakPtr& listener);
 
   /**
    * Called to mark the end of the frame, and update the value of is_invoked()
    */
-  void update()
-  {
-    previous_invoked_ = invoked_;
-    invoked_ = false;
-  }
+  void update(const rclcpp::Time& now);
 
-  virtual bool is_invoked()
-  {
-    return previous_invoked_;
-  }
+  /**
+   * Returns true if this event was invoked before update() was last called
+   */
+  virtual bool is_invoked();
 
   // Type conversion
-  explicit operator bool()
-  {
-    return is_invoked();
-  }
+  explicit operator bool();
 
   // Accessors
   [[nodiscard]] const std::string& get_name() const
   {
     return name_;
-  }
-
-  /**
-   * Makes the given listener be notified whenever the event is invoked.
-   */
-  void subscribe(const EventListener::WeakPtr& listener)
-  {
-    listeners_.emplace_back(listener);
   }
 
   using iterator = std::vector<std::weak_ptr<EventListener>>::iterator;
@@ -84,20 +60,22 @@ public:
   {
     return listeners_.begin();
   }
-
   [[nodiscard]] const_iterator begin() const
   {
     return listeners_.begin();
   }
-
   iterator end()
   {
     return listeners_.end();
   }
-
   [[nodiscard]] const_iterator end() const
   {
     return listeners_.end();
+  }
+
+protected:
+  virtual void on_update(const rclcpp::Time& now)
+  {
   }
 
 private:

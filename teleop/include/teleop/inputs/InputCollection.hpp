@@ -8,7 +8,9 @@
 #include "teleop/inputs/Button.hpp"
 #include "teleop/inputs/Axis.hpp"
 #include "InputCommon.hpp"
+#include "teleop/utilities/WeakMapIterator.hpp"
 #include <functional>
+#include <map>
 
 namespace teleop
 {
@@ -17,12 +19,10 @@ template <typename InputT>
 class InputCollection
 {
 public:
-  explicit InputCollection(EventCollection& events) : events_(events)
-  {
-  }
+  explicit InputCollection() = default;
 
   // Add move constructor
-  InputCollection(InputCollection&& other) noexcept : items_(std::move(other.items_)), events_(other.events_)
+  InputCollection(InputCollection&& other) noexcept : items_(std::move(other.items_))
   {
   }
 
@@ -32,7 +32,6 @@ public:
     if (this != &other)
     {
       items_ = std::move(other.items_);
-      events_ = other.events_;
     }
     return *this;
   }
@@ -80,19 +79,19 @@ public:
   {
     return iterator(items_.end(), &items_);
   }
-  const_iterator begin() const
+  [[nodiscard]] const_iterator begin() const
   {
     return const_iterator(items_.begin(), &items_);
   }
-  const_iterator end() const
+  [[nodiscard]] const_iterator end() const
   {
     return const_iterator(items_.end(), &items_);
   }
-  const_iterator cbegin() const
+  [[nodiscard]] const_iterator cbegin() const
   {
     return const_iterator(items_.begin(), &items_);
   }
-  const_iterator cend() const
+  [[nodiscard]] const_iterator cend() const
   {
     return const_iterator(items_.end(), &items_);
   }
@@ -135,7 +134,6 @@ private:
   void setup_new_item(const std::shared_ptr<InputT>& item);
   std::map<std::string, std::weak_ptr<InputT>> items_{};
   //  std::reference_wrapper<EventCollection> events_;
-  EventCollection& events_;
 };
 
 template <>

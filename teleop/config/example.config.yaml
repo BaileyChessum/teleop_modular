@@ -4,7 +4,7 @@ teleop:
     min_update_rate: 2.0
 
     # Set this true to display all the inputs. Very useful when trying to make a config!
-#    log_inputs: true
+    # log_inputs: true
 
     input_sources:
       # Declare the names of your input sources here
@@ -18,14 +18,14 @@ teleop:
       # Declare the names of your control modes here
       names: [
         "joint_space_control",
-        "task_space_control"
+        "twist_ik_control"
       ]
       joint_space_control:
         type: "teleop/JointSpaceControlMode"
         controllers: [
           "nova_arm_velocity_controller"
         ]
-      task_space_control:
+      twist_ik_control:
         type: "teleop/TwistControlMode"
         controllers: [
           "nova_arm_position_controller",
@@ -128,12 +128,30 @@ joy_input_source:
           from_buttons:
             positive: "dpad_right"
             negative: "dpad_left"
+        twist_x:
+          from: "dpad_x"
+          from_buttons:
+            positive: "dpad_right"
+            negative: "dpad_left"
+        twist_y:
+          from: "dpad_x"
+          from_buttons:
+            positive: "dpad_up"
+            negative: "dpad_down"
+        twist_z:
+          from_buttons:
+            positive: "triangle"
+            negative: "cross"
 
       buttons:
         lock:
           from: "start"
         unlock:
           from: "share"
+        locked:
+          from: "power"
+        twist_mode:
+          from: "left_bumper"
 
 joint_space_control:
   ros__parameters:
@@ -169,7 +187,7 @@ joint_space_control:
         input_name: "J6"
         max_speed: 0.364467013889
 
-task_space_control:
+twist_ik_control:
   ros__parameters:
     # TODO: get the actual name from arm code
     topic: "/todo_task_space"

@@ -7,7 +7,7 @@
 namespace teleop
 {
 
-void CommandManager::create_command(const std::string& name, InputManager& inputs)
+void CommandManager::create_command(const std::string& name, EventCollection& events)
 {
   // TODO: Ensure the name not already defined
   const auto logger = node_->get_logger();
@@ -32,27 +32,18 @@ void CommandManager::create_command(const std::string& name, InputManager& input
     return;
   }
 
-  std::vector<Event::SharedPtr> events;
+  std::vector<Event::SharedPtr> stored_events;
   for (const auto& invocation_event_name : invocation_event_names)
   {
-    events.emplace_back(inputs.get_events()[invocation_event_name]);
+    stored_events.emplace_back(events[invocation_event_name]);
   }
 
-  command_class->initialize(context_, name, events, node_->get_node_logging_interface(),
+  command_class->initialize(context_, name, stored_events, node_->get_node_logging_interface(),
                             node_->get_node_parameters_interface());
   add(name, command_class);
-
-  if (auto context = context_.lock())
-  {
-    for (const auto& event : events)
-    {
-      RCLCPP_DEBUG(logger, "Subscribing %s to %s", command_class->get_name().c_str(), event->get_name().c_str());
-      event->subscribe(command_class);
-    }
-  }
 }
 
-void CommandManager::configure(InputManager& inputs)
+void CommandManager::configure(EventCollection& events)
 {
   const auto logger = node_->get_logger();
 
@@ -97,7 +88,7 @@ void CommandManager::configure(InputManager& inputs)
 
   for (const auto& name : command_names)
   {
-    create_command(name, inputs);
+    create_command(name, events);
   }
 }
 

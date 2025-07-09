@@ -20,21 +20,6 @@ public:
   explicit Button(std::string name) : InputCommon<uint8_t>(std::move(name))
   {
   }
-
-  ~Button()
-  {
-    // Clear event pointers
-    on_pressed_down.reset();
-    on_pressed.reset();
-    on_pressed_up.reset();
-  }
-
-  void export_events(teleop::EventCollection& events) override;
-  void update_events(const rclcpp::Time& now) override;
-
-  Event::SharedPtr on_pressed;
-  Event::SharedPtr on_pressed_down;
-  Event::SharedPtr on_pressed_up;
 };
 
 }  // namespace teleop

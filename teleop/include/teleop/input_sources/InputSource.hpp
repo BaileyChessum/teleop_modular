@@ -8,7 +8,7 @@
 #include <rclcpp/node.hpp>
 
 #include "InputSourceUpdateDelegate.hpp"
-#include "teleop/inputs/events/Event.hpp"
+#include "teleop/events/Event.hpp"
 #include "teleop/inputs/InputCommon.hpp"
 #include "teleop/inputs/InputManager.hpp"
 #include "teleop/inputs/InputDeclaration.hpp"

@@ -16,6 +16,15 @@ void Command::initialize(const CommandDelegate::WeakPtr& context, const std::str
   on_ = on;
   logger_ = logging->get_logger();
 
+  // Subscribe to the given events
+  const auto logger = get_logger();
+  RCLCPP_DEBUG(logger, "Command %s has %lu invocation events:", get_name().c_str(), on_.size());
+  for (const auto& event : on)
+  {
+    RCLCPP_DEBUG(logger, "  - Subscribing to event %s", event->get_name().c_str());
+    event->subscribe(shared_from_this());
+  }
+
   // Do command implementation specific parameterization
   on_initialize("commands." + name + ".", parameters);
 }

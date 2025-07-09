@@ -3,7 +3,7 @@
 //
 
 #include <rclcpp/logging.hpp>
-#include "teleop/inputs/events/EventListenerQueue.hpp"
+#include "teleop/events/EventListenerQueue.hpp"
 
 namespace teleop
 {

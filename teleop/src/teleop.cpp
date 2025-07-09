@@ -11,7 +11,7 @@ using std::placeholders::_2;
 namespace teleop
 {
 
-Teleop::Teleop(const std::shared_ptr<rclcpp::Node>& node) : node_(node), states_(inputs_)
+Teleop::Teleop(const std::shared_ptr<rclcpp::Node>& node) : node_(node), states_(inputs_), events_(inputs_)
 {
   // Create publishers
   param_listener_ = std::make_shared<ParamListener>(Teleop::get_node());
@@ -27,15 +27,18 @@ void Teleop::initialize(const std::weak_ptr<rclcpp::Executor>& executor)
   control_mode_manager_ = std::make_shared<ControlModeManager>(get_node(), executor);
   control_mode_manager_->configure(inputs_);
 
+  RCLCPP_DEBUG(logger, "Teleop::initialize(): Creating commands.");
+  commands_ = std::make_shared<CommandManager>(get_node(), shared_from_this());
+  commands_->configure(events_.get_events());;
+
   log_existing_inputs();
 
+  // Input source initialization and setup depends on commands and control modes to first request the inputs that want
+  // populated.
   RCLCPP_DEBUG(logger, "Teleop::initialize(): Creating input sources.");
   input_source_manager_ = std::make_shared<InputSourceManager>(get_node(), executor, inputs_);
   input_source_manager_->configure(param_listener_, inputs_);
 
-  RCLCPP_DEBUG(logger, "Teleop::initialize(): Creating commands.");
-  commands_ = std::make_shared<CommandManager>(get_node(), shared_from_this());
-  commands_->configure(inputs_);
 
   RCLCPP_DEBUG(logger, "Teleop::initialize(): Fully initialized!");
 }
@@ -66,7 +69,7 @@ void Teleop::log_all_inputs()
       RCLCPP_INFO(logger, C_INPUT "  %s\t%d", button->get_name().c_str(), button->value());
     }
   }
-  for (auto& event : inputs_.get_events())
+  for (auto& event : events_.get_events())
   {
     if (!event)
       continue;
@@ -116,6 +119,7 @@ void Teleop::service_input_updates()
 
     input_source_manager_->update(now);
     inputs_.update(now);
+    events_.update(now);
 
     // Log inputs
     if (params_.log_inputs)

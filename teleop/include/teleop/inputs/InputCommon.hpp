@@ -9,7 +9,6 @@
 #include <utility>
 
 #include "InputDeclaration.hpp"
-#include "teleop/inputs/events/EventCollection.hpp"
 
 namespace teleop
 {
@@ -21,8 +20,6 @@ public:
   virtual ~InputCommon() = default;
 
   T value();
-  virtual void export_events(EventCollection& events) {};
-  virtual void update_events(const rclcpp::Time& now) {};
 
   void debounce(const rclcpp::Time& now);
 

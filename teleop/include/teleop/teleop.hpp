@@ -14,6 +14,7 @@
 #include "input_sources/InputSourceManager.hpp"
 #include "commands/CommandManager.hpp"
 #include "inputs/state/StateManager.hpp"
+#include "teleop/events/EventManager.hpp"
 
 namespace teleop
 {
@@ -60,6 +61,7 @@ private:
 
   InputManager inputs_;
   StateManager states_;
+  internal::EventManager events_;
 
   std::shared_ptr<ControlModeManager> control_mode_manager_ = nullptr;
   std::shared_ptr<InputSourceManager> input_source_manager_ = nullptr;

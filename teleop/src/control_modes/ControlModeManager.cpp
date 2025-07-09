@@ -143,7 +143,6 @@ void ControlModeManager::configure(InputManager& inputs)
 bool ControlModeManager::set_control_mode(const std::string& name)
 {
   const auto logger = node_->get_logger();
-  RCLCPP_INFO(logger, C_MODE "%s activated" C_RESET, snake_to_title(name).c_str());
 
   // Find the control mode from the name
   const auto new_control_mode_it = std::find_if(
@@ -152,11 +151,13 @@ bool ControlModeManager::set_control_mode(const std::string& name)
 
   // Ensure the given control mode exists
   if (new_control_mode_it == control_modes_.end() || !new_control_mode_it->second)
+  {
+    RCLCPP_ERROR(logger, "Can't find control mode \"%s\".", name.c_str());
     return false;
+  }
 
   // Whether we successfully switch controllers in ros2_control
   bool switch_result = false;
-  ;
 
   // Deactivate the previous control mode, then switch
   if (current_control_mode_)
@@ -177,12 +178,14 @@ bool ControlModeManager::set_control_mode(const std::string& name)
   if (!switch_result)
   {
     // TODO: Error recovery here
+    RCLCPP_ERROR(logger, "Failed to switch ros2_control controllers for control mode switch to \"%s\".", name.c_str());
     return false;
   }
 
   // Activate the new control mode
   current_control_mode_ = new_control_mode_it->second;
   current_control_mode_->activate();
+  RCLCPP_INFO(logger, C_MODE "%s activated" C_RESET, snake_to_title(name).c_str());
 
   return true;
 }
@@ -219,7 +222,7 @@ bool ControlModeManager::switch_controllers(const ControlMode& previous, const C
   if (previous.get_name() == next.get_name())
     return false;
 
-  RCLCPP_INFO(node_->get_logger(), "Changing from %s to %s", previous.get_name().c_str(), next.get_name().c_str());
+  RCLCPP_DEBUG(node_->get_logger(), "Changing from %s to %s", previous.get_name().c_str(), next.get_name().c_str());
 
   // The order of deactivation needs to be opposite to the activation order. This is the reverse to the final order.
   std::vector<std::string> deactivate_controllers_reversed = previous.get_base_params().controllers;

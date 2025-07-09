@@ -238,11 +238,6 @@ std::optional<InputSourceHandle::RemapAxisParams> InputSourceHandle::get_remap_a
 
   const auto transform_params = get_axis_transform_params(name);
 
-  if (!transform_params.has_value())
-  {
-    RCLCPP_WARN(logger, "Remapped axis %s is missing a transform", name.c_str());
-  }
-
   return RemapAxisParams{ name, from.value(), transform_params, from_buttons_params };
 }
 
@@ -304,7 +299,7 @@ InputSourceHandle::get_axis_transform_params(const std::string& name)
 
   if (!params.invert && !params.range.has_value() && !params.power.has_value())
   {
-    RCLCPP_WARN(logger, "Remapped axis %s does not define a transform", name.c_str());
+    RCLCPP_DEBUG(logger, "Remapped axis %s does not define a transform", name.c_str());
     return std::nullopt;
   }
 
