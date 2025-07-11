@@ -2,24 +2,27 @@
 #define TELEOP_MODULAR_TWIST__TELEOP_MODULAR_TWIST_HPP_
 
 #include "teleop_modular_twist/visibility_control.h"
-#include "teleop_modular/teleop_modular/control_modes/ControlMode.hpp"
+#include "teleop_modular/control_modes/ControlMode.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
-#include "teleop_modular/teleop_modular/inputs/Button.hpp"
-#include "teleop_modular/teleop_modular/inputs/Axis.hpp"
+#include "teleop_modular/inputs/Button.hpp"
+#include "teleop_modular/inputs/Axis.hpp"
+#include "twist_control_mode_parameters.hpp"
 
 namespace teleop_modular_twist
 {
   using teleop_modular::Button;
   using teleop_modular::Axis;
+  using teleop_modular::ControlMode;
+  using teleop_modular::InputManager;
 
-class TwistControlMode : public teleop_modular::ControlMode
+class TwistControlMode : public ControlMode
 {
 public:
   TwistControlMode();
 
   void on_initialize() override;
 
-  void on_configure(teleop_modular::InputManager& inputs) override;
+  void on_configure(InputManager& inputs) override;
   void on_activate() override;
   void on_deactivate() override;
 
@@ -27,7 +30,7 @@ public:
   void update(const rclcpp::Time &now, const rclcpp::Duration &period) override;
 
 protected:
-  ~TwistControlMode() override = default;
+  ~TwistControlMode() override;
 
 private:
   /// Helper function to get the euclidean length of a vector, used for normalized limits.

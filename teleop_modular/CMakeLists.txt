@@ -41,10 +41,6 @@ generate_parameter_library(
   joint_space_control_mode_parameters
   src/control_modes/joint_space/joint_space_control_mode_parameters.yaml
 )
-generate_parameter_library(
-  twist_control_mode_parameters
-  src/control_modes/twist/twist_control_mode_parameters.yaml
-)
 
 # Build the node executable
 add_executable(${PROJECT_NAME}_node
@@ -72,13 +68,12 @@ add_executable(${PROJECT_NAME}_node
   src/events/ButtonEvent.cpp
   src/events/Event.cpp
   src/events/EventManager.cpp
-  include/teleop_modular/events/EventManager.hpp
 )
 
 # Add plugin implementations here!
 add_library(${PROJECT_NAME} SHARED
+  src/control_modes/ControlMode.cpp
   src/control_modes/joint_space/JointSpaceControlMode.cpp
-  src/control_modes/twist/TwistControlMode.cpp
   src/input_sources/joy/JoyInputSource.cpp
   src/commands/SwitchControlModeCommand.cpp
   src/commands/LogCommand.cpp
@@ -107,7 +102,6 @@ add_library(${PROJECT_NAME} SHARED
   src/events/ButtonEvent.cpp
   src/events/Event.cpp
   src/events/EventManager.cpp
-  include/teleop_modular/events/EventManager.hpp
 )
 
 target_link_libraries(${PROJECT_NAME}_node
@@ -124,10 +118,6 @@ target_link_libraries(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
   joint_space_control_mode_parameters
 )
-target_link_libraries(${PROJECT_NAME}
-  twist_control_mode_parameters
-)
-
 
 ament_target_dependencies(${PROJECT_NAME}_node ${THIS_PACKAGE_INCLUDE_DEPENDS})
 ament_target_dependencies(${PROJECT_NAME} ${THIS_PACKAGE_INCLUDE_DEPENDS})
@@ -173,14 +163,13 @@ install(
     teleop_modular_parameters
     joy_input_source_parameters
     joint_space_control_mode_parameters
-    twist_control_mode_parameters
   DESTINATION lib/${PROJECT_NAME}
 )
 
 # Install header files
 install(
   DIRECTORY include/
-  DESTINATION include/${PROJECT_NAME}
+  DESTINATION include
 )
 
 # Install launch files
@@ -199,7 +188,6 @@ install(TARGETS ${PROJECT_NAME}
   teleop_modular_parameters
   joy_input_source_parameters
   joint_space_control_mode_parameters
-  twist_control_mode_parameters
   EXPORT export_${PROJECT_NAME}
   RUNTIME DESTINATION bin
   ARCHIVE DESTINATION lib

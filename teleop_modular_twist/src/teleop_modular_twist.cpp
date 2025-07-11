@@ -9,7 +9,7 @@ TwistControlMode::~TwistControlMode() = default;
 
 void TwistControlMode::on_initialize()
 {
-  param_listener_ = std::make_shared<twist_control_mode::ParamListener>(node_);
+  param_listener_ = std::make_shared<teleop_modular_twist::ParamListener>(node_);
   params_ = param_listener_->get_params();
 }
 

@@ -5,7 +5,7 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   pluginlib
   rclcpp
   std_msgs
-  std_srvs
+  geometry_msgs
 )
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -31,7 +31,7 @@ generate_parameter_library(
   src/twist_control_mode_parameters.yaml
 )
 
-add_library(teleop_modular_twist
+add_library(${PROJECT_NAME}
   src/teleop_modular_twist.cpp
 )
 
@@ -43,21 +43,21 @@ target_include_directories(teleop_modular_twist PUBLIC
 
 # Link the generate_parameter_library
 target_link_libraries(${PROJECT_NAME}
-  teleop_modular_parameters
+  twist_control_mode_parameters
 )
 
 ament_target_dependencies(${PROJECT_NAME} ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
 # Causes the visibility macros to use dllexport rather than dllimport,
 # which is appropriate when building the dll but not consuming it.
-target_compile_definitions(teleop_modular_twist PRIVATE "TELEOP_MODULAR_TWIST_BUILDING_LIBRARY")
+target_compile_definitions(${PROJECT_NAME} PRIVATE "TELEOP_MODULAR_TWIST_BUILDING_LIBRARY")
 
 install(
   DIRECTORY include/
   DESTINATION include/${PROJECT_NAME}
 )
 install(
-  TARGETS teleop_modular_twist
+  TARGETS ${PROJECT_NAME}
   twist_control_mode_parameters
   EXPORT export_${PROJECT_NAME}
   ARCHIVE DESTINATION lib
