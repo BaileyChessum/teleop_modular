@@ -34,10 +34,6 @@ generate_parameter_library(
 
 # Generate parameter library for the joy input source
 generate_parameter_library(
-  joy_input_source_parameters
-  src/input_sources/joy/joy_input_source_parameters.yaml
-)
-generate_parameter_library(
   joint_space_control_mode_parameters
   src/control_modes/joint_space/joint_space_control_mode_parameters.yaml
 )
@@ -74,7 +70,6 @@ add_executable(${PROJECT_NAME}_node
 add_library(${PROJECT_NAME} SHARED
   src/control_modes/ControlMode.cpp
   src/control_modes/joint_space/JointSpaceControlMode.cpp
-  src/input_sources/joy/JoyInputSource.cpp
   src/commands/SwitchControlModeCommand.cpp
   src/commands/LogCommand.cpp
   src/commands/SetButtonCommand.cpp
@@ -111,9 +106,6 @@ target_link_libraries(${PROJECT_NAME}_node
 # Link parameter libraries for plugins here!
 target_link_libraries(${PROJECT_NAME}
   teleop_modular_parameters
-)
-target_link_libraries(${PROJECT_NAME}
-  joy_input_source_parameters
 )
 target_link_libraries(${PROJECT_NAME}
   joint_space_control_mode_parameters
@@ -161,7 +153,6 @@ install(
     ${PROJECT_NAME}_node
     ${PROJECT_NAME}
     teleop_modular_parameters
-    joy_input_source_parameters
     joint_space_control_mode_parameters
   DESTINATION lib/${PROJECT_NAME}
 )
@@ -186,7 +177,6 @@ install(
 
 install(TARGETS ${PROJECT_NAME}
   teleop_modular_parameters
-  joy_input_source_parameters
   joint_space_control_mode_parameters
   EXPORT export_${PROJECT_NAME}
   RUNTIME DESTINATION bin

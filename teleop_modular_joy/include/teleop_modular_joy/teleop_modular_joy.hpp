@@ -9,9 +9,8 @@
 #include <utility>
 #include "teleop_modular/input_sources/InputSource.hpp"
 #include "joy_input_source_parameters.hpp"
-#include "teleop_modular/inputs/state/State.hpp"
 
-namespace teleop_modular
+namespace teleop_modular_joy
 {
 
 class JoyInputSource final : public InputSource
@@ -26,8 +25,8 @@ protected:
 private:
   void joy_callback(sensor_msgs::msg::Joy::SharedPtr msg);
 
-  std::shared_ptr<joy_input_source::ParamListener> param_listener_;
-  joy_input_source::Params params_;
+  std::shared_ptr<teleop_modular_joy::ParamListener> param_listener_;
+  teleop_modular_joy::Params params_;
 
   rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr subscription_;
   sensor_msgs::msg::Joy::SharedPtr joy_msg_ = nullptr;

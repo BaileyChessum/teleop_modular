@@ -7,24 +7,19 @@
 , gtest
 , rclcpp
 , geometry-msgs
-, sensor-msgs
 , generate-parameter-library
 , pluginlib
-, rclcpp-components
-, realtime-tools
-, controller-manager-msgs
-, control-msgs
 , std-msgs
-, std-srvs
-, nova-interfaces
+, teleop-modular
+, joy
 }:
 
 buildRosPackage {
-  name = "teleop-modular";
+  name = "teleop-modular-joy";
   buildType = "ament_cmake";
 
   src = builtins.path rec {
-    name = "teleop-modular-source";
+    name = "teleop-modular-joy-source";
     path = ./.;
     # TODO: Replace filter
     filter = lib.novaSourceFilter [ ] path;
@@ -39,23 +34,15 @@ buildRosPackage {
   ];
 
   buildInputs = [
-    control-msgs
     rclcpp
-    std-srvs
-    generate-parameter-library
-    realtime-tools
-    geometry-msgs
-    nova-interfaces
-    sensor-msgs
-    pluginlib
-    rclcpp-components
-    realtime-tools
-    controller-manager-msgs
-    control-msgs
     std-msgs
+    generate-parameter-library
+    geometry-msgs
+    pluginlib
+    teleop-modular
   ];
 
-  propagatedBuildInputs = [ ];
+  propagatedBuildInputs = [ joy ];
 
   # Enable running tests during build
   doCheck = true;

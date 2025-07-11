@@ -2,16 +2,15 @@
 // Created by nova on 6/11/25.
 //
 
-#include "../../../include/teleop_modular/input_sources/joy/JoyInputSource.hpp"
+#include "teleop_modular_joy/teleop_modular_joy.hpp"
+#include "teleop_modular/colors.hpp"
 
-#include "colors.hpp"
-
-namespace teleop_modular
+namespace teleop_modular_joy
 {
 
 void JoyInputSource::on_initialize()
 {
-  param_listener_ = std::make_shared<joy_input_source::ParamListener>(get_node());
+  param_listener_ = std::make_shared<teleop_modular_joy::ParamListener>(get_node());
   params_ = param_listener_->get_params();
 
   subscription_ = get_node()->create_subscription<sensor_msgs::msg::Joy>(
