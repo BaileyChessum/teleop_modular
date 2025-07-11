@@ -1,25 +1,24 @@
-//
-// Created by Bailey Chessum on 6/4/25.
-//
+#ifndef TELEOP_MODULAR_TWIST__TELEOP_MODULAR_TWIST_HPP_
+#define TELEOP_MODULAR_TWIST__TELEOP_MODULAR_TWIST_HPP_
 
-#ifndef TELEOP_MODULAR_TWISTIKCONTROLMODE_HPP
-#define TELEOP_MODULAR_TWISTIKCONTROLMODE_HPP
-
-#include "twist_control_mode_parameters.hpp"
+#include "teleop_modular_twist/visibility_control.h"
 #include "teleop_modular/control_modes/ControlMode.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
 #include "teleop_modular/inputs/Button.hpp"
 #include "teleop_modular/inputs/Axis.hpp"
+#include "twist_control_mode_parameters.hpp"
 
-namespace teleop_modular
+namespace teleop_modular_twist
 {
-/**
- * Control mode for moving joint velocities directly
- */
-class TwistControlMode final : public ControlMode
+  using teleop_modular::Button;
+  using teleop_modular::Axis;
+  using teleop_modular::ControlMode;
+  using teleop_modular::InputManager;
+
+class TwistControlMode : public ControlMode
 {
 public:
-  explicit TwistControlMode() = default;
+  TwistControlMode();
 
   void on_initialize() override;
 
@@ -28,18 +27,18 @@ public:
   void on_deactivate() override;
 
   void publish_halt_message(const rclcpp::Time& now) const;
-
-  void update(const rclcpp::Time& now, const rclcpp::Duration& period) override;
+  void update(const rclcpp::Time &now, const rclcpp::Duration &period) override;
 
 protected:
-  ~TwistControlMode() override = default;
+  ~TwistControlMode() override;
 
+private:
   /// Helper function to get the euclidean length of a vector, used for normalized limits.
   double norm(double x, double y, double z);
 
   /// Tracks parameters
-  std::shared_ptr<twist_control_mode::ParamListener> param_listener_{};
-  twist_control_mode::Params params_{};
+  std::shared_ptr<teleop_modular_twist::ParamListener> param_listener_{};
+  teleop_modular_twist::Params params_{};
 
   /// Input from 0 to 1 that directly scales the output speed.
   Axis::SharedPtr speed_coefficient_;
@@ -57,6 +56,6 @@ protected:
   rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr publisher_;
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop_modular_twist
 
-#endif  // TELEOP_MODULAR_TWISTIKCONTROLMODE_HPP
+#endif  // TELEOP_MODULAR_TWIST__TELEOP_MODULAR_TWIST_HPP_

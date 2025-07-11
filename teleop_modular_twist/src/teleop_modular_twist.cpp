@@ -1,15 +1,15 @@
-//
-// Created by Bailey Chessum on 6/7/25.
-//
+#include "teleop_modular_twist/teleop_modular_twist.hpp"
 
-#include "teleop_modular/control_modes/twist/TwistControlMode.hpp"
-
-namespace teleop_modular
+namespace teleop_modular_twist
 {
+
+TwistControlMode::TwistControlMode() = default;
+
+TwistControlMode::~TwistControlMode() = default;
 
 void TwistControlMode::on_initialize()
 {
-  param_listener_ = std::make_shared<twist_control_mode::ParamListener>(node_);
+  param_listener_ = std::make_shared<teleop_modular_twist::ParamListener>(node_);
   params_ = param_listener_->get_params();
 }
 
@@ -109,8 +109,8 @@ double TwistControlMode::norm(double x, double y, double z)
   return std::sqrt(x * x + y * y + z * z);
 }
 
-}  // namespace teleop_modular
+}  // namespace teleop_modular_twist
 
 #include <pluginlib/class_list_macros.hpp>
 
-CLASS_LOADER_REGISTER_CLASS(teleop_modular::TwistControlMode, teleop_modular::ControlMode);
+CLASS_LOADER_REGISTER_CLASS(teleop_modular_twist::TwistControlMode, teleop_modular::ControlMode);

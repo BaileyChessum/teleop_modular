@@ -1,6 +1,6 @@
 # This is only the schema for Node Parameters
 # Look here for docs about this YAML : https://github.com/PickNikRobotics/generate_parameter_library
-twist_control_mode:
+teleop_modular_twist:
   topic:
     type: string
     default_value: ""

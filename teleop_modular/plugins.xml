@@ -3,9 +3,6 @@
    <class name="teleop_modular/JointSpaceControlMode" type="teleop_modular::JointSpaceControlMode" base_class_type="teleop_modular::ControlMode">
        <description>A control mode that directly controls joints of the arm.</description>
    </class>
-    <class name="teleop_modular/TwistControlMode" type="teleop_modular::TwistControlMode" base_class_type="teleop_modular::ControlMode">
-        <description>A control mode that moves some reference frame of the robot by a Twist.</description>
-    </class>
 
     <!-- Input Sources -->
     <class name="teleop_modular/JoyInputSource" type="teleop_modular::JoyInputSource" base_class_type="teleop_modular::InputSource">
