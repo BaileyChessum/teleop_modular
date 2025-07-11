@@ -39,13 +39,14 @@ void TeleopModular::initialize(const std::weak_ptr<rclcpp::Executor>& executor)
   input_source_manager_ = std::make_shared<InputSourceManager>(get_node(), executor, inputs_);
   input_source_manager_->configure(param_listener_, inputs_);
 
-  control_mode_manager_->activate_initial_control_mode();
 
-  RCLCPP_DEBUG(logger, "Teleop_Modular::initialize(): Fully initialized!");
+  RCLCPP_DEBUG(logger, "Teleop_Modular::initialize(): Starting...");
+  control_mode_manager_->activate_initial_control_mode();
 
   const auto now = get_node()->now();
   events_.get_events()["start"]->invoke();
   events_.update(now);
+  RCLCPP_DEBUG(logger, "Teleop_Modular::initialize(): Fully initialized!");
 }
 
 void TeleopModular::log_all_inputs()

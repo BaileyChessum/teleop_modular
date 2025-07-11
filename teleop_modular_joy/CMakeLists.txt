@@ -53,6 +53,8 @@ ament_target_dependencies(${PROJECT_NAME} ${THIS_PACKAGE_INCLUDE_DEPENDS})
 # which is appropriate when building the dll but not consuming it.
 target_compile_definitions(${PROJECT_NAME} PRIVATE "TELEOP_MODULAR_JOY_BUILDING_LIBRARY")
 
+pluginlib_export_plugin_description_file(teleop_modular plugins.xml)
+
 install(
   DIRECTORY include/
   DESTINATION include/${PROJECT_NAME}
