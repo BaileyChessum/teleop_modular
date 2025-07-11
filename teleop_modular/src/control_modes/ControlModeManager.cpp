@@ -2,8 +2,8 @@
 #include "teleop_modular/control_modes/ControlModeManager.hpp"
 
 #include <controller_manager_msgs/srv/detail/switch_controller__struct.hpp>
-#include "colors.hpp"
-#include "utils.hpp"
+#include "teleop_modular/colors.hpp"
+#include "teleop_modular/utils.hpp"
 
 namespace teleop_modular
 {

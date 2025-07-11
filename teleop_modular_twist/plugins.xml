@@ -1,4 +1,4 @@
-<library path="teleop_modular">
+<library path="teleop_modular_twist">
     <!-- Control Modes -->
     <class name="teleop_modular_twist/TwistControlMode" type="teleop_modular_twist::TwistControlMode" base_class_type="teleop_modular::ControlMode">
         <description>A control mode that moves some reference frame of the robot by a Twist.</description>

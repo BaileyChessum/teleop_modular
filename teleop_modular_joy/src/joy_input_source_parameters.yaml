@@ -1,8 +1,6 @@
 # This is only the schema for Node Parameters
-# This YAML will be converted to teleop_modular_drive_joy_parameters.hpp upon build
-# Look at individual controller config for changing axes / buttons
 # Look here for docs about this YAML : https://github.com/PickNikRobotics/generate_parameter_library
-joy_input_source:
+teleop_modular_joy:
   axis_definitions:
     type: string_array
     default_value: []

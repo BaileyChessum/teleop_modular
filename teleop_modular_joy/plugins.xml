@@ -1,0 +1,6 @@
+<library path="teleop_modular_joy">
+    <!-- Input Sources -->
+    <class name="teleop_modular_joy/JoyInputSource" type="teleop_modular_joy::JoyInputSource" base_class_type="teleop_modular::InputSource">
+        <description>An input source for joysticks, such as xbox controllers.</description>
+    </class>
+</library>
