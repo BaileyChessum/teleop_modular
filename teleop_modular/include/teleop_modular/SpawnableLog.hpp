@@ -9,7 +9,7 @@
 #include <optional>
 #include <utility>
 #include <sstream>
-#include "colors.hpp"
+#include "teleop_modular/colors.hpp"
 
 namespace teleop_modular
 {

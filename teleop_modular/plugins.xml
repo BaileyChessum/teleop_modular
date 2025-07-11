@@ -1,12 +1,7 @@
 <library path="teleop_modular">
     <!-- Control Modes -->
-   <class name="teleop_modular/JointSpaceControlMode" type="teleop_modular::JointSpaceControlMode" base_class_type="teleop_modular::ControlMode">
-       <description>A control mode that directly controls joints of the arm.</description>
-   </class>
-
-    <!-- Input Sources -->
-    <class name="teleop_modular/JoyInputSource" type="teleop_modular::JoyInputSource" base_class_type="teleop_modular::InputSource">
-        <description>An input source for joysticks, such as xbox controllers and thrustmasters.</description>
+    <class name="teleop_modular/JointSpaceControlMode" type="teleop_modular::JointSpaceControlMode" base_class_type="teleop_modular::ControlMode">
+        <description>A control mode that directly controls joints of the arm.</description>
     </class>
 
     <!-- Commands -->

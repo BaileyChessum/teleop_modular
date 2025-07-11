@@ -3,7 +3,7 @@
 //
 
 #include "teleop_modular/control_modes/joint_space/JointSpaceControlMode.hpp"
-#include "colors.hpp"
+#include "teleop_modular/colors.hpp"
 
 namespace teleop_modular
 {

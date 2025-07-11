@@ -12,6 +12,8 @@
 
 namespace teleop_modular_joy
 {
+  using teleop_modular::InputSource;
+  using teleop_modular::InputDeclarationList;
 
 class JoyInputSource final : public InputSource
 {

@@ -6,7 +6,7 @@
 #include <functional>
 #include <set>
 #include "teleop_modular/utilities/get_parameter.hpp"
-#include "colors.hpp"
+#include "teleop_modular/colors.hpp"
 
 namespace teleop_modular::internal
 {

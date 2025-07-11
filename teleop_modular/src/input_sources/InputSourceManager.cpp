@@ -4,8 +4,8 @@
 
 #include "teleop_modular/input_sources/InputSourceManager.hpp"
 
-#include "colors.hpp"
-#include "utils.hpp"
+#include "teleop_modular/colors.hpp"
+#include "teleop_modular/utils.hpp"
 
 namespace teleop_modular
 {

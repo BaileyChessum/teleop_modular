@@ -1,6 +1,6 @@
 #include "teleop_modular/teleop_modular.hpp"
 
-#include "colors.hpp"
+#include "teleop_modular/colors.hpp"
 #include "teleop_modular/control_modes/ControlModeManager.hpp"
 
 using namespace std::chrono_literals;
