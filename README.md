@@ -1,19 +1,19 @@
 # teleop_modular
 
-> Note: `teleop_modular` is experimental, and missing build processes and documentation needed for production use. 
->
-> As of v0.0.1, you are not yet able to build and use `teleop_modular` without access to a private repository. This will be fixed in the next few days.
-> 
-> `teleop_modular` will be ready for use shortly. Please star the repository for updates.
-
 `teleop_modular` is a generalized framework for teleoperation input handling in ROS2.
 
-It pairs well with `ros2_control`, supporting switching between multiple different control modes, with associated `ros2_control` controllers. However, it the modular design is generalized to be useful for teleoperation with custom infrastructure for control. 
+> ⚠️ `teleop_modular` is experimental, and missing build processes and documentation needed for production use. 
+> 
+> Expect major API changes until v1.0.0 -- reference stable tags rather than `main` in build processes
 
-It aims to replace packages like [teleop-twist-joy](https://github.com/ros-teleop/teleop_twist_joy) and [teleop-twist-keyboard](https://github.com/ros-teleop/teleop_twist_keyboard), with the intent to:
+`teleop_modular` will be ready for use shortly! Please star the repository for updates, and see [announcements](https://github.com/BaileyChessum/teleop_modular/discussions/categories/announcements) for more information.
+
+## Motivation
+
+`teleop_modular` aims to replace packages like `teleop_twist_joy` and `teleop_twist_keyboard`, with the intent to:
 - Prevent control mode logic being tightly coupled to a specific input source.
 - Centralize management of multiple control modes.
-  - integration with `ros2_control` to dynamically switch active controllers for each control mode.
+  - Integration with `ros2_control` to dynamically switch active controllers for each control mode.
 - Allow new control modes to be easily added to teleop systems using plugins.
   - Promote experimentation with control modes.
   - Allow control mode code to be reused to achieve different functionality 
@@ -21,6 +21,38 @@ It aims to replace packages like [teleop-twist-joy](https://github.com/ros-teleo
 - Allow novel input sources to be developed and integrated with existing systems
 - Improve configuration for individual input sources
 
-More specific WIP documentation and examples can be found under [./teleop_modular/README.md](./teleop_modular/README.md) and [./teleop_modular/docs](./teleop_modular/docs). More information will be provided as designs are finalized after getting feedback from implementing `teleop_modular` into an existing system.
+## Plugins
+
+This is a list of plugins you can use with teleop_modular. Please post plugins to the [discussions](https://github.com/BaileyChessum/teleop_modular/discussions/categories/general) page to add them to this list.
+
+#### Control Modes
+
+- [teleop_modular_twist/TwistControlMode](./teleop_modular_twist) -- A control mode for sending TwistStamped messages.
+
+#### Input Sources
+
+- [teleop_modular_joy/JoyInputSource](./teleop_modular_joy) -- An input source for joystick devices.
+
+## Documentation 
+
+Detailed documentation and examples are still a work in progress. Incomplete documentation can be found under under [./teleop_modular/README.md](./teleop_modular/README.md) and [./teleop_modular/docs](./teleop_modular/docs). This will be expanded upon as the API is finalised with testing over the next week.
+
+Please see [teleop_modular_twist/TwistControlMode](./teleop_modular_twist) as an example implementation of a ControlMode and [teleop_modular_joy/JoyInputSource](./teleop_modular_joy) as an example implementation for an InputSource. Detailed guides for writing control modes and input sources are in progress.
+
+## Contributing
+
+All are welcome to contribute. As `teleop_modular` is still very experimental, I'm keen to hear feedback on any aspect of using the package with your robots.
+
+Please post in the [discussions](https://github.com/BaileyChessum/teleop_modular/discussions/categories/general) page -- we are happy to help in any way we can!
+
+#### PRs
+
+Feel free to make a fork of the repository, and raise a pull request with any changes you wish to contribute. Any changes you submit will be under the [Apache 2.0 License](./LICENSE.txt).
+
+#### Issues
+
+You are welcome to [raise new issues](https://github.com/BaileyChessum/teleop_modular/issues/new) for any bugs or feature requests.
+
+The project development roadmap is outlined for each upcoming version as [Milestones](https://github.com/BaileyChessum/teleop_modular/milestones).
 
 
