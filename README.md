@@ -21,6 +21,6 @@ It aims to replace packages like [teleop-twist-joy](https://github.com/ros-teleo
 - Allow novel input sources to be developed and integrated with existing systems
 - Improve configuration for individual input sources
 
-More specific WIP documentation and examples can be found under [./modular_teleop/README.md](./modular_teleop/README.md) and [./modular_teleop/docs](./modular_teleop/docs). More information will be provided as designs are finalized after getting feedback from implementing `teleop_modular` into an existing system.
+More specific WIP documentation and examples can be found under [./teleop_modular/README.md](./teleop_modular/README.md) and [./teleop_modular/docs](./teleop_modular/docs). More information will be provided as designs are finalized after getting feedback from implementing `teleop_modular` into an existing system.
 
 
