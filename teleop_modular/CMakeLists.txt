@@ -6,7 +6,6 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   geometry_msgs
   sensor_msgs
   controller_manager_msgs
-  nova_interfaces
   pluginlib
   rclcpp
   realtime_tools

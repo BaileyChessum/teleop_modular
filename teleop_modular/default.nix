@@ -16,7 +16,6 @@
 , control-msgs
 , std-msgs
 , std-srvs
-, nova-interfaces
 }:
 
 buildRosPackage {
@@ -26,8 +25,6 @@ buildRosPackage {
   src = builtins.path rec {
     name = "teleop-modular-source";
     path = ./.;
-    # TODO: Replace filter
-    filter = lib.novaSourceFilter [ ] path;
   };
 
   nativeBuildInputs = [
@@ -45,7 +42,6 @@ buildRosPackage {
     generate-parameter-library
     realtime-tools
     geometry-msgs
-    nova-interfaces
     sensor-msgs
     pluginlib
     rclcpp-components
