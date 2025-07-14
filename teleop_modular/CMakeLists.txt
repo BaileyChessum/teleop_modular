@@ -6,7 +6,6 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   geometry_msgs
   sensor_msgs
   controller_manager_msgs
-  nova_interfaces
   pluginlib
   rclcpp
   realtime_tools
@@ -30,12 +29,6 @@ include_directories(
 generate_parameter_library(
   teleop_modular_parameters
   src/parameters.yaml
-)
-
-# Generate parameter library for the joy input source
-generate_parameter_library(
-  joint_space_control_mode_parameters
-  src/control_modes/joint_space/joint_space_control_mode_parameters.yaml
 )
 
 # Build the node executable
@@ -69,7 +62,7 @@ add_executable(${PROJECT_NAME}_node
 # Add plugin implementations here!
 add_library(${PROJECT_NAME} SHARED
   src/control_modes/ControlMode.cpp
-  src/control_modes/joint_space/JointSpaceControlMode.cpp
+
   src/commands/SwitchControlModeCommand.cpp
   src/commands/LogCommand.cpp
   src/commands/SetButtonCommand.cpp
@@ -106,9 +99,6 @@ target_link_libraries(${PROJECT_NAME}_node
 # Link parameter libraries for plugins here!
 target_link_libraries(${PROJECT_NAME}
   teleop_modular_parameters
-)
-target_link_libraries(${PROJECT_NAME}
-  joint_space_control_mode_parameters
 )
 
 ament_target_dependencies(${PROJECT_NAME}_node ${THIS_PACKAGE_INCLUDE_DEPENDS})
@@ -153,7 +143,6 @@ install(
     ${PROJECT_NAME}_node
     ${PROJECT_NAME}
     teleop_modular_parameters
-    joint_space_control_mode_parameters
   DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -177,7 +166,6 @@ install(
 
 install(TARGETS ${PROJECT_NAME}
   teleop_modular_parameters
-  joint_space_control_mode_parameters
   EXPORT export_${PROJECT_NAME}
   RUNTIME DESTINATION bin
   ARCHIVE DESTINATION lib

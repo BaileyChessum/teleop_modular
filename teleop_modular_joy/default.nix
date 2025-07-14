@@ -21,8 +21,6 @@ buildRosPackage {
   src = builtins.path rec {
     name = "teleop-modular-joy-source";
     path = ./.;
-    # TODO: Replace filter
-    filter = lib.novaSourceFilter [ ] path;
   };
 
   nativeBuildInputs = [

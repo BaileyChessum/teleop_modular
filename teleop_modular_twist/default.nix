@@ -20,8 +20,6 @@ buildRosPackage {
   src = builtins.path rec {
     name = "teleop-modular-twist-source";
     path = ./.;
-    # TODO: Replace filter
-    filter = lib.novaSourceFilter [ ] path;
   };
 
   nativeBuildInputs = [

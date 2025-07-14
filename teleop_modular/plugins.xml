@@ -1,9 +1,4 @@
 <library path="teleop_modular">
-    <!-- Control Modes -->
-    <class name="teleop_modular/JointSpaceControlMode" type="teleop_modular::JointSpaceControlMode" base_class_type="teleop_modular::ControlMode">
-        <description>A control mode that directly controls joints of the arm.</description>
-    </class>
-
     <!-- Commands -->
     <class name="log" type="teleop_modular::LogCommand" base_class_type="teleop_modular::Command">
         <description>A command to log a message.</description>

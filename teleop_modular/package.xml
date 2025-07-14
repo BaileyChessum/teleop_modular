@@ -2,10 +2,10 @@
 <package format="2">
   <name>teleop_modular</name>
   <version>0.0.1</version>
-  <description>A framework for teleop_modulareration input handling in ROS2.</description>
+  <description>A framework for teleoperation input handling in ROS2.</description>
   <maintainer email="bailey.chessum1@gmail.com">Bailey Chessum</maintainer>
 
-  <license>MIT</license>
+  <license>Apache-2.0</license>
 
   <url type="website"></url>
   <author email="bailey.chessum1@gmail.com">Bailey Chessum</author>
@@ -20,8 +20,6 @@
   <depend>core</depend>
   <depend>nova_interfaces</depend>
   <depend>std_srvs</depend>
-
-  <exec_depend>joy</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
