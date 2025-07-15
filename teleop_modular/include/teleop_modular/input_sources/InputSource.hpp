@@ -33,14 +33,14 @@ class InputSource
 public:
   struct InputValueSpans
   {
-    span<uint8_t> buttons;
-    span<float> axes;
+    utils::span<uint8_t> buttons;
+    utils::span<float> axes;
   };
 
   struct InputDeclarationSpans : InputValueSpans
   {
-    span<std::string> button_names;
-    span<std::string> axis_names;
+    utils::span<std::string> button_names;
+    utils::span<std::string> axis_names;
   };
 
   virtual ~InputSource() = default;

@@ -24,8 +24,8 @@ class EventCollection
 public:
   explicit EventCollection(std::weak_ptr<internal::EventListenerQueue> listener_queue, InputManager& inputs);
 
-  using iterator = WeakMapIterator<Event, false>;
-  using const_iterator = WeakMapIterator<Event, true>;
+  using iterator = utils::WeakMapIterator<Event, false>;
+  using const_iterator = utils::WeakMapIterator<Event, true>;
 
   Event::SharedPtr operator[](const std::string& index);
 

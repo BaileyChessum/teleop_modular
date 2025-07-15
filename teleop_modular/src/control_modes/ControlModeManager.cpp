@@ -14,8 +14,8 @@ namespace teleop::internal
 namespace
 {
 using control_mode::ControlMode;
-using utilities::get_parameter;
-using utilities::get_parameter_or_default;
+using utils::get_parameter;
+using utils::get_parameter_or_default;
 }  // namespace
 
 void ControlModeManager::configure(InputManager& inputs)
@@ -257,7 +257,8 @@ void ControlModeManager::reset()
   switch_controller_client_ = nullptr;
 }
 
-bool ControlModeManager::switch_controllers(const std::vector<std::string>& controllers_to_deactivate, const std::vector<std::string>& controllers_to_activate) const
+bool ControlModeManager::switch_controllers(const std::vector<std::string>& controllers_to_deactivate,
+                                            const std::vector<std::string>& controllers_to_activate) const
 {
   if (controllers_to_deactivate.empty() && controllers_to_activate.empty())
     return true;

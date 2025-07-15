@@ -7,7 +7,7 @@
 
 #include "teleop_modular/utilities/VectorRef.hpp"
 
-namespace teleop_modular
+namespace teleop::input_source
 {
 
 /**
@@ -30,12 +30,12 @@ public:
    * `operator=` during on_update() to change the value of the declared input. Alternatively, you can set the value
    * directly in your InputSource by assigning `this->buttons_[i]` or `this->axes_[i]` to avoid a layer of indirection.
    */
-  inline VectorRef<T> add(const std::string& name) noexcept
+  inline utils::VectorRef<T> add(const std::string& name) noexcept
   {
     auto idx = values_.size();
     names_.emplace_back(name);
     values_.emplace_back(0);
-    return VectorRef<T>(values_, idx);
+    return utils::VectorRef<T>(values_, idx);
   }
 
   /**
@@ -47,12 +47,12 @@ public:
    * `operator=` during on_update() to change the value of the declared input. Alternatively, you can set the value
    * directly in your InputSource by assigning `this->buttons_[i]` or `this->axes_[i]` to avoid a layer of indirection.
    */
-  inline VectorRef<T> add(const std::string& name, T initial_value) noexcept
+  inline utils::VectorRef<T> add(const std::string& name, T initial_value) noexcept
   {
     auto idx = values_.size();
     names_.emplace_back(name);
     values_.emplace_back(initial_value);
-    return VectorRef<T>(values_, idx);
+    return utils::VectorRef<T>(values_, idx);
   }
 
   /**
@@ -69,6 +69,6 @@ private:
   std::vector<T>& values_;
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop::input_source
 
 #endif  // TELEOP_MODULAR_INPUTDECLARATIONLIST_HPP

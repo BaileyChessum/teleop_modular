@@ -24,7 +24,7 @@ class Event
 public:
   using SharedPtr = std::shared_ptr<Event>;
 
-  explicit Event(std::string name, std::weak_ptr<EventListenerQueue> listener_queue);
+  explicit Event(std::string name, std::weak_ptr<internal::EventListenerQueue> listener_queue);
   virtual ~Event() = default;
 
   virtual void invoke();
@@ -86,7 +86,7 @@ private:
 
   /// Any Commands or other implementations of EventListener that should be notified when an Event is invoked.
   std::vector<EventListener::WeakPtr> listeners_;
-  std::weak_ptr<EventListenerQueue> listener_queue_;
+  std::weak_ptr<internal::EventListenerQueue> listener_queue_;
 };
 
 }  // namespace teleop

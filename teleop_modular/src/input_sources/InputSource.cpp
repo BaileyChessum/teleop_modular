@@ -7,6 +7,8 @@
 namespace teleop::input_source
 {
 
+using teleop::utils::span;
+
 void InputSource::initialize(const std::shared_ptr<rclcpp::Node>& node, const std::string& name,
                              const std::weak_ptr<InputSourceUpdateDelegate>& delegate)
 {

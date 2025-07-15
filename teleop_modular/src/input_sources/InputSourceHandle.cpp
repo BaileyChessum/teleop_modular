@@ -11,6 +11,14 @@
 namespace teleop::internal
 {
 
+namespace
+{
+using utils::get_parameter;
+using utils::get_parameter_or_default;
+using input_source::InputSource;
+}  // namespace
+
+
 InputSourceHandle::InputSourceHandle(const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr& parameters,
                                      InputManager& inputs, const std::shared_ptr<InputSource>& source)
   : inputs_(std::ref(inputs)), parameters_(parameters), source_(source)

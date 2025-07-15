@@ -56,8 +56,8 @@ public:
 private:
   std::shared_ptr<rclcpp::Node> node_;
 
-  std::shared_ptr<ParamListener> param_listener_;
-  Params params_;
+  std::shared_ptr<teleop_modular_params::ParamListener> param_listener_;
+  teleop_modular_params::Params params_;
 
   InputManager inputs_;
   state::StateManager states_;

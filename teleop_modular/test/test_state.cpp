@@ -13,9 +13,9 @@
 using teleop::Axis;
 using teleop::Button;
 using teleop::InputManager;
-using teleop::internal::State;
-using teleop::internal::StateCollection;
-using teleop::internal::StateManager;
+using teleop::state::State;
+using teleop::state::StateCollection;
+using teleop::state::StateManager;
 
 class StateTest : public ::testing::Test
 {

@@ -10,7 +10,7 @@
 namespace teleop::internal
 {
 
-void InputSourceManager::configure(const std::shared_ptr<ParamListener>& param_listener, InputManager& inputs)
+void InputSourceManager::configure(const std::shared_ptr<teleop_modular_params::ParamListener>& param_listener, InputManager& inputs)
 {
   const auto logger = node_->get_logger();
 
@@ -103,7 +103,7 @@ bool InputSourceManager::create_input_source(const std::string& input_source_nam
   }
 
   // Get the control mode class from pluginlib
-  std::shared_ptr<InputSource> input_source_class = nullptr;
+  std::shared_ptr<input_source::InputSource> input_source_class = nullptr;
   try
   {
     input_source_class = source_loader_->createSharedInstance(input_source_type);
@@ -151,7 +151,7 @@ void InputSourceManager::setup_input_sources()
   node_->get_parameter("input_sources.names", input_sources_param);
 
   // Pluginlib for loading control modes dynamically
-  source_loader_ = std::make_unique<pluginlib::ClassLoader<InputSource>>("teleop_modular", "teleop_modular::InputSource");
+  source_loader_ = std::make_unique<pluginlib::ClassLoader<input_source::InputSource>>("teleop_modular", "teleop_modular::InputSource");
 
   // List available input source plugins
   try

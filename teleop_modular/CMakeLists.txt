@@ -32,12 +32,6 @@ generate_parameter_library(
   src/parameters.yaml
 )
 
-# Generate parameter library for the joy input source
-generate_parameter_library(
-  joint_space_control_mode_parameters
-  src/control_modes/joint_space/joint_space_control_mode_parameters.yaml
-)
-
 # Build the node executable
 add_executable(${PROJECT_NAME}_node
   src/teleop_modular.cpp
@@ -69,7 +63,6 @@ add_executable(${PROJECT_NAME}_node
 # Add plugin implementations here!
 add_library(${PROJECT_NAME} SHARED
   src/control_modes/ControlMode.cpp
-  src/control_modes/joint_space/JointSpaceControlMode.cpp
   src/commands/SwitchControlModeCommand.cpp
   src/commands/LogCommand.cpp
   src/commands/SetButtonCommand.cpp
@@ -107,9 +100,6 @@ target_link_libraries(${PROJECT_NAME}_node
 target_link_libraries(${PROJECT_NAME}
   teleop_modular_parameters
 )
-target_link_libraries(${PROJECT_NAME}
-  joint_space_control_mode_parameters
-)
 
 ament_target_dependencies(${PROJECT_NAME}_node ${THIS_PACKAGE_INCLUDE_DEPENDS})
 ament_target_dependencies(${PROJECT_NAME} ${THIS_PACKAGE_INCLUDE_DEPENDS})
@@ -145,7 +135,7 @@ install(FILES plugins.xml
   ament_lint_auto_find_test_dependencies()
 #endif()
 
-# -- Intall
+# -- Install
 
 # Install the executable
 install(
@@ -153,7 +143,6 @@ install(
     ${PROJECT_NAME}_node
     ${PROJECT_NAME}
     teleop_modular_parameters
-    joint_space_control_mode_parameters
   DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -177,7 +166,6 @@ install(
 
 install(TARGETS ${PROJECT_NAME}
   teleop_modular_parameters
-  joint_space_control_mode_parameters
   EXPORT export_${PROJECT_NAME}
   RUNTIME DESTINATION bin
   ARCHIVE DESTINATION lib

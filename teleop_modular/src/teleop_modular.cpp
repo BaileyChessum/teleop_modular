@@ -14,7 +14,7 @@ namespace teleop
 TeleopModular::TeleopModular(const std::shared_ptr<rclcpp::Node>& node) : node_(node), states_(inputs_), events_(inputs_)
 {
   // Create publishers
-  param_listener_ = std::make_shared<ParamListener>(TeleopModular::get_node());
+  param_listener_ = std::make_shared<teleop_modular_params::ParamListener>(TeleopModular::get_node());
   params_ = param_listener_->get_params();
 }
 
