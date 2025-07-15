@@ -10,7 +10,7 @@
 #include <memory>
 #include <map>
 
-namespace teleop_modular
+namespace teleop
 {
 
 template <typename T, bool is_const>
@@ -136,6 +136,6 @@ protected:
   friend class WeakMapIterator;
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop
 
 #endif  // TELEOP_MODULAR_WEAKMAPITERATOR_HPP

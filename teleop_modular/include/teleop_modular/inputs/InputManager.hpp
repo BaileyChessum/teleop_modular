@@ -11,7 +11,7 @@
 #include "teleop_modular/inputs/Axis.hpp"
 #include "InputCollection.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 
 /**
@@ -80,6 +80,6 @@ protected:
   InputCollection<Axis> axes_{ };
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop
 
 #endif  // TELEOP_MODULAR_INPUTMANAGER_HPP

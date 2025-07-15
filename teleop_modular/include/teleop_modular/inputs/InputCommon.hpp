@@ -10,7 +10,7 @@
 
 #include "InputDeclaration.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 
 template <typename T>
@@ -114,6 +114,6 @@ bool InputCommon<T>::changed() const
   return previous_debounce_value_ != current_debounce_value_;
 }
 
-}  // namespace teleop_modular
+}  // namespace teleop
 
 #endif  // TELEOP_MODULAR_INPUTCOMMON_HPP

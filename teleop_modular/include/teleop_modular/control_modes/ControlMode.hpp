@@ -53,7 +53,7 @@ public:
   {
     return name_;
   }
-  [[nodiscard]] const std::shared_ptr<rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface>& get_node() const
+  [[nodiscard]] const std::shared_ptr<rclcpp_lifecycle::LifecycleNode>& get_node() const
   {
     return node_;
   }

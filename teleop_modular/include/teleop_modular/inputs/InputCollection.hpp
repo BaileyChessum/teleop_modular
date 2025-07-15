@@ -12,7 +12,7 @@
 #include <functional>
 #include <map>
 
-namespace teleop_modular
+namespace teleop
 {
 
 template <typename InputT>
@@ -142,6 +142,6 @@ void InputCollection<Button>::setup_new_item(const std::shared_ptr<Button>& item
 template <>
 void InputCollection<Axis>::setup_new_item(const std::shared_ptr<Axis>& item);
 
-}  // namespace teleop_modular
+}  // namespace teleop
 
 #endif  // TELEOP_MODULAR_INPUTCOLLECTION_HPP

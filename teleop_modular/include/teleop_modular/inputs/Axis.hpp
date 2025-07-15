@@ -8,7 +8,7 @@
 #include <utility>
 #include "Input.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 
 class Axis : public InputCommon<float>
@@ -22,6 +22,6 @@ public:
   }
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop
 
 #endif  // TELEOP_MODULAR_AXIS_HPP

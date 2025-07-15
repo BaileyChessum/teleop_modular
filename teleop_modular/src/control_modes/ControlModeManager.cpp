@@ -5,16 +5,12 @@
 #include "teleop_modular/colors.hpp"
 #include "teleop_modular/utils.hpp"
 
-namespace teleop_modular
+namespace teleop::internal
 {
 
-// ControlModeManager::~ControlModeManager() {
-//   switch_controller_client_.reset();
-//   node_.reset();
-//   current_control_mode_.reset();
-//   control_modes_.clear();
-//   control_mode_loader_.reset();
-// }
+namespace {
+  using control_mode::ControlMode;
+}
 
 void ControlModeManager::configure(InputManager& inputs)
 {
@@ -109,11 +105,9 @@ void ControlModeManager::configure(InputManager& inputs)
     // Create a node for the control mode
     const auto options =
         rclcpp::NodeOptions(node_->get_node_options()).context(node_->get_node_base_interface()->get_context());
-    const auto node_name = control_mode_name;
-    const auto control_mode_node = std::make_shared<rclcpp::Node>(node_name, node_->get_namespace(), options);
 
     // Initialize the control mode
-    control_mode_class->init(control_mode_node, control_mode_name);
+    control_mode_class->init(control_mode_name, node_->get_namespace(), options);
 
     registered_modes_log << "\n\t- " << pretty_name << C_QUIET << "\t: " << control_mode_type << C_RESET;
     control_modes_[control_mode_name] = control_mode_class;
@@ -128,9 +122,10 @@ void ControlModeManager::configure(InputManager& inputs)
   {
     if (!control_mode)
       continue;
-    control_mode->configure(inputs);
+    executor->add_node(control_mode->get_node()->get_node_base_interface());
 
-    executor->add_node(control_mode->get_node());
+    control_mode->get_node()->configure();
+    control_mode->capture_inputs(inputs);
   }
 
   executor.reset();
@@ -164,7 +159,7 @@ bool ControlModeManager::set_control_mode(const std::string& name)
   // Deactivate the previous control mode, then switch
   if (current_control_mode_)
   {
-    current_control_mode_->deactivate();
+    current_control_mode_->get_node()->deactivate();
 
     const auto previous_control_mode_ = current_control_mode_;
     current_control_mode_ = nullptr;
@@ -186,7 +181,7 @@ bool ControlModeManager::set_control_mode(const std::string& name)
 
   // Activate the new control mode
   current_control_mode_ = new_control_mode_it->second;
-  current_control_mode_->activate();
+  current_control_mode_->get_node()->activate();
   RCLCPP_INFO(logger, C_MODE "%s activated" C_RESET, snake_to_title(name).c_str());
 
   return true;
@@ -225,6 +220,8 @@ bool ControlModeManager::switch_controllers(const ControlMode& previous, const C
     return false;
 
   RCLCPP_DEBUG(node_->get_logger(), "Changing from %s to %s", previous.get_name().c_str(), next.get_name().c_str());
+
+  // TODO: Reimplement 'controllers' param
 
   // The order of deactivation needs to be opposite to the activation order. This is the reverse to the final order.
   std::vector<std::string> deactivate_controllers_reversed = previous.get_base_params().controllers;
@@ -296,4 +293,4 @@ bool ControlModeManager::get_type_for_control_mode(const std::string& name, std:
   return result;
 }
 
-}  // namespace teleop_modular
+}  // namespace teleop::internal
