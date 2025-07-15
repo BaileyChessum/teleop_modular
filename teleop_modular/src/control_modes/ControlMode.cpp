@@ -1,44 +1,54 @@
-
 #include "teleop_modular/control_modes/ControlMode.hpp"
+#include "lifecycle_msgs/msg/state.hpp"
 
-void teleop_modular::ControlMode::initialize(const std::shared_ptr<rclcpp::Node>& node, const std::string& name)
+namespace teleop::control_mode
 {
-  node_ = node;
+
+ControlMode::~ControlMode()
+{
+  // Check from ControllerInterfaceBase
+  if (node_.get() && rclcpp::ok() &&
+      node_->get_current_state().id() != lifecycle_msgs::msg::State::PRIMARY_STATE_FINALIZED)
+  {
+    node_->shutdown();
+  }
+}
+
+return_type ControlMode::init(const std::string& name, const std::string& node_namespace,
+                              const rclcpp::NodeOptions& node_options)
+{
   name_ = name;
+  node_ = std::make_shared<rclcpp_lifecycle::LifecycleNode>(name_, node_namespace, node_options, false);
 
   // Perform child class initialization
-  on_initialize();
-}
-
-void teleop_modular::ControlMode::configure(InputManager& inputs)
-{
-  if (!node_)
+  switch (on_init())
   {
-    return;
+    case CallbackReturn::SUCCESS:
+      break;
+    default:
+      node_->shutdown();
+      return return_type::ERROR;
   }
 
-  // Do common configuration
+  node_->register_on_configure(std::bind(&ControlMode::on_configure, this, std::placeholders::_1));
+  node_->register_on_activate(std::bind(&ControlMode::on_configure, this, std::placeholders::_1));
+  node_->register_on_deactivate(std::bind(&ControlMode::on_deactivate, this, std::placeholders::_1));
+  node_->register_on_error(std::bind(&ControlMode::on_error, this, std::placeholders::_1));
+  node_->register_on_shutdown(std::bind(&ControlMode::on_shutdown, this, std::placeholders::_1));
+  node_->register_on_cleanup(std::bind(&ControlMode::on_cleanup, this, std::placeholders::_1));
 
-  // Perform child class configuration
-  on_configure(inputs);
+  return return_type::OK;
 }
 
-void teleop_modular::ControlMode::activate()
+const rclcpp_lifecycle::State& ControlMode::get_lifecycle_state() const
 {
-  if (!node_)
+  if (!node_.get())
   {
-    return;
+    RCLCPP_ERROR(rclcpp::get_logger(get_name()), "Lifecycle node accessed without being initialized!");
+    throw std::runtime_error("Lifecycle node accessed without being initialized!");
   }
 
-  on_activate();
+  return node_->get_current_state();
 }
 
-void teleop_modular::ControlMode::deactivate()
-{
-  if (!node_)
-  {
-    return;
-  }
-
-  on_deactivate();
-}
+}  // namespace teleop::control_mode

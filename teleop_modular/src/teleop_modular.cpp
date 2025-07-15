@@ -21,13 +21,13 @@ TeleopModular::TeleopModular(const std::shared_ptr<rclcpp::Node>& node) : node_(
 void TeleopModular::initialize(const std::weak_ptr<rclcpp::Executor>& executor)
 {
   const auto logger = get_node()->get_logger();
-  RCLCPP_DEBUG(logger, "Teleop_Modular::initialize(): Creating inputs");
+  RCLCPP_DEBUG(logger, "Teleop_Modular::init(): Creating inputs");
 
-  RCLCPP_DEBUG(logger, "Teleop_Modular::initialize(): Creating control modes.");
+  RCLCPP_DEBUG(logger, "Teleop_Modular::init(): Creating control modes.");
   control_mode_manager_ = std::make_shared<ControlModeManager>(get_node(), executor);
   control_mode_manager_->configure(inputs_);
 
-  RCLCPP_DEBUG(logger, "Teleop_Modular::initialize(): Creating commands.");
+  RCLCPP_DEBUG(logger, "Teleop_Modular::init(): Creating commands.");
   commands_ = std::make_shared<CommandManager>(get_node(), shared_from_this());
   commands_->configure(events_.get_events());;
 
@@ -35,18 +35,18 @@ void TeleopModular::initialize(const std::weak_ptr<rclcpp::Executor>& executor)
 
   // Input source initialization and setup depends on commands and control modes to first request the inputs that want
   // populated.
-  RCLCPP_DEBUG(logger, "Teleop_Modular::initialize(): Creating input sources.");
+  RCLCPP_DEBUG(logger, "Teleop_Modular::init(): Creating input sources.");
   input_source_manager_ = std::make_shared<InputSourceManager>(get_node(), executor, inputs_);
   input_source_manager_->configure(param_listener_, inputs_);
 
 
-  RCLCPP_DEBUG(logger, "Teleop_Modular::initialize(): Starting...");
+  RCLCPP_DEBUG(logger, "Teleop_Modular::init(): Starting...");
   control_mode_manager_->activate_initial_control_mode();
 
   const auto now = get_node()->now();
   events_.get_events()["start"]->invoke();
   events_.update(now);
-  RCLCPP_DEBUG(logger, "Teleop_Modular::initialize(): Fully initialized!");
+  RCLCPP_DEBUG(logger, "Teleop_Modular::init(): Fully initialized!");
 }
 
 void TeleopModular::log_all_inputs()

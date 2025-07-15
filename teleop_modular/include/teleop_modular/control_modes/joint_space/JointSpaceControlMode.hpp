@@ -23,7 +23,7 @@ class JointSpaceControlMode final : public ControlMode
 public:
   explicit JointSpaceControlMode() = default;
 
-  void on_initialize() override;
+  void on_init() override;
 
   void on_configure(InputManager& inputs) override;
   void on_activate() override;

@@ -8,7 +8,7 @@
 namespace teleop_modular
 {
 
-void JointSpaceControlMode::on_initialize()
+void JointSpaceControlMode::on_init()
 {
   param_listener_ = std::make_shared<joint_space_control_mode::ParamListener>(node_);
   params_ = param_listener_->get_params();

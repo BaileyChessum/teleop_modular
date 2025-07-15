@@ -113,7 +113,7 @@ void ControlModeManager::configure(InputManager& inputs)
     const auto control_mode_node = std::make_shared<rclcpp::Node>(node_name, node_->get_namespace(), options);
 
     // Initialize the control mode
-    control_mode_class->initialize(control_mode_node, control_mode_name);
+    control_mode_class->init(control_mode_node, control_mode_name);
 
     registered_modes_log << "\n\t- " << pretty_name << C_QUIET << "\t: " << control_mode_type << C_RESET;
     control_modes_[control_mode_name] = control_mode_class;
