@@ -2,10 +2,10 @@
 // Created by nova on 6/28/25.
 //
 
-#include "../../include/teleop_modular/commands/CommandManager.hpp"
+#include "teleop_modular/commands/CommandManager.hpp"
 #include "teleop_modular/utilities/get_parameter.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 
 void CommandManager::create_command(const std::string& name, EventCollection& events)
@@ -146,4 +146,4 @@ void CommandManager::add(const std::string& key, const std::shared_ptr<Command>&
   items_.insert({ key, value });
 }
 
-}  // namespace teleop_modular
+}  // namespace teleop

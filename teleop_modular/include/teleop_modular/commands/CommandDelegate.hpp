@@ -10,7 +10,7 @@
 #include "teleop_modular/inputs/InputManager.hpp"
 #include "teleop_modular/inputs/state/StateManager.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 
 class ControlModeManager;  // Forward declaration
@@ -28,10 +28,10 @@ public:
 
   [[nodiscard]] virtual std::shared_ptr<rclcpp::Node> get_node() const = 0;
   [[nodiscard]] virtual const InputManager& get_inputs() const = 0;
-  [[nodiscard]] virtual StateManager& get_states() = 0;
+  [[nodiscard]] virtual state::StateManager& get_states() = 0;
   [[nodiscard]] virtual const std::shared_ptr<ControlModeManager> get_control_modes() const = 0;
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop
 
 #endif  // TELEOP_MODULAR_COMMANDDELEGATE_HPP

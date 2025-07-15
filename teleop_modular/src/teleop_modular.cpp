@@ -8,7 +8,7 @@ using namespace std::chrono_literals;
 using std::placeholders::_1;
 using std::placeholders::_2;
 
-namespace teleop_modular
+namespace teleop
 {
 
 TeleopModular::TeleopModular(const std::shared_ptr<rclcpp::Node>& node) : node_(node), states_(inputs_), events_(inputs_)
@@ -24,11 +24,11 @@ void TeleopModular::initialize(const std::weak_ptr<rclcpp::Executor>& executor)
   RCLCPP_DEBUG(logger, "Teleop_Modular::init(): Creating inputs");
 
   RCLCPP_DEBUG(logger, "Teleop_Modular::init(): Creating control modes.");
-  control_mode_manager_ = std::make_shared<ControlModeManager>(get_node(), executor);
+  control_mode_manager_ = std::make_shared<internal::ControlModeManager>(get_node(), executor);
   control_mode_manager_->configure(inputs_);
 
   RCLCPP_DEBUG(logger, "Teleop_Modular::init(): Creating commands.");
-  commands_ = std::make_shared<CommandManager>(get_node(), shared_from_this());
+  commands_ = std::make_shared<internal::CommandManager>(get_node(), shared_from_this());
   commands_->configure(events_.get_events());;
 
   log_existing_inputs();
@@ -36,7 +36,7 @@ void TeleopModular::initialize(const std::weak_ptr<rclcpp::Executor>& executor)
   // Input source initialization and setup depends on commands and control modes to first request the inputs that want
   // populated.
   RCLCPP_DEBUG(logger, "Teleop_Modular::init(): Creating input sources.");
-  input_source_manager_ = std::make_shared<InputSourceManager>(get_node(), executor, inputs_);
+  input_source_manager_ = std::make_shared<internal::InputSourceManager>(get_node(), executor, inputs_);
   input_source_manager_->configure(param_listener_, inputs_);
 
 
@@ -152,12 +152,12 @@ const InputManager& TeleopModular::get_inputs() const
   return inputs_;
 }
 
-StateManager& TeleopModular::get_states()
+state::StateManager& TeleopModular::get_states()
 {
   return states_;
 }
 
-const std::shared_ptr<ControlModeManager> TeleopModular::get_control_modes() const
+const std::shared_ptr<internal::ControlModeManager> TeleopModular::get_control_modes() const
 {
   return control_mode_manager_;
 }
@@ -174,13 +174,13 @@ TeleopModular::~TeleopModular()
   control_mode_manager_.reset();
 }
 
-}  // namespace teleop_modular
+}  // namespace teleop
 
 int main(int argc, char* argv[])
 {
   rclcpp::init(argc, argv);
   const auto node = std::make_shared<rclcpp::Node>("teleop_modular");
-  const auto teleop_modular = std::make_shared<teleop_modular::TeleopModular>(node);
+  const auto teleop_modular = std::make_shared<teleop::TeleopModular>(node);
   const auto executor = std::make_shared<rclcpp::executors::MultiThreadedExecutor>();
   executor->add_node(node);
 
@@ -188,7 +188,7 @@ int main(int argc, char* argv[])
   teleop_modular->initialize(executor);
 
   {
-    std::thread main_update_thread(&teleop_modular::TeleopModular::service_input_updates, teleop_modular);
+    std::thread main_update_thread(&teleop::TeleopModular::service_input_updates, teleop_modular);
     executor->spin();
 
     teleop_modular->stop();

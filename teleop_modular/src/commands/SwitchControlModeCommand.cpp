@@ -5,7 +5,7 @@
 #include "../../include/teleop_modular/commands/SwitchControlModeCommand.hpp"
 #include "teleop_modular/control_modes/ControlModeManager.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 
 void SwitchControlModeCommand::on_initialize(const std::string& prefix, const ParameterInterface::SharedPtr& parameters)
@@ -27,8 +27,8 @@ void SwitchControlModeCommand::execute(CommandDelegate& context, const rclcpp::T
   context.get_control_modes()->set_control_mode(params_.to);
 }
 
-}  // namespace teleop_modular
+}  // namespace teleop
 
 #include <pluginlib/class_list_macros.hpp>
 
-CLASS_LOADER_REGISTER_CLASS(teleop_modular::SwitchControlModeCommand, teleop_modular::Command);
+CLASS_LOADER_REGISTER_CLASS(teleop::SwitchControlModeCommand, teleop::Command);

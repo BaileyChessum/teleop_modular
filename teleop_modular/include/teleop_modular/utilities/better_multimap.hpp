@@ -7,7 +7,7 @@
 #include <map>
 #include <vector>
 
-namespace teleop_modular
+namespace teleop::utils
 {
 template <typename KeyT, typename ValueT>
 class better_multimap
@@ -67,6 +67,6 @@ public:
 private:
   std::map<KeyT, std::vector<ValueT> > items_{};
 };
-}  // namespace teleop_modular
+}  // namespace teleop::utils
 
 #endif  // BETTER_MULTIMAP_HPP

@@ -4,9 +4,10 @@
 
 #ifndef STATEMANAGER_HPP
 #define STATEMANAGER_HPP
+
 #include "StateCollection.hpp"
 
-namespace teleop_modular
+namespace teleop::state
 {
 
 /**
@@ -34,6 +35,6 @@ private:
   StateCollection<float, Axis> axes_;
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop::state
 
 #endif  // STATEMANAGER_HPP

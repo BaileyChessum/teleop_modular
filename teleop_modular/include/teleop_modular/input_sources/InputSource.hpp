@@ -11,19 +11,19 @@
 #include "teleop_modular/events/Event.hpp"
 #include "teleop_modular/inputs/InputCommon.hpp"
 #include "teleop_modular/inputs/InputManager.hpp"
-#include "teleop_modular/inputs/InputDeclaration.hpp"
+#include "teleop_modular/inputs/state/InputDeclaration.hpp"
 #include "teleop_modular/input_sources/InputDeclarationList.hpp"
 #include "teleop_modular/utilities/span.hpp"
 
-namespace teleop_modular
+namespace teleop::internal
+{
+class InputSourceHandle;  // Forward declaration
+}
+
+namespace teleop::input_source
 {
 
 //class InputSourceManager; // Forward declaration
-
-namespace internal
-{
-  class InputSourceHandle;  // Forward declaration
-}
 
 /**
  * A base class for various sources of inputs and event invokers, such as joysticks, keyboards, the GUI, etc.

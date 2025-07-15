@@ -16,7 +16,7 @@
 #include <pluginlib/class_loader.hpp>
 #include <rclcpp/node.hpp>
 
-namespace teleop_modular
+namespace teleop
 {
 
 class CommandManager final
@@ -89,6 +89,6 @@ private:
   CommandDelegate::WeakPtr context_;
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop
 
 #endif  // TELEOP_MODULAR_COMMANDMANAGER_HPP

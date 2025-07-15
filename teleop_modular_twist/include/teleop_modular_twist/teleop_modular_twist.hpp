@@ -10,10 +10,10 @@
 
 namespace teleop_modular_twist
 {
-  using teleop_modular::Button;
-  using teleop_modular::Axis;
-  using teleop_modular::ControlMode;
-  using teleop_modular::InputManager;
+  using teleop::Button;
+  using teleop::Axis;
+  using teleop::control_mode::ControlMode;
+  using teleop::InputManager;
 
 class TwistControlMode : public ControlMode
 {

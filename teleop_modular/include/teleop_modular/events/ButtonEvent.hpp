@@ -9,7 +9,7 @@
 #include "teleop_modular/inputs/Button.hpp"
 #include "teleop_modular/inputs/InputCollection.hpp"
 
-namespace teleop_modular::internal
+namespace teleop::internal
 {
 
 class ButtonEvent : public Event
@@ -34,6 +34,6 @@ private:
   const bool down_;
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop
 
 #endif  // TELEOP_MODULAR_BUTTONEVENT_HPP

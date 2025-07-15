@@ -10,7 +10,7 @@
 #include "InputSource.hpp"
 #include "teleop_modular/utilities/better_multimap.hpp"
 
-namespace teleop_modular::internal
+namespace teleop::internal
 {
 
 /// For each InputSource we store, we associate some extra metadata.
@@ -20,9 +20,9 @@ class InputSourceHandle
 
 public:
   explicit InputSourceHandle(const ParameterInterface::SharedPtr& parameters, InputManager& inputs,
-                             const std::shared_ptr<InputSource>& source);
+                             const std::shared_ptr<input_source::InputSource>& source);
 
-  explicit InputSourceHandle(InputManager& inputs, const std::shared_ptr<InputSource>& source);
+  explicit InputSourceHandle(InputManager& inputs, const std::shared_ptr<input_source::InputSource>& source);
 
   void update(const rclcpp::Time& now);
 
@@ -128,7 +128,7 @@ private:
     }
   };
 
-  void remap(InputSource::InputDeclarationSpans declarations, RemapParams remap_params);
+  void remap(input_source::InputSource::InputDeclarationSpans declarations, RemapParams remap_params);
   RemapParams get_remap_params();
 
   std::optional<RemapButtonParams> get_remap_button_params(const std::string& name);
@@ -143,11 +143,11 @@ private:
   std::vector<TransformedRemapButton> transformed_buttons_;
   std::vector<TransformedRemapAxis> transformed_axes_;
 
-  std::shared_ptr<InputSource> source_;
+  std::shared_ptr<input_source::InputSource> source_;
   std::reference_wrapper<InputManager> inputs_;
   ParameterInterface::SharedPtr parameters_;
 };
 
-}  // namespace teleop_modular::internal
+}  // namespace teleop::internal
 
 #endif  // TELEOP_MODULAR_INPUTSOURCEHANDLE_HPP

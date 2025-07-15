@@ -5,7 +5,7 @@
 #ifndef TELEOP_MODULAR_INPUTDECLARATION_HPP
 #define TELEOP_MODULAR_INPUTDECLARATION_HPP
 
-namespace teleop_modular
+namespace teleop::state
 {
 
 /**
@@ -30,6 +30,6 @@ struct InputDeclaration
   }
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop::state
 
 #endif  // TELEOP_MODULAR_INPUTDECLARATION_HPP

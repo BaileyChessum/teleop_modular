@@ -6,7 +6,7 @@
 #define TELEOP_MODULAR_LOGCOMMAND_HPP
 #include "Command.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 
 class LogCommand final : public Command
@@ -25,6 +25,6 @@ protected:
   Params params_{};
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop
 
 #endif  // TELEOP_MODULAR_LOGCOMMAND_HPP

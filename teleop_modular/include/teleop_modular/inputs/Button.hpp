@@ -6,7 +6,7 @@
 #define TELEOP_MODULAR_BUTTON_HPP
 
 #include <utility>
-#include "Input.hpp"
+#include "InputCommon.hpp"
 
 namespace teleop
 {

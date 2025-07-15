@@ -14,10 +14,10 @@
 #include "InputSource.hpp"
 #include "InputSourceUpdateDelegate.hpp"
 #include "teleop_modular_parameters.hpp"
-#include "teleop_modular/SpawnableLog.hpp"
+#include "teleop_modular/utilities/SpawnableLog.hpp"
 #include "InputSourceHandle.hpp"
 
-namespace teleop_modular
+namespace teleop::internal
 {
 
 class InputSourceManager final : public InputSourceUpdateDelegate,
@@ -100,6 +100,6 @@ private:
   std::vector<SpawnableLog> logs_{};
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop::internal
 
 #endif  // TELEOP_MODULAR_INPUTSOURCEMANAGER_HPP

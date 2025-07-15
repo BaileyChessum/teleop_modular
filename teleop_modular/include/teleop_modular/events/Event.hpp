@@ -12,7 +12,7 @@
 #include "EventListener.hpp"
 #include "EventListenerQueue.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 
 /**
@@ -89,6 +89,6 @@ private:
   std::weak_ptr<EventListenerQueue> listener_queue_;
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop
 
 #endif  // EVENT_HPP

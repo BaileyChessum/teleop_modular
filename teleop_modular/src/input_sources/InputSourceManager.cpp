@@ -5,9 +5,9 @@
 #include "teleop_modular/input_sources/InputSourceManager.hpp"
 
 #include "teleop_modular/colors.hpp"
-#include "teleop_modular/utils.hpp"
+#include "teleop_modular/utilities/utils.hpp"
 
-namespace teleop_modular
+namespace teleop::internal
 {
 
 void InputSourceManager::configure(const std::shared_ptr<ParamListener>& param_listener, InputManager& inputs)
@@ -81,60 +81,6 @@ void InputSourceManager::update(const rclcpp::Time& now)
     source.update(now);
   }
 }
-
-//InputSourceManager::InputSourceHandle
-//InputSourceManager::create_input_source_handle(const std::shared_ptr<InputSource>& input_source_class) const
-//{
-//  InputSourceHandle handle{ input_source_class };
-//
-//  // Export input declarations
-//  std::vector<InputDeclaration<bool>> button_declarations{};
-//  input_source_class->_export_buttons(button_declarations);
-//
-//  std::vector<InputDeclaration<double>> axis_declarations{};
-//  input_source_class->_export_axes(axis_declarations);
-//
-//  // Create input declaration handles for all the input declarations
-//  handle.button_handles.reserve(button_declarations.size());
-//  for (const auto& declaration : button_declarations)
-//  {
-//    InputDeclarationHandle<bool, Button> button_handle{ declaration, inputs_.get().get_buttons()[declaration.name] };
-//    handle.button_handles.emplace_back(button_handle);
-//  }
-//
-//  handle.axis_handles.reserve(axis_declarations.size());
-//  for (const auto& declaration : axis_declarations)
-//  {
-//    InputDeclarationHandle<double, Axis> axis_handle{ declaration, inputs_.get().get_axes()[declaration.name] };
-//    handle.axis_handles.emplace_back(axis_handle);
-//  }
-//
-//  return handle;
-//}
-//
-//void InputSourceManager::add_input_source_input_definitions(InputSourceHandle& handle) const
-//{
-//  // Export to inputs
-//  auto& inputs = inputs_.get();
-//
-//  for (const auto& [declaration, input] : handle.axis_handles)
-//    inputs.get_axes()[declaration.name]->add_definition(declaration.reference);
-//
-//  for (const auto& [declaration, input] : handle.button_handles)
-//    inputs.get_buttons()[declaration.name]->add_definition(declaration.reference);
-//}
-//
-//void InputSourceManager::remove_input_source_input_definitions(InputSourceHandle& handle) const
-//{
-//  // Unexport to inputs
-//  auto& inputs = inputs_.get();
-//
-//  for (const auto& [declaration, input] : handle.axis_handles)
-//    inputs.get_axes()[declaration.name]->remove_definition(declaration.reference);
-//
-//  for (const auto& [declaration, input] : handle.button_handles)
-//    inputs.get_buttons()[declaration.name]->remove_definition(declaration.reference);
-//}
 
 bool InputSourceManager::create_input_source(const std::string& input_source_name)
 {
@@ -242,4 +188,4 @@ void InputSourceManager::setup_input_sources()
   RCLCPP_INFO(logger, C_TITLE "Input Sources:" C_RESET "%s\n", registered_sources_log.str().c_str());
 }
 
-}  // namespace teleop_modular
+}  // namespace teleop::internal

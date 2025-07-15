@@ -16,7 +16,7 @@
 #include "inputs/state/StateManager.hpp"
 #include "teleop_modular/events/EventManager.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 /**
  * @class Teleop_Modular
@@ -45,8 +45,8 @@ public:
 
   [[nodiscard]] std::shared_ptr<rclcpp::Node> get_node() const override;
   [[nodiscard]] const InputManager& get_inputs() const override;
-  [[nodiscard]] StateManager& get_states() override;
-  [[nodiscard]] const std::shared_ptr<ControlModeManager> get_control_modes() const override;
+  [[nodiscard]] state::StateManager& get_states() override;
+  [[nodiscard]] const std::shared_ptr<internal::ControlModeManager> get_control_modes() const override;
 
   /**
    * Ends any running threads
@@ -60,16 +60,16 @@ private:
   Params params_;
 
   InputManager inputs_;
-  StateManager states_;
+  state::StateManager states_;
   internal::EventManager events_;
 
-  std::shared_ptr<ControlModeManager> control_mode_manager_ = nullptr;
-  std::shared_ptr<InputSourceManager> input_source_manager_ = nullptr;
-  std::shared_ptr<CommandManager> commands_ = nullptr;
+  std::shared_ptr<internal::ControlModeManager> control_mode_manager_ = nullptr;
+  std::shared_ptr<internal::InputSourceManager> input_source_manager_ = nullptr;
+  std::shared_ptr<internal::CommandManager> commands_ = nullptr;
 
   std::atomic<bool> program_running_ = true;
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop
 
 #endif  // TELEOP_MODULAR_HPP

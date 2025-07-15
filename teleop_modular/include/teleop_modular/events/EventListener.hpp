@@ -6,7 +6,7 @@
 #define EVENTLISTENER_HPP
 #include <memory>
 
-namespace teleop_modular
+namespace teleop
 {
 /**
  * Interface providing a means for events to alert things that depend on them that they have been invoked.
@@ -22,6 +22,6 @@ public:
   virtual void on_event_invoked(const rclcpp::Time& now) = 0;
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop
 
 #endif  // EVENTLISTENER_HPP

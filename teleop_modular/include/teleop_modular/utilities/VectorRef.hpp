@@ -5,7 +5,7 @@
 #ifndef TELEOP_MODULAR_VECTORREF_HPP
 #define TELEOP_MODULAR_VECTORREF_HPP
 
-namespace teleop_modular
+namespace teleop::utils
 {
 
 /**
@@ -72,6 +72,6 @@ private:
   std::size_t index_;
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop::utils
 
 #endif  // TELEOP_MODULAR_VECTORREF_HPP

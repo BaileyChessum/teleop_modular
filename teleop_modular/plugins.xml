@@ -1,17 +1,12 @@
 <library path="teleop_modular">
-    <!-- Control Modes -->
-    <class name="teleop_modular/JointSpaceControlMode" type="teleop_modular::JointSpaceControlMode" base_class_type="teleop_modular::ControlMode">
-        <description>A control mode that directly controls joints of the arm.</description>
-    </class>
-
     <!-- Commands -->
-    <class name="log" type="teleop_modular::LogCommand" base_class_type="teleop_modular::Command">
+    <class name="log" type="teleop::LogCommand" base_class_type="teleop::Command">
         <description>A command to log a message.</description>
     </class>
-    <class name="switch_control_mode" type="teleop_modular::SwitchControlModeCommand" base_class_type="teleop_modular::Command">
+    <class name="switch_control_mode" type="teleop::SwitchControlModeCommand" base_class_type="teleop::Command">
         <description>A command to deactivate the current control mode, and active another specified control mode.</description>
     </class>
-    <class name="set_button" type="teleop_modular::SetButtonCommand" base_class_type="teleop_modular::Command">
+    <class name="set_button" type="teleop::SetButtonCommand" base_class_type="teleop::Command">
         <description>A command to set the value of a boolean input.</description>
     </class>
 </library>

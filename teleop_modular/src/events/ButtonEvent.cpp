@@ -6,7 +6,7 @@
 
 #include "teleop_modular/events/ButtonEvent.hpp"
 
-namespace teleop_modular::internal
+namespace teleop::internal
 {
 
 ButtonEvent::ButtonEvent(std::string name, std::weak_ptr<EventListenerQueue> listener_queue, bool down, InputCollection<Button>& buttons)
@@ -41,4 +41,4 @@ void ButtonEvent::on_update(const rclcpp::Time& now)
   }
 }
 
-}  // namespace teleop_modular::internal
+}  // namespace teleop::internal

@@ -4,10 +4,10 @@
 
 #include "teleop_modular/events/Event.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 
-Event::Event(std::string name, std::weak_ptr<EventListenerQueue> listener_queue)
+Event::Event(std::string name, std::weak_ptr<internal::EventListenerQueue> listener_queue)
     : name_(std::move(name)), listener_queue_(std::move(listener_queue))
 {
 }
@@ -52,4 +52,4 @@ Event::operator bool()
   return is_invoked();
 }
 
-} // teleop_modular
+} // teleop

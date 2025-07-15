@@ -7,9 +7,9 @@
 
 #include <memory>
 #include <string>
-#include "teleop_modular/inputs/InputDeclaration.hpp"
+#include "InputDeclaration.hpp"
 
-namespace teleop_modular
+namespace teleop::state
 {
 
 /// Same as a InputDeclaration, but it actually holds the value being referenced too.

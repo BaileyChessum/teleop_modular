@@ -8,7 +8,7 @@
 #include <rclcpp/time.hpp>
 #include <utility>
 
-#include "InputDeclaration.hpp"
+#include "teleop_modular/inputs/state/InputDeclaration.hpp"
 
 namespace teleop
 {

@@ -10,7 +10,7 @@
 #include <rclcpp/time.hpp>
 #include "CommandDelegate.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 
 class SetButtonCommand final : public Command
@@ -29,6 +29,6 @@ protected:
   Params params_{};
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop
 
 #endif  // TELEOP_MODULAR_SETBUTTONCOMMAND_HPP

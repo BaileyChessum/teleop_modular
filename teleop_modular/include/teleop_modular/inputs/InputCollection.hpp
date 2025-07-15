@@ -41,8 +41,8 @@ public:
   InputCollection& operator=(const InputCollection&) = delete;
 
   // Container type aliases
-  using iterator = WeakMapIterator<InputT, false>;
-  using const_iterator = WeakMapIterator<InputT, true>;
+  using iterator = utils::WeakMapIterator<InputT, false>;
+  using const_iterator = utils::WeakMapIterator<InputT, true>;
 
   std::shared_ptr<InputT> operator[](const std::string& key)
   {

@@ -4,7 +4,7 @@
 #include <controller_manager_msgs/srv/detail/switch_controller__struct.hpp>
 #include <lifecycle_msgs/msg/detail/state__struct.hpp>
 #include "teleop_modular/colors.hpp"
-#include "teleop_modular/utils.hpp"
+#include "teleop_modular/utilities/utils.hpp"
 #include "rclcpp_lifecycle/state.hpp"
 #include "teleop_modular/utilities/get_parameter.hpp"
 

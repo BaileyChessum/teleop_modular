@@ -17,7 +17,7 @@ inline std::string snake_to_title(const std::string_view in)
   for (const char ch : in)
   {
     if (ch == '_')
-    {  // underscore → space, next char starts a word
+    {  // underscore -> space, next char starts a word
       out.push_back(' ');
       new_word = true;
     }

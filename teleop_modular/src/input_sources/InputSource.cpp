@@ -4,7 +4,7 @@
 
 #include "teleop_modular/input_sources/InputSource.hpp"
 
-namespace teleop_modular
+namespace teleop::input_source
 {
 
 void InputSource::initialize(const std::shared_ptr<rclcpp::Node>& node, const std::string& name,
@@ -54,4 +54,4 @@ InputSource::InputDeclarationSpans InputSource::export_inputs()
   return InputDeclarationSpans{ span(button_values_), span(axis_values_), span(button_names_), span(axis_names_) };
 }
 
-}  // namespace teleop_modular
+}  // namespace teleop::input_source

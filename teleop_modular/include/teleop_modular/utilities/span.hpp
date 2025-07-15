@@ -8,7 +8,7 @@
 #include <vector>
 #include <cstddef>
 
-namespace teleop_modular
+namespace teleop::utils
 {
 
 /**
@@ -72,6 +72,6 @@ struct span
   }
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop::utils
 
 #endif  // TELEOP_MODULAR_SPAN_HPP

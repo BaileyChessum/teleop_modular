@@ -4,9 +4,10 @@
 
 #ifndef TELEOP_MODULAR_INPUTSOURCEUPDATEDELEGATE_HPP
 #define TELEOP_MODULAR_INPUTSOURCEUPDATEDELEGATE_HPP
+
 #include <rclcpp/time.hpp>
 
-namespace teleop_modular
+namespace teleop::input_source
 {
 
 /**
@@ -25,6 +26,6 @@ public:
   virtual void on_input_source_requested_update(const rclcpp::Time& now) = 0;
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop::input_source
 
 #endif  // TELEOP_MODULAR_INPUTSOURCEUPDATEDELEGATE_HPP
