@@ -19,7 +19,6 @@
 namespace teleop::control_mode
 {
 
-
 /// To replace returning bools to indicate whether an operation was successful, or failed due to some error. Used to
 /// be more explicit.
 enum class return_type : bool
@@ -30,7 +29,6 @@ enum class return_type : bool
 
 /// These usings are added with hopes to reduce the length of type names for implementers of control modes
 using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
-using teleop_modular::InputManager;
 
 /**
  * Base class for a control mode used in teleoperation
@@ -38,14 +36,17 @@ using teleop_modular::InputManager;
 class ControlMode : public rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface
 {
 public:
-  using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
+  using CallbackReturn = CallbackReturn;
+  struct CommonParams {
+    std::vector<std::string> controllers;
+  };
 
   ~ControlMode() override;
   ControlMode() = default;
 
   /// This function effectively replaces the initializer
   return_type init(const std::string& name, const std::string& node_namespace,
-                      const rclcpp::NodeOptions& node_options);
+                   const rclcpp::NodeOptions& node_options, const CommonParams& common_params);
 
   // Accessors
   /// Name of the control mode, which the control mode is indexed by
@@ -62,6 +63,7 @@ public:
   virtual return_type update(const rclcpp::Time& now, const rclcpp::Duration& period) = 0;
 
   [[nodiscard]] const rclcpp_lifecycle::State& get_lifecycle_state() const;
+  [[nodiscard]] const std::vector<std::string>& get_controllers() const;
 
 protected:
   virtual CallbackReturn on_init() = 0;
@@ -72,6 +74,9 @@ protected:
 private:
   /// Name of the control mode, which the control mode is indexed by
   std::string name_;
+
+  /// The params common to all control_modes, managed externally
+  CommonParams common_params_;
 };
 
 }  // namespace teleop_modular

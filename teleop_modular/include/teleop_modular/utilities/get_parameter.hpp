@@ -9,7 +9,7 @@
 #include <string>
 #include <rclcpp/rclcpp.hpp>
 
-namespace teleop_modular
+namespace teleop::utilities
 {
 
 template <typename T>

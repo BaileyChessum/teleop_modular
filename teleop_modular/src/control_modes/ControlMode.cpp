@@ -15,10 +15,11 @@ ControlMode::~ControlMode()
 }
 
 return_type ControlMode::init(const std::string& name, const std::string& node_namespace,
-                              const rclcpp::NodeOptions& node_options)
+                              const rclcpp::NodeOptions& node_options, const CommonParams& common_params)
 {
   name_ = name;
   node_ = std::make_shared<rclcpp_lifecycle::LifecycleNode>(name_, node_namespace, node_options, false);
+  common_params_ = common_params;
 
   // Perform child class initialization
   switch (on_init())
@@ -49,6 +50,11 @@ const rclcpp_lifecycle::State& ControlMode::get_lifecycle_state() const
   }
 
   return node_->get_current_state();
+}
+
+const std::vector<std::string>& ControlMode::get_controllers() const
+{
+  return common_params_.controllers;
 }
 
 }  // namespace teleop::control_mode

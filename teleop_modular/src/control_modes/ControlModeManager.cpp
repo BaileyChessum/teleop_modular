@@ -2,15 +2,21 @@
 #include "teleop_modular/control_modes/ControlModeManager.hpp"
 
 #include <controller_manager_msgs/srv/detail/switch_controller__struct.hpp>
+#include <lifecycle_msgs/msg/detail/state__struct.hpp>
 #include "teleop_modular/colors.hpp"
 #include "teleop_modular/utils.hpp"
+#include "rclcpp_lifecycle/state.hpp"
+#include "teleop_modular/utilities/get_parameter.hpp"
 
 namespace teleop::internal
 {
 
-namespace {
-  using control_mode::ControlMode;
-}
+namespace
+{
+using control_mode::ControlMode;
+using utilities::get_parameter;
+using utilities::get_parameter_or_default;
+}  // namespace
 
 void ControlModeManager::configure(InputManager& inputs)
 {
@@ -48,7 +54,8 @@ void ControlModeManager::configure(InputManager& inputs)
                                       std::vector<std::string>();
 
   // Pluginlib for loading control modes dynamically
-  control_mode_loader_ = std::make_unique<pluginlib::ClassLoader<ControlMode>>("teleop_modular", "teleop_modular::ControlMode");
+  control_mode_loader_ =
+      std::make_unique<pluginlib::ClassLoader<ControlMode>>("teleop_modular", "teleop_modular::ControlMode");
 
   // List available control mode plugins
   try
@@ -106,8 +113,15 @@ void ControlModeManager::configure(InputManager& inputs)
     const auto options =
         rclcpp::NodeOptions(node_->get_node_options()).context(node_->get_node_base_interface()->get_context());
 
+    // Get common params for control modes
+    const auto params = node_->get_node_parameters_interface();
+    const auto controllers = get_parameter_or_default<std::vector<std::string>>(
+        params, "control_modes." + control_mode_name + ".controllers",
+        "The names of ros2_control controllers to use for this control mode.", std::vector<std::string>());
+    const control_mode::ControlMode::CommonParams common_params{ controllers };
+
     // Initialize the control mode
-    control_mode_class->init(control_mode_name, node_->get_namespace(), options);
+    control_mode_class->init(control_mode_name, node_->get_namespace(), options, common_params);
 
     registered_modes_log << "\n\t- " << pretty_name << C_QUIET << "\t: " << control_mode_type << C_RESET;
     control_modes_[control_mode_name] = control_mode_class;
@@ -157,21 +171,39 @@ bool ControlModeManager::set_control_mode(const std::string& name)
   bool switch_result = false;
 
   // Deactivate the previous control mode, then switch
-  if (current_control_mode_)
+  std::vector<std::string> deactivate_controllers_reversed;
+
+  // Get controllers to deactivate
+  for (const auto& [name, control_mode] : control_modes_)
   {
-    current_control_mode_->get_node()->deactivate();
+    if (control_mode == new_control_mode_it->second)
+    {
+      continue;
+    }
 
-    const auto previous_control_mode_ = current_control_mode_;
-    current_control_mode_ = nullptr;
+    if (control_mode->get_lifecycle_state().id() != lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE)
+    {
+      // This control mode isn't active
+      continue;
+    }
 
-    // Disable and enable controllers by calling controller manager
-    switch_result = switch_controllers(*previous_control_mode_, *new_control_mode_it->second);
+    control_mode->get_node()->deactivate();
+
+    for (const auto& controller : control_mode->get_controllers())
+      deactivate_controllers_reversed.push_back(controller);
   }
-  else
-  {
-    switch_result = switch_controllers(*new_control_mode_it->second);
-  }
 
+  // The order of deactivation needs to be opposite to the activation order. This is the reverse to the final order.
+  // Reverse the given order of controllers so they deactivate correctly; in order.
+  std::vector<std::string> controllers_to_deactivate(deactivate_controllers_reversed.size());
+  std::reverse_copy(deactivate_controllers_reversed.begin(), deactivate_controllers_reversed.end(),
+                    controllers_to_deactivate.begin());
+
+  std::vector<std::string> controllers_to_activate;
+
+  switch_result = switch_controllers(controllers_to_deactivate, controllers_to_activate);
+
+  // Disable and enable controllers by calling controller manager
   if (!switch_result)
   {
     // TODO: Error recovery here
@@ -180,8 +212,8 @@ bool ControlModeManager::set_control_mode(const std::string& name)
   }
 
   // Activate the new control mode
-  current_control_mode_ = new_control_mode_it->second;
-  current_control_mode_->get_node()->activate();
+  //  current_control_mode_ = new_control_mode_it->second;
+  //  current_control_mode_->get_node()->activate();
   RCLCPP_INFO(logger, C_MODE "%s activated" C_RESET, snake_to_title(name).c_str());
 
   return true;
@@ -189,13 +221,24 @@ bool ControlModeManager::set_control_mode(const std::string& name)
 
 void ControlModeManager::update(const rclcpp::Time& now, const rclcpp::Duration& period) const
 {
-  if (!current_control_mode_)
+  bool any_control_mode_updated = false;
+
+  for (const auto& [name, control_mode] : control_modes_)
   {
-    RCLCPP_WARN(node_->get_logger(), "ControlModeManager::update(): No mode is active!");
-    return;
+    if (control_mode->get_lifecycle_state().id() != lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE)
+    {
+      // This control mode isn't active
+      continue;
+    }
+
+    control_mode->update(now, period);
+    any_control_mode_updated = true;
   }
 
-  current_control_mode_->update(now, period);
+  if (!any_control_mode_updated)
+  {
+    RCLCPP_WARN(node_->get_logger(), "ControlModeManager::update(): No mode is active!");
+  }
 }
 
 std::shared_ptr<ControlMode> ControlModeManager::operator[](const std::string& index)
@@ -214,28 +257,13 @@ void ControlModeManager::reset()
   switch_controller_client_ = nullptr;
 }
 
-bool ControlModeManager::switch_controllers(const ControlMode& previous, const ControlMode& next) const
+bool ControlModeManager::switch_controllers(const std::vector<std::string>& controllers_to_deactivate, const std::vector<std::string>& controllers_to_activate) const
 {
-  if (previous.get_name() == next.get_name())
-    return false;
-
-  RCLCPP_DEBUG(node_->get_logger(), "Changing from %s to %s", previous.get_name().c_str(), next.get_name().c_str());
+  if (controllers_to_deactivate.empty() && controllers_to_activate.empty())
+    return true;
 
   // TODO: Reimplement 'controllers' param
 
-  // The order of deactivation needs to be opposite to the activation order. This is the reverse to the final order.
-  std::vector<std::string> deactivate_controllers_reversed = previous.get_base_params().controllers;
-  // Reverse the given order of controllers so they deactivate correctly; in order.
-  std::vector<std::string> deactivate_controllers(deactivate_controllers_reversed.size());
-  std::reverse_copy(deactivate_controllers_reversed.begin(), deactivate_controllers_reversed.end(),
-                    deactivate_controllers.begin());
-
-  // Given order of activated controllers is already correct
-  const std::vector<std::string> activate_controllers = next.get_base_params().controllers;
-
-  if (activate_controllers.empty() && deactivate_controllers.empty())
-    return true;
-
   if (!switch_controller_client_->service_is_ready())
   {
     RCLCPP_ERROR(node_->get_logger(), "Controller manager service not available.");
@@ -243,32 +271,8 @@ bool ControlModeManager::switch_controllers(const ControlMode& previous, const C
   }
 
   const auto request = std::make_shared<controller_manager_msgs::srv::SwitchController::Request>();
-  request->deactivate_controllers = deactivate_controllers;
-  request->activate_controllers = activate_controllers;
-  request->strictness = 2;
-  request->activate_asap = true;
-
-  auto future = switch_controller_client_->async_send_request(request);
-
-  // TODO: Error recovery when the controller isn't able to switch the controllers.
-  return true;
-}
-
-bool ControlModeManager::switch_controllers(const ControlMode& next) const
-{
-  const std::vector<std::string> activate_controllers = next.get_base_params().controllers;
-
-  if (activate_controllers.empty())
-    return true;
-
-  if (!switch_controller_client_->service_is_ready())
-  {
-    RCLCPP_ERROR(node_->get_logger(), "Controller manager service not available.");
-    return false;
-  }
-
-  const auto request = std::make_shared<controller_manager_msgs::srv::SwitchController::Request>();
-  request->activate_controllers = activate_controllers;
+  request->deactivate_controllers = controllers_to_deactivate;
+  request->activate_controllers = controllers_to_activate;
   request->strictness = 2;
   request->activate_asap = true;
 
