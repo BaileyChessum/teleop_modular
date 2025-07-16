@@ -14,15 +14,23 @@ namespace teleop_modular_twist
   using namespace teleop;
   using namespace teleop::control_mode;
 
-class TwistControlMode : public ControlMode
+  class TwistControlMode : public teleop::control_mode::ControlMode
 {
 public:
   TwistControlMode();
 
-  void capture_inputs(InputManager& inputs) override;
-
   void publish_halt_message(const rclcpp::Time& now) const;
+
+  CallbackReturn on_init() override;
+  void capture_inputs(InputManager& inputs) override;
   return_type update(const rclcpp::Time &now, const rclcpp::Duration &period) override;
+
+  CallbackReturn on_configure(const rclcpp_lifecycle::State &previous_state) override;
+  CallbackReturn on_activate(const rclcpp_lifecycle::State &previous_state) override;
+  CallbackReturn on_deactivate(const rclcpp_lifecycle::State &previous_state) override;
+  CallbackReturn on_cleanup(const rclcpp_lifecycle::State &previous_state) override;
+  CallbackReturn on_error(const rclcpp_lifecycle::State &previous_state) override;
+  CallbackReturn on_shutdown(const rclcpp_lifecycle::State &previous_state) override;
 
 protected:
   ~TwistControlMode() override;
