@@ -1,7 +1,7 @@
 #include "teleop_modular/control_modes/ControlMode.hpp"
 #include "lifecycle_msgs/msg/state.hpp"
 
-namespace teleop::control_mode
+namespace control_mode
 {
 
 ControlMode::~ControlMode()
@@ -24,7 +24,7 @@ return_type ControlMode::init(const std::string& name, const std::string& node_n
   // Perform child class initialization
   switch (on_init())
   {
-    case CallbackReturn::SUCCESS:
+    case return_type::OK:
       break;
     default:
       node_->shutdown();
@@ -57,4 +57,4 @@ const std::vector<std::string>& ControlMode::get_controllers() const
   return common_params_.controllers;
 }
 
-}  // namespace teleop::control_mode
+}  // namespace control_mode

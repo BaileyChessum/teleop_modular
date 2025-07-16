@@ -11,37 +11,36 @@
 
 namespace teleop_modular_twist
 {
-  using namespace teleop;
-  using namespace teleop::control_mode;
+using namespace control_mode;
 
-  class TwistControlMode : public teleop::control_mode::ControlMode
+class TwistControlMode : public ControlMode
 {
 public:
   TwistControlMode();
 
   void publish_halt_message(const rclcpp::Time& now) const;
 
-  CallbackReturn on_init() override;
+  return_type on_init() override;
   void capture_inputs(InputManager& inputs) override;
-  return_type update(const rclcpp::Time &now, const rclcpp::Duration &period) override;
+  return_type update(const rclcpp::Time& now, const rclcpp::Duration& period) override;
 
-  CallbackReturn on_configure(const rclcpp_lifecycle::State &previous_state) override;
-  CallbackReturn on_activate(const rclcpp_lifecycle::State &previous_state) override;
-  CallbackReturn on_deactivate(const rclcpp_lifecycle::State &previous_state) override;
-  CallbackReturn on_cleanup(const rclcpp_lifecycle::State &previous_state) override;
-  CallbackReturn on_error(const rclcpp_lifecycle::State &previous_state) override;
-  CallbackReturn on_shutdown(const rclcpp_lifecycle::State &previous_state) override;
+  CallbackReturn on_configure(const State& previous_state) override;
+  CallbackReturn on_activate(const State& previous_state) override;
+  CallbackReturn on_deactivate(const State& previous_state) override;
+  CallbackReturn on_cleanup(const State& previous_state) override;
+  CallbackReturn on_error(const State& previous_state) override;
+  CallbackReturn on_shutdown(const State& previous_state) override;
 
 protected:
   ~TwistControlMode() override;
 
 private:
   /// Helper function to get the euclidean length of a vector, used for normalized limits.
-  double norm(double x, double y, double z);
+  static double norm(double x, double y, double z);
 
   /// Tracks parameters
   std::shared_ptr<teleop_modular_twist::ParamListener> param_listener_{};
-  teleop_modular_twist::Params params_{};
+  teleop_modular_twist::Params params_;
 
   /// Input from 0 to 1 that directly scales the output speed.
   Axis::SharedPtr speed_coefficient_;

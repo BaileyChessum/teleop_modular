@@ -3,20 +3,20 @@
 namespace teleop_modular_twist
 {
 
-using namespace teleop::control_mode;
-using teleop::control_mode::ControlMode;
+using namespace control_mode;
+using control_mode::ControlMode;
 
 TwistControlMode::TwistControlMode() = default;
 
 TwistControlMode::~TwistControlMode() = default;
 
-CallbackReturn TwistControlMode::on_init()
+return_type TwistControlMode::on_init()
 {
   param_listener_ = std::make_shared<teleop_modular_twist::ParamListener>(node_);
   params_ = param_listener_->get_params();
 }
 
-CallbackReturn TwistControlMode::on_configure(const rclcpp_lifecycle::State& previous_state)
+CallbackReturn TwistControlMode::on_configure(const State& previous_state)
 {
   const auto logger = get_node()->get_logger();
 
@@ -47,14 +47,14 @@ void TwistControlMode::capture_inputs(InputManager& inputs)
   yaw_ = axes[params_.input_names.twist_yaw];
 }
 
-CallbackReturn TwistControlMode::on_activate(const rclcpp_lifecycle::State& previous_state)
+CallbackReturn TwistControlMode::on_activate(const State& previous_state)
 {
   return CallbackReturn::SUCCESS;
 }
 
-CallbackReturn TwistControlMode::on_deactivate(const rclcpp_lifecycle::State& previous_state)
+CallbackReturn TwistControlMode::on_deactivate(const State& previous_state)
 {
-  return CallbackReturn::SUCCESS;
+  publish_halt_message(get_node()->now());
 }
 
 void TwistControlMode::publish_halt_message(const rclcpp::Time& now) const
@@ -117,23 +117,12 @@ double TwistControlMode::norm(double x, double y, double z)
   return std::sqrt(x * x + y * y + z * z);
 }
 
-CallbackReturn TwistControlMode::on_error(const rclcpp_lifecycle::State& previous_state)
-{
-  return CallbackReturn::SUCCESS;
-}
-
-CallbackReturn TwistControlMode::on_cleanup(const rclcpp_lifecycle::State& previous_state)
-{
-  return CallbackReturn::SUCCESS;
-}
-
-CallbackReturn TwistControlMode::on_shutdown(const rclcpp_lifecycle::State& previous_state)
-{
-  return CallbackReturn::SUCCESS;
-}
+CallbackReturn TwistControlMode::on_error(const State& previous_state) {}
+CallbackReturn TwistControlMode::on_cleanup(const State& previous_state) {}
+CallbackReturn TwistControlMode::on_shutdown(const State& previous_state) {}
 
 }  // namespace teleop_modular_twist
 
 #include <pluginlib/class_list_macros.hpp>
 
-CLASS_LOADER_REGISTER_CLASS(teleop_modular_twist::TwistControlMode, teleop::control_mode::ControlMode);
+CLASS_LOADER_REGISTER_CLASS(teleop_modular_twist::TwistControlMode, control_mode::ControlMode);
