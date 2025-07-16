@@ -30,9 +30,18 @@ enum class return_type : bool
 using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 using State = rclcpp_lifecycle::State;
 
-using InputManager = teleop::InputManager;
+// Definitions may be subject to change! Please use the names in control_mode::
 using Button = teleop::Button;
 using Axis = teleop::Axis;
+
+// Definitions may be subject to change! Please use the names in control_mode::
+using ButtonCollection = teleop::InputCollection<Button>;
+using AxisCollection = teleop::InputCollection<Axis>;
+
+struct Inputs {
+  ButtonCollection& buttons;
+  AxisCollection& axes;
+};
 
 /**
  * Base class for a control mode used in teleoperation
@@ -63,7 +72,7 @@ public:
   }
 
   virtual return_type on_init() = 0;
-  virtual void capture_inputs(InputManager& inputs) = 0;
+  virtual void capture_inputs(Inputs inputs) = 0;
   virtual return_type update(const rclcpp::Time& now, const rclcpp::Duration& period) = 0;
 
   [[nodiscard]] const rclcpp_lifecycle::State& get_lifecycle_state() const;

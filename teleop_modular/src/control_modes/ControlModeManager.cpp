@@ -131,6 +131,11 @@ void ControlModeManager::configure(InputManager& inputs)
 
   auto executor = executor_.lock();
 
+  control_mode::Inputs control_mode_inputs{
+      inputs.get_buttons(),
+      inputs.get_axes(),
+  };
+
   // Configure each control mode
   for (const auto& [name, control_mode] : control_modes_)
   {
@@ -139,7 +144,7 @@ void ControlModeManager::configure(InputManager& inputs)
     executor->add_node(control_mode->get_node()->get_node_base_interface());
 
     control_mode->get_node()->configure();
-    control_mode->capture_inputs(inputs);
+    control_mode->capture_inputs(control_mode_inputs);
   }
 
   executor.reset();
