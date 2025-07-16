@@ -3,13 +3,11 @@ project(teleop_modular LANGUAGES CXX)
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
   control_msgs
+  controller_manager_msgs
   geometry_msgs
   sensor_msgs
-  controller_manager_msgs
-  nova_interfaces
   pluginlib
   rclcpp
-  realtime_tools
   std_msgs
   std_srvs
 )
@@ -30,6 +28,12 @@ include_directories(
 generate_parameter_library(
   teleop_modular_parameters
   src/parameters.yaml
+)
+
+# Export generated include directory
+target_include_directories(teleop_modular_parameters INTERFACE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/teleop_modular_parameters>
+  $<INSTALL_INTERFACE:include/teleop_modular_parameters>
 )
 
 # Build the node executable

@@ -11,6 +11,7 @@
 , pluginlib
 , std-msgs
 , teleop-modular
+, std-srvs
 }:
 
 buildRosPackage {
@@ -35,6 +36,7 @@ buildRosPackage {
   buildInputs = [
     rclcpp
     std-msgs
+    std-srvs
     generate-parameter-library
     geometry-msgs
     pluginlib

@@ -113,4 +113,4 @@ double TwistControlMode::norm(double x, double y, double z)
 
 #include <pluginlib/class_list_macros.hpp>
 
-CLASS_LOADER_REGISTER_CLASS(teleop_modular_twist::TwistControlMode, teleop_modular::ControlMode);
+CLASS_LOADER_REGISTER_CLASS(teleop_modular_twist::TwistControlMode, teleop::control_mode::ControlMode);

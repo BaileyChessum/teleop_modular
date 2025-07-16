@@ -1,6 +1,7 @@
 #ifndef TELEOP_MODULAR_TWIST__TELEOP_MODULAR_TWIST_HPP_
 #define TELEOP_MODULAR_TWIST__TELEOP_MODULAR_TWIST_HPP_
 
+#include <rclcpp/time.hpp>
 #include "teleop_modular_twist/visibility_control.h"
 #include "teleop_modular/control_modes/ControlMode.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
@@ -10,24 +11,18 @@
 
 namespace teleop_modular_twist
 {
-  using teleop::Button;
-  using teleop::Axis;
-  using teleop::control_mode::ControlMode;
-  using teleop::InputManager;
+  using namespace teleop;
+  using namespace teleop::control_mode;
 
 class TwistControlMode : public ControlMode
 {
 public:
   TwistControlMode();
 
-  void on_initialize() override;
-
-  void on_configure(InputManager& inputs) override;
-  void on_activate() override;
-  void on_deactivate() override;
+  void capture_inputs(InputManager& inputs) override;
 
   void publish_halt_message(const rclcpp::Time& now) const;
-  void update(const rclcpp::Time &now, const rclcpp::Duration &period) override;
+  return_type update(const rclcpp::Time &now, const rclcpp::Duration &period) override;
 
 protected:
   ~TwistControlMode() override;

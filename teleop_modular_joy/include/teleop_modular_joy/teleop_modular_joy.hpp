@@ -12,8 +12,8 @@
 
 namespace teleop_modular_joy
 {
-  using teleop_modular::InputSource;
-  using teleop_modular::InputDeclarationList;
+using teleop::input_source::InputSource;
+using teleop::input_source::InputDeclarationList;
 
 class JoyInputSource final : public InputSource
 {
@@ -35,6 +35,6 @@ private:
   std::mutex joy_msg_mutex_{};
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop_modular_joy
 
 #endif  // TELEOP_MODULAR_JOYINPUTSOURCE_HPP

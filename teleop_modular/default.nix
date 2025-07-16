@@ -10,13 +10,10 @@
 , sensor-msgs
 , generate-parameter-library
 , pluginlib
-, rclcpp-components
-, realtime-tools
 , controller-manager-msgs
 , control-msgs
 , std-msgs
 , std-srvs
-, nova-interfaces
 }:
 
 buildRosPackage {
@@ -41,19 +38,20 @@ buildRosPackage {
     rclcpp
     std-srvs
     generate-parameter-library
-    realtime-tools
     geometry-msgs
-    nova-interfaces
     sensor-msgs
     pluginlib
-    rclcpp-components
-    realtime-tools
     controller-manager-msgs
     control-msgs
     std-msgs
   ];
 
-  propagatedBuildInputs = [ ];
+  propagatedBuildInputs = [ 
+    controller-manager-msgs
+    control-msgs 
+    std-srvs
+    std-msgs
+  ];
 
   # Enable running tests during build
   doCheck = true;
