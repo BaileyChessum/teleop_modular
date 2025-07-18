@@ -7,6 +7,8 @@
 
 #include "visibility_control.h"
 #include "input_source/utilities/vector_ref.hpp"
+#include <vector>
+#include <string>
 
 namespace input_source
 {
@@ -19,7 +21,7 @@ template <typename T>
 class INPUT_SOURCE_PUBLIC InputDeclarationList
 {
 public:
-  using Ref = teleop::utils::VectorRef<T>;
+  using Ref = VectorRef<T>;
 
   InputDeclarationList(std::vector<std::string>& names, std::vector<T>& values) : names_(names), values_(values)
   {

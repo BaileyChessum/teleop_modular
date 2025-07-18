@@ -314,7 +314,7 @@ InputSourceHandle::get_axis_transform_params(const std::string& name)
   return params;
 }
 
-void InputSourceHandle::remap(InputSource::InputDeclarationSpans declarations, RemapParams remap_params)
+void InputSourceHandle::remap(input_source::InputDeclarationSpans declarations, RemapParams remap_params)
 {
   const auto logger = source_->get_node()->get_logger();
   auto& inputs = inputs_.get();
