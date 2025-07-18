@@ -13,6 +13,7 @@
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include "teleop_modular/inputs/InputCommon.hpp"
 #include "teleop_modular/inputs/InputManager.hpp"
+#include <rclcpp/executor.hpp>
 
 namespace control_mode
 {
@@ -51,7 +52,8 @@ using AxisCollection = teleop::InputCollection<Axis>;
  * Including this extra struct affords abstraction for the providers of buttons, axes, and the potential expansion of
  * available inputs (events?)
  */
-struct Inputs {
+struct Inputs
+{
   ButtonCollection& buttons;
   AxisCollection& axes;
 };
@@ -65,7 +67,8 @@ public:
   /**
    * These are parameters shared across all controllers. These can be populated by setting the control_mode_name.
    */
-  struct CommonParams {
+  struct CommonParams
+  {
     /**
      * The set of ros2_control controllers to activate with this control mode. Populated by the
      * control_modes.control_mode_name.controllers parameter in the main teleop_modular node.
@@ -80,8 +83,8 @@ public:
    * This function effectively replaces the initializer, and should only be called once immediately after spawning the
    * control mode, and before anything else.
    */
-  return_type init(const std::string& name, const std::string& node_namespace,
-                   const rclcpp::NodeOptions& node_options, const CommonParams& common_params);
+  return_type init(const std::string& name, const std::string& node_namespace, const rclcpp::NodeOptions& node_options,
+                   const std::shared_ptr<rclcpp::Executor>& executor, const CommonParams& common_params);
 
   // Accessors
   /**
@@ -99,15 +102,33 @@ public:
     return node_;
   }
 
-  virtual return_type on_init() { return return_type::OK; };
+  virtual return_type on_init()
+  {
+    return return_type::OK;
+  };
   virtual void capture_inputs(Inputs inputs) = 0;
   virtual return_type update(const rclcpp::Time& now, const rclcpp::Duration& period) = 0;
 
-  CallbackReturn on_activate(const State&) override { return CallbackReturn::SUCCESS; };
-  CallbackReturn on_deactivate(const State&) override { return CallbackReturn::SUCCESS; };
-  CallbackReturn on_cleanup(const State&) override { return CallbackReturn::SUCCESS; };
-  CallbackReturn on_error(const State&) override { return CallbackReturn::SUCCESS; };
-  CallbackReturn on_configure(const State&) override { return CallbackReturn::SUCCESS; };
+  CallbackReturn on_activate(const State&) override
+  {
+    return CallbackReturn::SUCCESS;
+  };
+  CallbackReturn on_deactivate(const State&) override
+  {
+    return CallbackReturn::SUCCESS;
+  };
+  CallbackReturn on_cleanup(const State&) override
+  {
+    return CallbackReturn::SUCCESS;
+  };
+  CallbackReturn on_error(const State&) override
+  {
+    return CallbackReturn::SUCCESS;
+  };
+  CallbackReturn on_configure(const State&) override
+  {
+    return CallbackReturn::SUCCESS;
+  };
 
   [[nodiscard]] const State& get_lifecycle_state() const;
   [[nodiscard]] bool is_active() const;
@@ -127,6 +148,6 @@ private:
   CommonParams common_params_;
 };
 
-}  // namespace teleop_modular
+}  // namespace control_mode
 
 #endif  // TELEOP_MODULAR_CONTROLMODE_HPP

@@ -55,7 +55,7 @@ void ControlModeManager::configure(InputManager& inputs)
 
   // Pluginlib for loading control modes dynamically
   control_mode_loader_ =
-      std::make_unique<pluginlib::ClassLoader<ControlMode>>("teleop_modular", "teleop_modular::ControlMode");
+      std::make_unique<pluginlib::ClassLoader<ControlMode>>("teleop_modular", "control_mode::ControlMode");
 
   // List available control mode plugins
   try
@@ -79,6 +79,8 @@ void ControlModeManager::configure(InputManager& inputs)
   std::stringstream registered_modes_log{};
   for (auto& control_mode_name : control_mode_names)
   {
+    RCLCPP_DEBUG(logger, "Attempting to create control mode for name \"%s\"", control_mode_name.c_str());
+
     std::string control_mode_type;
     const std::string pretty_name = snake_to_title(control_mode_name);
 
@@ -120,8 +122,15 @@ void ControlModeManager::configure(InputManager& inputs)
         "The names of ros2_control controllers to use for this control mode.", std::vector<std::string>());
     const control_mode::ControlMode::CommonParams common_params{ controllers };
 
+    auto executor = executor_.lock();
+
+    if (!executor) {
+      RCLCPP_ERROR(logger, "Failed to get the executor when setting up control modes!");
+      throw std::runtime_error("Failed to get the executor when setting up control modes!");
+    }
+
     // Initialize the control mode
-    control_mode_class->init(control_mode_name, node_->get_namespace(), options, common_params);
+    control_mode_class->init(control_mode_name, node_->get_namespace(), options, executor, common_params);
 
     registered_modes_log << "\n\t- " << pretty_name << C_QUIET << "\t: " << control_mode_type << C_RESET;
     control_modes_[control_mode_name] = control_mode_class;
@@ -141,7 +150,7 @@ void ControlModeManager::configure(InputManager& inputs)
   {
     if (!control_mode)
       continue;
-    executor->add_node(control_mode->get_node()->get_node_base_interface());
+    //executor->add_node(control_mode->get_node()->get_node_base_interface());
 
     control_mode->get_node()->configure();
     control_mode->capture_inputs(control_mode_inputs);

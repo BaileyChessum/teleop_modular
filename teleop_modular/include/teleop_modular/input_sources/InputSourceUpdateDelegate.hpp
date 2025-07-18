@@ -7,7 +7,7 @@
 
 #include <rclcpp/time.hpp>
 
-namespace teleop::input_source
+namespace input_source
 {
 
 /**
@@ -26,6 +26,6 @@ public:
   virtual void on_input_source_requested_update(const rclcpp::Time& now) = 0;
 };
 
-}  // namespace teleop::input_source
+}  // namespace input_source
 
 #endif  // TELEOP_MODULAR_INPUTSOURCEUPDATEDELEGATE_HPP

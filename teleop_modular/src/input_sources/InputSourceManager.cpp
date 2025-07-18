@@ -151,7 +151,7 @@ void InputSourceManager::setup_input_sources()
   node_->get_parameter("input_sources.names", input_sources_param);
 
   // Pluginlib for loading control modes dynamically
-  source_loader_ = std::make_unique<pluginlib::ClassLoader<input_source::InputSource>>("teleop_modular", "teleop_modular::InputSource");
+  source_loader_ = std::make_unique<pluginlib::ClassLoader<input_source::InputSource>>("teleop_modular", "input_source::InputSource");
 
   // List available input source plugins
   try

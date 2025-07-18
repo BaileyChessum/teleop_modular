@@ -31,4 +31,4 @@ void LogCommand::execute(CommandDelegate& context, const rclcpp::Time& now)
 
 #include <pluginlib/class_list_macros.hpp>
 
-CLASS_LOADER_REGISTER_CLASS(teleop::LogCommand, teleop::Command);
+PLUGINLIB_EXPORT_CLASS(teleop::LogCommand, teleop::Command);

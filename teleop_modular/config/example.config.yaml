@@ -21,7 +21,8 @@ teleop_modular:
         "twist_ik_control"
       ]
       joint_space_control:
-        type: "teleop_modular/JointSpaceControlMode"
+        # type: "teleop_modular/JointSpaceControlMode"
+        type: "teleop_modular_twist/TwistControlMode"
         controllers: [
           "nova_arm_velocity_controller"
         ]
@@ -169,6 +170,11 @@ joint_space_control:
   ros__parameters:
     # TODO: get the actual name from arm code
     topic: "/todo_joint_space"
+
+    # this is actually for a twist control mode! But I changed it here
+    max_speed:
+      linear: 0.3
+      angular: 0.3
 
     joint_definitions: [
       "arm_j1",

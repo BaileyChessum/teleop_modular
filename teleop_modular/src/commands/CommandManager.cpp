@@ -67,7 +67,7 @@ void CommandManager::configure(EventCollection& events)
                                  std::vector<std::string>();
 
   // Pluginlib for loading commands dynamically
-  loader_ = std::make_unique<pluginlib::ClassLoader<Command>>("teleop_modular", "teleop_modular::Command");
+  loader_ = std::make_unique<pluginlib::ClassLoader<Command>>("teleop_modular", "teleop::Command");
 
   // List available input source plugins
   try

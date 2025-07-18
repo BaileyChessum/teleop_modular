@@ -81,4 +81,4 @@ void JoyInputSource::on_update(const rclcpp::Time& now, InputValueSpans values)
 
 #include <pluginlib/class_list_macros.hpp>
 
-CLASS_LOADER_REGISTER_CLASS(teleop_modular_joy::JoyInputSource, teleop::input_source::InputSource);
+PLUGINLIB_EXPORT_CLASS(teleop_modular_joy::JoyInputSource, input_source::InputSource);

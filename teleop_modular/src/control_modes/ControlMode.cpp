@@ -1,3 +1,4 @@
+#include <rclcpp/executor.hpp>
 #include "teleop_modular/control_modes/ControlMode.hpp"
 #include "lifecycle_msgs/msg/state.hpp"
 
@@ -18,11 +19,16 @@ ControlMode::~ControlMode()
 }
 
 return_type ControlMode::init(const std::string& name, const std::string& node_namespace,
-                              const rclcpp::NodeOptions& node_options, const CommonParams& common_params)
+                              const rclcpp::NodeOptions& node_options,
+                              const std::shared_ptr<rclcpp::Executor>& executor, const CommonParams& common_params)
 {
   name_ = name;
   node_ = std::make_shared<rclcpp_lifecycle::LifecycleNode>(name_, node_namespace, node_options, false);
   common_params_ = common_params;
+
+  const auto logger = get_node()->get_logger();
+  RCLCPP_DEBUG(logger, "Initializing ControlMode with name \"%s\" in namespace \"%s\"...", name_.c_str(),
+               node_namespace.c_str());
 
   // Perform child class initialization
   switch (on_init())
@@ -34,12 +40,20 @@ return_type ControlMode::init(const std::string& name, const std::string& node_n
       return return_type::ERROR;
   }
 
+  RCLCPP_DEBUG(logger, "Setting up LifecycleNode callbacks for \"%s\"...", name_.c_str());
+
   node_->register_on_configure(std::bind(&ControlMode::on_configure, this, std::placeholders::_1));
   node_->register_on_activate(std::bind(&ControlMode::on_configure, this, std::placeholders::_1));
   node_->register_on_deactivate(std::bind(&ControlMode::on_deactivate, this, std::placeholders::_1));
   node_->register_on_error(std::bind(&ControlMode::on_error, this, std::placeholders::_1));
   node_->register_on_shutdown(std::bind(&ControlMode::on_shutdown, this, std::placeholders::_1));
   node_->register_on_cleanup(std::bind(&ControlMode::on_cleanup, this, std::placeholders::_1));
+
+  RCLCPP_DEBUG(logger, "Adding LifecycleNode for \"%s\" to the executor.", name_.c_str());
+
+  executor->add_node(node_->get_node_base_interface());
+
+  RCLCPP_DEBUG(logger, "\"%s\" fully initialized.", name_.c_str());
 
   return return_type::OK;
 }

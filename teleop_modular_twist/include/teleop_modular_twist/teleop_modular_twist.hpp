@@ -5,8 +5,6 @@
 #include "teleop_modular_twist/visibility_control.h"
 #include "teleop_modular/control_modes/ControlMode.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
-#include "teleop_modular/inputs/Button.hpp"
-#include "teleop_modular/inputs/Axis.hpp"
 #include "twist_control_mode_parameters.hpp"
 
 namespace teleop_modular_twist
@@ -21,7 +19,7 @@ public:
   void publish_halt_message(const rclcpp::Time& now) const;
 
   return_type on_init() override;
-  void capture_inputs(InputManager& inputs) override;
+  void capture_inputs(Inputs inputs) override;
   return_type update(const rclcpp::Time& now, const rclcpp::Duration& period) override;
 
   CallbackReturn on_configure(const State& previous_state) override;

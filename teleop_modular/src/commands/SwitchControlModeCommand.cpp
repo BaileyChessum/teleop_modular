@@ -31,4 +31,4 @@ void SwitchControlModeCommand::execute(CommandDelegate& context, const rclcpp::T
 
 #include <pluginlib/class_list_macros.hpp>
 
-CLASS_LOADER_REGISTER_CLASS(teleop::SwitchControlModeCommand, teleop::Command);
+PLUGINLIB_EXPORT_CLASS(teleop::SwitchControlModeCommand, teleop::Command);

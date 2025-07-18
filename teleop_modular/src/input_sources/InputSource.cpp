@@ -4,7 +4,7 @@
 
 #include "teleop_modular/input_sources/InputSource.hpp"
 
-namespace teleop::input_source
+namespace input_source
 {
 
 using teleop::utils::span;
@@ -56,4 +56,4 @@ InputSource::InputDeclarationSpans InputSource::export_inputs()
   return InputDeclarationSpans{ span(button_values_), span(axis_values_), span(button_names_), span(axis_names_) };
 }
 
-}  // namespace teleop::input_source
+}  // namespace input_source

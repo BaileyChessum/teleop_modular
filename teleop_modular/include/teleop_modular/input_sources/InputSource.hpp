@@ -20,8 +20,10 @@ namespace teleop::internal
 class InputSourceHandle;  // Forward declaration
 }
 
-namespace teleop::input_source
+namespace input_source
 {
+
+using teleop::utils::span;
 
 //class InputSourceManager; // Forward declaration
 
@@ -33,14 +35,14 @@ class InputSource
 public:
   struct InputValueSpans
   {
-    utils::span<uint8_t> buttons;
-    utils::span<float> axes;
+    span<uint8_t> buttons;
+    span<float> axes;
   };
 
   struct InputDeclarationSpans : InputValueSpans
   {
-    utils::span<std::string> button_names;
-    utils::span<std::string> axis_names;
+    span<std::string> button_names;
+    span<std::string> axis_names;
   };
 
   virtual ~InputSource() = default;

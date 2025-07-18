@@ -2,11 +2,9 @@
 
 #include "teleop_modular/colors.hpp"
 #include "teleop_modular/control_modes/ControlModeManager.hpp"
+#include <iostream>
 
 using namespace std::chrono_literals;
-
-using std::placeholders::_1;
-using std::placeholders::_2;
 
 namespace teleop
 {
