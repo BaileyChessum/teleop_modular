@@ -17,6 +17,8 @@ public:
   using SharedPtr = std::shared_ptr<Axis>;
   using WeakPtr = std::weak_ptr<Axis>;
 
+  using ControlModeType = control_mode::Axis;
+
   explicit Axis(std::string name) : InputCommon<float>(std::move(name))
   {
   }
