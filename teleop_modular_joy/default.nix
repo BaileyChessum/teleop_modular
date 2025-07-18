@@ -10,7 +10,7 @@
 , generate-parameter-library
 , pluginlib
 , std-msgs
-, teleop-modular
+, teleop-modular-input-source
 , joy
 }:
 
@@ -37,7 +37,7 @@ buildRosPackage {
     generate-parameter-library
     geometry-msgs
     pluginlib
-    teleop-modular
+    teleop-modular-input-source
   ];
 
   propagatedBuildInputs = [ joy ];
