@@ -37,7 +37,6 @@ target_include_directories(teleop_modular_parameters INTERFACE
   $<INSTALL_INTERFACE:include/teleop_modular_parameters>
 )
 
-
 # Add plugin implementations here!
 add_library(${PROJECT_NAME} SHARED
   src/commands/SwitchControlModeCommand.cpp
