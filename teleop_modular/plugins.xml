@@ -1,12 +1,4 @@
 <library path="teleop_modular">
     <!-- Commands -->
-    <class name="log" type="teleop::LogCommand" base_class_type="teleop::Command">
-        <description>A command to log a message.</description>
-    </class>
-    <class name="switch_control_mode" type="teleop::SwitchControlModeCommand" base_class_type="teleop::Command">
-        <description>A command to deactivate the current control mode, and active another specified control mode.</description>
-    </class>
-    <class name="set_button" type="teleop::SetButtonCommand" base_class_type="teleop::Command">
-        <description>A command to set the value of a boolean input.</description>
-    </class>
+    <!-- TODO: move the commands back here :( -->
 </library>

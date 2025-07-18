@@ -2,7 +2,7 @@
 // Created by nova on 6/29/25.
 //
 
-#include "../../include/teleop_modular/commands/SwitchControlModeCommand.hpp"
+#include "teleop_modular/commands/SwitchControlModeCommand.hpp"
 #include "teleop_modular/control_modes/ControlModeManager.hpp"
 
 namespace teleop

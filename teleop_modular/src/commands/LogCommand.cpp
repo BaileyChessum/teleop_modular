@@ -2,7 +2,7 @@
 // Created by nova on 6/29/25.
 //
 
-#include "../../include/teleop_modular/commands/LogCommand.hpp"
+#include "teleop_modular/commands/LogCommand.hpp"
 #include "teleop_modular/colors.hpp"
 
 namespace teleop

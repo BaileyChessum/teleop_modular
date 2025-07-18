@@ -12,6 +12,7 @@ namespace teleop
 class LogCommand final : public Command
 {
 public:
+  LogCommand() = default;
   void on_initialize(const std::string& prefix, const ParameterInterface::SharedPtr& parameters) override;
 
   void execute(CommandDelegate& context, const rclcpp::Time& now) override;
