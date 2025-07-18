@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>teleop_modular</name>
-  <version>0.0.1</version>
+  <version>0.0.3</version>
   <description>A framework for teleoperation input handling in ROS2.</description>
   <maintainer email="bailey.chessum1@gmail.com">Bailey Chessum</maintainer>
 
