@@ -7,8 +7,10 @@
 
 #include <memory>
 #include <vector>
-#include "InputSource.hpp"
+#include <rclcpp/node_interfaces/node_parameters_interface.hpp>
+#include "input_source/input_source.hpp"
 #include "teleop_modular/utilities/better_multimap.hpp"
+#include "teleop_modular/inputs/InputManager.hpp"
 
 namespace teleop::internal
 {
@@ -128,7 +130,7 @@ private:
     }
   };
 
-  void remap(input_source::InputSource::InputDeclarationSpans declarations, RemapParams remap_params);
+  void remap(input_source::InputDeclarationSpans declarations, RemapParams remap_params);
   RemapParams get_remap_params();
 
   std::optional<RemapButtonParams> get_remap_button_params(const std::string& name);

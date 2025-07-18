@@ -6,20 +6,15 @@
 , ament-lint-auto
 , gtest
 , rclcpp
-, geometry-msgs
-, generate-parameter-library
 , pluginlib
-, std-msgs
-, teleop-modular-input-source
-, joy
 }:
 
 buildRosPackage {
-  name = "teleop-modular-joy";
+  name = "teleop-modular-input-source";
   buildType = "ament_cmake";
 
   src = builtins.path rec {
-    name = "teleop-modular-joy-source";
+    name = "teleop-modular-input-source-source";
     path = ./.;
   };
 
@@ -33,14 +28,10 @@ buildRosPackage {
 
   buildInputs = [
     rclcpp
-    std-msgs
-    generate-parameter-library
-    geometry-msgs
     pluginlib
-    teleop-modular-input-source
   ];
 
-  propagatedBuildInputs = [ joy ];
+  propagatedBuildInputs = [ ];
 
   # Enable running tests during build
   doCheck = true;

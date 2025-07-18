@@ -125,7 +125,7 @@ bool InputSourceManager::create_input_source(const std::string& input_source_nam
   const auto input_source_node = std::make_shared<rclcpp::Node>(node_name, node_->get_namespace(), options);
 
   // Initialize the control mode
-  input_source_class->initialize(input_source_node, input_source_name, shared_from_this());
+  input_source_class->init(input_source_node, input_source_name, shared_from_this());
 
   // Export the inputs
   sources_.emplace_back(inputs_.get(), input_source_class);
