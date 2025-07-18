@@ -8,8 +8,16 @@
 #include "teleop_modular/utilities/get_parameter.hpp"
 #include "teleop_modular/colors.hpp"
 
-namespace teleop_modular::internal
+namespace teleop::internal
 {
+
+namespace
+{
+using utils::get_parameter;
+using utils::get_parameter_or_default;
+using input_source::InputSource;
+}  // namespace
+
 
 InputSourceHandle::InputSourceHandle(const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr& parameters,
                                      InputManager& inputs, const std::shared_ptr<InputSource>& source)
@@ -536,4 +544,4 @@ void InputSourceHandle::remap(InputSource::InputDeclarationSpans declarations, R
   }
 }
 
-}  // namespace teleop_modular::internal
+}  // namespace teleop::internal

@@ -2,9 +2,9 @@
 // Created by nova on 6/28/25.
 //
 
-#include "../../include/teleop_modular/commands/Command.hpp"
+#include "teleop_modular/commands/Command.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 
 void Command::initialize(const CommandDelegate::WeakPtr& context, const std::string& name,
@@ -35,4 +35,4 @@ void Command::on_event_invoked(const rclcpp::Time& now)
     execute(*context, now);
 }
 
-}  // namespace teleop_modular
+}  // namespace teleop

@@ -4,13 +4,14 @@
 
 #ifndef STATECOLLECTION_HPP
 #define STATECOLLECTION_HPP
+
 #include <map>
 #include <string>
 
 #include "State.hpp"
 #include "teleop_modular/inputs/InputManager.hpp"
 
-namespace teleop_modular
+namespace teleop::state
 {
 
 /**
@@ -109,6 +110,6 @@ private:
   std::map<std::string, StateHandle> items_{};
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop::state
 
 #endif  // STATECOLLECTION_HPP

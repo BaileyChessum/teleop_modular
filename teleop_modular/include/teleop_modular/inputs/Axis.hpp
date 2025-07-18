@@ -6,9 +6,9 @@
 #define TELEOP_MODULAR_AXIS_HPP
 
 #include <utility>
-#include "Input.hpp"
+#include "InputCommon.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 
 class Axis : public InputCommon<float>
@@ -17,11 +17,13 @@ public:
   using SharedPtr = std::shared_ptr<Axis>;
   using WeakPtr = std::weak_ptr<Axis>;
 
+  using ControlModeType = control_mode::Axis;
+
   explicit Axis(std::string name) : InputCommon<float>(std::move(name))
   {
   }
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop
 
 #endif  // TELEOP_MODULAR_AXIS_HPP

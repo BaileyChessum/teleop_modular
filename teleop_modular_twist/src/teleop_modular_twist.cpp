@@ -7,13 +7,15 @@ TwistControlMode::TwistControlMode() = default;
 
 TwistControlMode::~TwistControlMode() = default;
 
-void TwistControlMode::on_initialize()
+return_type TwistControlMode::on_init()
 {
   param_listener_ = std::make_shared<teleop_modular_twist::ParamListener>(node_);
   params_ = param_listener_->get_params();
+
+  return return_type::OK;
 }
 
-void TwistControlMode::on_configure(InputManager& inputs)
+CallbackReturn TwistControlMode::on_configure(const State& previous_state)
 {
   const auto logger = get_node()->get_logger();
 
@@ -27,28 +29,32 @@ void TwistControlMode::on_configure(InputManager& inputs)
                                       .keep_last(1);
   publisher_ = get_node()->create_publisher<geometry_msgs::msg::TwistStamped>(params_.topic, qos_profile);
 
-  // Get interested inputs
-  auto& axes = inputs.get_axes();
-  auto& buttons = inputs.get_buttons();
-
-  speed_coefficient_ = axes[params_.input_names.speed];
-  locked_ = buttons[params_.input_names.locked];
-
-  x_ = axes[params_.input_names.twist_x];
-  y_ = axes[params_.input_names.twist_y];
-  z_ = axes[params_.input_names.twist_z];
-  roll_ = axes[params_.input_names.twist_roll];
-  pitch_ = axes[params_.input_names.twist_pitch];
-  yaw_ = axes[params_.input_names.twist_yaw];
+  return CallbackReturn::SUCCESS;
 }
 
-void TwistControlMode::on_activate()
+void TwistControlMode::capture_inputs(Inputs inputs)
 {
+  speed_coefficient_ = inputs.axes[params_.input_names.speed];
+  locked_ = inputs.buttons[params_.input_names.locked];
+
+  x_ = inputs.axes[params_.input_names.twist_x];
+  y_ = inputs.axes[params_.input_names.twist_y];
+  z_ = inputs.axes[params_.input_names.twist_z];
+  roll_ = inputs.axes[params_.input_names.twist_roll];
+  pitch_ = inputs.axes[params_.input_names.twist_pitch];
+  yaw_ = inputs.axes[params_.input_names.twist_yaw];
 }
 
-void TwistControlMode::on_deactivate()
+CallbackReturn TwistControlMode::on_activate(const State& previous_state)
+{
+  return CallbackReturn::SUCCESS;
+}
+
+CallbackReturn TwistControlMode::on_deactivate(const State& previous_state)
 {
   publish_halt_message(get_node()->now());
+
+  return CallbackReturn::SUCCESS;
 }
 
 void TwistControlMode::publish_halt_message(const rclcpp::Time& now) const
@@ -58,7 +64,7 @@ void TwistControlMode::publish_halt_message(const rclcpp::Time& now) const
   publisher_->publish(std::move(msg));
 }
 
-void TwistControlMode::update(const rclcpp::Time& now, const rclcpp::Duration& period)
+return_type TwistControlMode::update(const rclcpp::Time& now, const rclcpp::Duration& period)
 {
   auto logger = get_node()->get_logger();
 
@@ -66,7 +72,7 @@ void TwistControlMode::update(const rclcpp::Time& now, const rclcpp::Duration& p
   if (*locked_)
   {
     publish_halt_message(now);
-    return;
+    return return_type::OK;
   }
 
   const float speed_coefficient = std::clamp(speed_coefficient_->value(), 0.0f, 1.0f);
@@ -102,6 +108,8 @@ void TwistControlMode::update(const rclcpp::Time& now, const rclcpp::Duration& p
   msg->header.frame_id = params_.frame_id;
 
   publisher_->publish(std::move(msg));
+
+  return return_type::OK;
 }
 
 double TwistControlMode::norm(double x, double y, double z)
@@ -109,8 +117,23 @@ double TwistControlMode::norm(double x, double y, double z)
   return std::sqrt(x * x + y * y + z * z);
 }
 
+CallbackReturn TwistControlMode::on_error(const State& previous_state)
+{
+  return CallbackReturn::SUCCESS;
+}
+
+CallbackReturn TwistControlMode::on_cleanup(const State& previous_state)
+{
+  return CallbackReturn::SUCCESS;
+}
+
+CallbackReturn TwistControlMode::on_shutdown(const State& previous_state)
+{
+  return CallbackReturn::SUCCESS;
+}
+
 }  // namespace teleop_modular_twist
 
 #include <pluginlib/class_list_macros.hpp>
 
-CLASS_LOADER_REGISTER_CLASS(teleop_modular_twist::TwistControlMode, teleop_modular::ControlMode);
+PLUGINLIB_EXPORT_CLASS(teleop_modular_twist::TwistControlMode, control_mode::ControlMode);

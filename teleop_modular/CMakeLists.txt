@@ -3,14 +3,14 @@ project(teleop_modular LANGUAGES CXX)
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
   control_msgs
+  controller_manager_msgs
   geometry_msgs
   sensor_msgs
-  controller_manager_msgs
   pluginlib
   rclcpp
-  realtime_tools
   std_msgs
   std_srvs
+  control_mode
 )
 
 find_package(ament_cmake REQUIRED)
@@ -31,38 +31,14 @@ generate_parameter_library(
   src/parameters.yaml
 )
 
-# Build the node executable
-add_executable(${PROJECT_NAME}_node
-  src/teleop_modular.cpp
-  src/control_modes/ControlMode.cpp
-  src/control_modes/ControlModeManager.cpp
-  src/input_sources/InputSourceManager.cpp
-  src/input_sources/InputSource.cpp
-  src/commands/Command.cpp
-  src/commands/CommandManager.cpp
-  src/events/EventListenerQueue.cpp
-  src/events/EventCollection.cpp
-  src/inputs/InputCommonSpecializations.cpp
-  src/inputs/InputManager.cpp
-  src/inputs/Button.cpp
-  src/inputs/Axis.cpp
-  src/inputs/InputCollection.cpp
-
-  # State
-  src/inputs/state/StateManager.cpp
-  src/inputs/state/StateCollection.cpp
-  src/inputs/state/State.cpp
-
-  src/input_sources/InputSourceHandle.cpp
-  src/events/ButtonEvent.cpp
-  src/events/Event.cpp
-  src/events/EventManager.cpp
+# Export generated include directory
+target_include_directories(teleop_modular_parameters INTERFACE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/teleop_modular_parameters>
+  $<INSTALL_INTERFACE:include/teleop_modular_parameters>
 )
 
 # Add plugin implementations here!
 add_library(${PROJECT_NAME} SHARED
-  src/control_modes/ControlMode.cpp
-
   src/commands/SwitchControlModeCommand.cpp
   src/commands/LogCommand.cpp
   src/commands/SetButtonCommand.cpp
@@ -73,7 +49,6 @@ add_library(${PROJECT_NAME} SHARED
   src/inputs/Axis.cpp
   src/commands/Command.cpp
   src/control_modes/ControlModeManager.cpp
-  src/control_modes/ControlMode.cpp
   src/inputs/InputManager.cpp
   src/events/EventCollection.cpp
   src/events/EventListenerQueue.cpp
@@ -90,16 +65,30 @@ add_library(${PROJECT_NAME} SHARED
   src/events/ButtonEvent.cpp
   src/events/Event.cpp
   src/events/EventManager.cpp
+
+  src/input_sources/InputSourceManager.cpp
+  src/commands/CommandManager.cpp
 )
 
-target_link_libraries(${PROJECT_NAME}_node
-  teleop_modular_parameters
+# Build the node executable
+add_executable(${PROJECT_NAME}_node
+  src/teleop_modular.cpp
 )
 
 # Link parameter libraries for plugins here!
 target_link_libraries(${PROJECT_NAME}
   teleop_modular_parameters
 )
+
+target_link_libraries(${PROJECT_NAME}_node
+  teleop_modular_parameters
+  ${PROJECT_NAME}
+)
+
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)  # Require C++17
+target_include_directories(${PROJECT_NAME} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
 
 ament_target_dependencies(${PROJECT_NAME}_node ${THIS_PACKAGE_INCLUDE_DEPENDS})
 ament_target_dependencies(${PROJECT_NAME} ${THIS_PACKAGE_INCLUDE_DEPENDS})
@@ -135,7 +124,7 @@ install(FILES plugins.xml
   ament_lint_auto_find_test_dependencies()
 #endif()
 
-# -- Intall
+# -- Install
 
 # Install the executable
 install(

@@ -5,17 +5,17 @@
 #include "teleop_modular/events/EventCollection.hpp"
 #include "teleop_modular/events/ButtonEvent.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 
-EventCollection::EventCollection(std::weak_ptr<EventListenerQueue> listener_queue, InputManager& inputs)
+EventCollection::EventCollection(std::weak_ptr<internal::EventListenerQueue> listener_queue, InputManager& inputs)
   : listener_queue_(std::move(listener_queue))
   , factory_{ { "/down",
-                [&inputs](const std::string& name, const std::weak_ptr<teleop_modular::EventListenerQueue>& queue) {
-                  return std::make_shared<teleop_modular::internal::ButtonEvent>(name, queue, true, inputs.get_buttons());
+                [&inputs](const std::string& name, const std::weak_ptr<internal::EventListenerQueue>& queue) {
+                  return std::make_shared<internal::ButtonEvent>(name, queue, true, inputs.get_buttons());
                 } },
-              { "/up", [&inputs](const std::string& name, const std::weak_ptr<teleop_modular::EventListenerQueue>& queue) {
-                 return std::make_shared<teleop_modular::internal::ButtonEvent>(name, queue, false, inputs.get_buttons());
+              { "/up", [&inputs](const std::string& name, const std::weak_ptr<internal::EventListenerQueue>& queue) {
+                 return std::make_shared<internal::ButtonEvent>(name, queue, false, inputs.get_buttons());
                } } }
 {
 }
@@ -92,4 +92,4 @@ Event::SharedPtr EventCollection::create_event_for_name(const std::string& name)
   return std::make_shared<Event>(name, listener_queue_);
 }
 
-}  // namespace teleop_modular
+}  // namespace teleop

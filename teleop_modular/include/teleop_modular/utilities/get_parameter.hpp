@@ -9,7 +9,7 @@
 #include <string>
 #include <rclcpp/rclcpp.hpp>
 
-namespace teleop_modular
+namespace teleop::utils
 {
 
 template <typename T>
@@ -193,6 +193,6 @@ get_parameter(const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr&
   return from_param.as_integer_array();
 }
 
-}  // namespace teleop_modular
+}  // namespace teleop::utils
 
 #endif  // TELEOP_MODULAR_GET_PARAMETER_HPP

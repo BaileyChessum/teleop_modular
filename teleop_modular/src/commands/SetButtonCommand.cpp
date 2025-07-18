@@ -4,7 +4,7 @@
 
 #include "teleop_modular/commands/SetButtonCommand.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 
 void SetButtonCommand::on_initialize(const std::string& prefix, const ParameterInterface::SharedPtr& parameters)
@@ -33,8 +33,8 @@ void SetButtonCommand::execute(CommandDelegate& context, const rclcpp::Time& now
   context.get_states().get_buttons().set(params_.name, params_.value);
 }
 
-}  // namespace teleop_modular
+}  // namespace teleop
 
 #include <pluginlib/class_list_macros.hpp>
 
-CLASS_LOADER_REGISTER_CLASS(teleop_modular::SetButtonCommand, teleop_modular::Command);
+PLUGINLIB_EXPORT_CLASS(teleop::SetButtonCommand, teleop::Command);

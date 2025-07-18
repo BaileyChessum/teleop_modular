@@ -11,7 +11,7 @@
 #include <sstream>
 #include "teleop_modular/colors.hpp"
 
-namespace teleop_modular
+namespace teleop::utils
 {
 
 /**
@@ -62,6 +62,6 @@ struct SpawnableLog
   }
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop::utils
 
 #endif  // TELEOP_MODULAR_SPAWNABLELOG_HPP

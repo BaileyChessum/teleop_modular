@@ -4,7 +4,7 @@
 
 #include "teleop_modular/inputs/InputManager.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 
 void InputManager::update(const rclcpp::Time& now)
@@ -20,4 +20,4 @@ void InputManager::update(const rclcpp::Time& now)
   }
 }
 
-}  // namespace teleop_modular
+}  // namespace teleop

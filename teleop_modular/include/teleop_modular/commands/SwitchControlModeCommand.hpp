@@ -7,7 +7,7 @@
 
 #include "Command.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 
 class SwitchControlModeCommand final : public Command
@@ -26,6 +26,6 @@ protected:
   Params params_{};
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop
 
 #endif  // TELEOP_MODULAR_SWITCHCONTROLMODECOMMAND_HPP

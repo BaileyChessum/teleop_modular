@@ -8,18 +8,19 @@
 #include <rclcpp/time.hpp>
 #include <utility>
 
-#include "InputDeclaration.hpp"
+#include "teleop_modular/inputs/state/InputDeclaration.hpp"
+#include "control_mode/input_interface.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 
 template <typename T>
-class InputCommon
+class InputCommon : public control_mode::InputInterface<T>
 {
 public:
   virtual ~InputCommon() = default;
 
-  T value();
+  T value() override;
 
   void debounce(const rclcpp::Time& now);
 
@@ -27,18 +28,6 @@ public:
    * @returns true if the value changed since last debounce
    */
   [[nodiscard]] bool changed() const;
-
-  // Accessors
-  [[nodiscard]] const std::string& get_name() const
-  {
-    return name_;
-  }
-
-  // Type conversion
-  operator T()
-  {
-    return value();
-  }
 
   /**
    * Adds the given definition to the input
@@ -68,7 +57,7 @@ public:
 
 protected:
   // Constructor is protected, as to ensure plugin classes don't accidentally use this type directly
-  explicit InputCommon(std::string name) : name_(std::move(name))
+  explicit InputCommon(std::string name) : control_mode::InputInterface<T>(std::move(name))
   {
   }
 
@@ -102,8 +91,6 @@ private:
   T previous_debounce_value_ = 0;
   T current_debounce_value_ = 0;
 
-  const std::string name_;
-
   /// Reference wrappers obtained through InputDeclaration<T>s, that provide the value for the input
   std::vector<std::reference_wrapper<T>> definitions_{};
 };
@@ -114,6 +101,6 @@ bool InputCommon<T>::changed() const
   return previous_debounce_value_ != current_debounce_value_;
 }
 
-}  // namespace teleop_modular
+}  // namespace teleop
 
 #endif  // TELEOP_MODULAR_INPUTCOMMON_HPP

@@ -2,10 +2,10 @@
 // Created by nova on 6/29/25.
 //
 
-#include "../../include/teleop_modular/commands/LogCommand.hpp"
+#include "teleop_modular/commands/LogCommand.hpp"
 #include "teleop_modular/colors.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 
 void LogCommand::on_initialize(const std::string& prefix, const ParameterInterface::SharedPtr& parameters)
@@ -27,8 +27,8 @@ void LogCommand::execute(CommandDelegate& context, const rclcpp::Time& now)
   RCLCPP_INFO(get_logger(), "%s" C_RESET, params_.message.c_str());
 }
 
-}  // namespace teleop_modular
+}  // namespace teleop
 
 #include <pluginlib/class_list_macros.hpp>
 
-CLASS_LOADER_REGISTER_CLASS(teleop_modular::LogCommand, teleop_modular::Command);
+PLUGINLIB_EXPORT_CLASS(teleop::LogCommand, teleop::Command);

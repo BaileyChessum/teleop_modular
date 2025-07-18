@@ -14,14 +14,14 @@
 #include "InputSource.hpp"
 #include "InputSourceUpdateDelegate.hpp"
 #include "teleop_modular_parameters.hpp"
-#include "teleop_modular/SpawnableLog.hpp"
+#include "teleop_modular/utilities/SpawnableLog.hpp"
 #include "InputSourceHandle.hpp"
 
-namespace teleop_modular
+namespace teleop::internal
 {
 
-class InputSourceManager final : public InputSourceUpdateDelegate,
-                                 public std::enable_shared_from_this<InputSourceUpdateDelegate>
+class InputSourceManager final : public input_source::InputSourceUpdateDelegate,
+                                 public std::enable_shared_from_this<input_source::InputSourceUpdateDelegate>
 {
 public:
   InputSourceManager() = default;
@@ -34,7 +34,7 @@ public:
   /**
    * Populates the sources_ from the params in node_.
    */
-  void configure(const std::shared_ptr<ParamListener>& param_listener, InputManager& inputs);
+  void configure(const std::shared_ptr<teleop_modular_params::ParamListener>& param_listener, InputManager& inputs);
 
   /**
    * Gets the control mode plugin class type name for a given input source name, to be given to pluginlib to load.
@@ -78,11 +78,11 @@ private:
   /// A reference to the input manager used for linking
   std::reference_wrapper<InputManager> inputs_;
 
-  std::weak_ptr<ParamListener> param_listener_;
-  Params params_;
+  std::weak_ptr<teleop_modular_params::ParamListener> param_listener_;
+  teleop_modular_params::Params params_;
 
   /// Loads the control modes, and needs to stay alive during the whole lifecycle of the control modes.
-  std::unique_ptr<pluginlib::ClassLoader<InputSource>> source_loader_;
+  std::unique_ptr<pluginlib::ClassLoader<input_source::InputSource>> source_loader_;
 
   /// The structure that holds all the tests
   std::vector<internal::InputSourceHandle> sources_{};
@@ -93,13 +93,13 @@ private:
   /// Lock that waits until should_update_ is true.
   std::condition_variable update_condition_;
   std::atomic<bool> should_update_ = false;
-  std::queue<std::weak_ptr<InputSource>> sources_to_update_;
+  std::queue<std::weak_ptr<input_source::InputSource>> sources_to_update_;
   rclcpp::Time update_time_ = rclcpp::Time();
 
   /// Used to log the spawned input sources
-  std::vector<SpawnableLog> logs_{};
+  std::vector<utils::SpawnableLog> logs_{};
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop::internal
 
 #endif  // TELEOP_MODULAR_INPUTSOURCEMANAGER_HPP

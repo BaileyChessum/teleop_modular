@@ -12,7 +12,7 @@ namespace
 constexpr float EPSILON = 1e-1f;
 }
 
-namespace teleop_modular
+namespace teleop
 {
 
 template <>
@@ -55,4 +55,4 @@ void InputCommon<float>::debounce(const rclcpp::Time& now)
     current_debounce_value_ = new_value;
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop

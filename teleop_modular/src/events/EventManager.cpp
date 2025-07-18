@@ -4,7 +4,7 @@
 
 #include "teleop_modular/events/EventManager.hpp"
 
-namespace teleop_modular::internal
+namespace teleop::internal
 {
 
 EventManager::EventManager(InputManager& inputs)
@@ -23,4 +23,4 @@ void EventManager::update(const rclcpp::Time& now)
   queue_->service(now);
 }
 
-}  // namespace teleop_modular
+}  // namespace teleop::internal

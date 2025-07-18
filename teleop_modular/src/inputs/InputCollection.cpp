@@ -4,7 +4,7 @@
 
 #include "teleop_modular/inputs/InputCollection.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 
 // TODO: Make these redundant

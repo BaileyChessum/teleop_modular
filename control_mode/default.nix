@@ -6,20 +6,16 @@
 , ament-lint-auto
 , gtest
 , rclcpp
-, geometry-msgs
-, generate-parameter-library
 , pluginlib
-, std-msgs
-, teleop-modular-control-mode
-, std-srvs
+, rclcpp-lifecycle
 }:
 
 buildRosPackage {
-  name = "teleop-modular-twist";
+  name = "teleop-modular-control-mode";
   buildType = "ament_cmake";
 
   src = builtins.path rec {
-    name = "teleop-modular-twist-source";
+    name = "teleop-modular-control-mode-source";
     path = ./.;
   };
 
@@ -33,15 +29,12 @@ buildRosPackage {
 
   buildInputs = [
     rclcpp
-    std-msgs
-    std-srvs
-    generate-parameter-library
-    geometry-msgs
     pluginlib
-    teleop-modular-control-mode
   ];
 
-  propagatedBuildInputs = [ ];
+  propagatedBuildInputs = [
+    rclcpp-lifecycle
+  ];
 
   # Enable running tests during build
   doCheck = true;

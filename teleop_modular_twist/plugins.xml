@@ -1,6 +1,17 @@
 <library path="teleop_modular_twist">
     <!-- Control Modes -->
-    <class name="teleop_modular_twist/TwistControlMode" type="teleop_modular_twist::TwistControlMode" base_class_type="teleop_modular::ControlMode">
+    <class name="teleop_modular_twist/TwistControlMode" type="teleop_modular_twist::TwistControlMode" base_class_type="control_mode::ControlMode">
         <description>A control mode that moves some reference frame of the robot by a Twist.</description>
+    </class>
+
+    <!-- TODO: move this back to teleop_modular -->
+    <class name="log" type="teleop::LogCommand" base_class_type="teleop::Command">
+        <description>A command to log a message.</description>
+    </class>
+    <class name="switch_control_mode" type="teleop::SwitchControlModeCommand" base_class_type="teleop::Command">
+        <description>A command to deactivate the current control mode, and active another specified control mode.</description>
+    </class>
+    <class name="set_button" type="teleop::SetButtonCommand" base_class_type="teleop::Command">
+        <description>A command to set the value of a boolean input.</description>
     </class>
 </library>

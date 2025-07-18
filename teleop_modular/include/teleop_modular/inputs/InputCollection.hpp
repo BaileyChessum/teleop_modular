@@ -11,8 +11,9 @@
 #include "teleop_modular/utilities/WeakMapIterator.hpp"
 #include <functional>
 #include <map>
+#include "control_mode/input_collection.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 
 template <typename InputT>
@@ -41,13 +42,13 @@ public:
   InputCollection& operator=(const InputCollection&) = delete;
 
   // Container type aliases
-  using iterator = WeakMapIterator<InputT, false>;
-  using const_iterator = WeakMapIterator<InputT, true>;
+  using iterator = utils::WeakMapIterator<InputT, false>;
+  using const_iterator = utils::WeakMapIterator<InputT, true>;
 
-  std::shared_ptr<InputT> operator[](const std::string& key)
+  std::shared_ptr<InputT> operator[](const std::string& name)
   {
     // Find the element
-    auto it = items_.find(key);
+    auto it = items_.find(name);
     std::shared_ptr<InputT> ptr;
 
     if (it != items_.end())
@@ -63,9 +64,9 @@ public:
     if (!ptr)
     {
       // Create new input if we don't have a valid one
-      ptr = std::make_shared<InputT>(key);
+      ptr = std::make_shared<InputT>(name);
       setup_new_item(ptr);
-      items_[key] = ptr;
+      items_[name] = ptr;
     }
 
     return ptr;
@@ -130,6 +131,27 @@ public:
     return count;
   }
 
+  class ControlModeCompat : public control_mode::InputCollection<typename InputT::ControlModeType> 
+  {
+  public:
+    ControlModeCompat(InputCollection& parent) : parent_(parent) 
+    {
+    }
+
+    typename InputT::ControlModeType::SharedPtr operator[](const std::string& name) override 
+    {
+      return parent_[name];
+    }
+
+  private:
+    InputCollection& parent_;
+  };
+
+  ControlModeCompat get_control_mode_compat() 
+  {
+    return ControlModeCompat(*this); 
+  }
+
 private:
   void setup_new_item(const std::shared_ptr<InputT>& item);
   std::map<std::string, std::weak_ptr<InputT>> items_{};
@@ -142,6 +164,6 @@ void InputCollection<Button>::setup_new_item(const std::shared_ptr<Button>& item
 template <>
 void InputCollection<Axis>::setup_new_item(const std::shared_ptr<Axis>& item);
 
-}  // namespace teleop_modular
+}  // namespace teleop
 
 #endif  // TELEOP_MODULAR_INPUTCOLLECTION_HPP

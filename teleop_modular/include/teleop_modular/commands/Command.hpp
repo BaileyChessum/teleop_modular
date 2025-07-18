@@ -10,7 +10,7 @@
 #include "CommandDelegate.hpp"
 #include "teleop_modular/events/Event.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 
 /**

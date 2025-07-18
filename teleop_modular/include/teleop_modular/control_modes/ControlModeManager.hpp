@@ -11,11 +11,10 @@
 #include <controller_manager_msgs/srv/switch_controller.hpp>
 #include <pluginlib/class_loader.hpp>
 #include <rclcpp/executor.hpp>
-
-#include "ControlMode.hpp"
+#include "control_mode/control_mode.hpp"
 #include "teleop_modular/inputs/InputManager.hpp"
 
-namespace teleop_modular
+namespace teleop::internal
 {
 
 /**
@@ -48,10 +47,10 @@ public:
   auto update(const rclcpp::Time& now, const rclcpp::Duration& period) const -> void;
 
   // Collection<ControlMode> implementation
-  std::shared_ptr<ControlMode> operator[](const std::string& index);
+  std::shared_ptr<control_mode::ControlMode> operator[](const std::string& index);
 
-  using iterator = typename std::map<std::string, std::shared_ptr<ControlMode>>::iterator;
-  using const_iterator = typename std::map<std::string, std::shared_ptr<ControlMode>>::const_iterator;
+  using iterator = typename std::map<std::string, std::shared_ptr<control_mode::ControlMode>>::iterator;
+  using const_iterator = typename std::map<std::string, std::shared_ptr<control_mode::ControlMode>>::const_iterator;
 
   iterator begin()
   {
@@ -70,7 +69,7 @@ public:
     return control_modes_.end();
   };
 
-  void add(const std::string& key, const std::shared_ptr<ControlMode>& value);
+  void add(const std::string& key, const std::shared_ptr<control_mode::ControlMode>& value);
 
   void activate_initial_control_mode();
 
@@ -82,18 +81,12 @@ private:
 
   /**
    * Switches ros2_control controllers in the controller_manager for the given change in control modes.
-   * @param previous the control mode being deactivated.
-   * @param next the control mode being activated.
+   * @param controllers_to_deactivate the control mode being deactivated.
+   * @param controllers_to_activate the control mode being activated.
    * @return True if the request was made successfully. False otherwise.
    */
-  [[nodiscard]] bool switch_controllers(const ControlMode& previous, const ControlMode& next) const;
-
-  /**
-   * Switches ros2_control controllers in the controller_manager for the given change in control modes.
-   * @param next the control mode being activated.
-   * @return True if the request was made successfully. False otherwise.
-   */
-  [[nodiscard]] bool switch_controllers(const ControlMode& next) const;
+  [[nodiscard]] bool switch_controllers(const std::vector<std::string>& controllers_to_deactivate,
+                                        const std::vector<std::string>& controllers_to_activate) const;
 
   /**
    * Gets the control mode plugin class type name for a given control mode name, to be given to pluginlib to load.
@@ -111,18 +104,18 @@ private:
 
   // Control modes
   /// Loads the control modes, and needs to stay alive during the whole lifecycle of the control modes.
-  std::unique_ptr<pluginlib::ClassLoader<ControlMode>> control_mode_loader_;
+  std::unique_ptr<pluginlib::ClassLoader<control_mode::ControlMode>> control_mode_loader_;
 
   /// Currently loaded control modes.
-  std::map<std::string, std::shared_ptr<ControlMode>> control_modes_{};
+  std::map<std::string, std::shared_ptr<control_mode::ControlMode>> control_modes_{};
   /// The currently active control mode.
-  std::shared_ptr<ControlMode> current_control_mode_ = nullptr;
+  // std::shared_ptr<control_mode::ControlMode> current_control_mode_ = nullptr;
 
   // Service calls
   /// Client to call the service on the controller manager to change the currently active controllers.
   rclcpp::Client<controller_manager_msgs::srv::SwitchController>::SharedPtr switch_controller_client_ = nullptr;
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop::internal
 
 #endif  // TELEOP_MODULAR_CONTROLMODEMANAGER_HPP

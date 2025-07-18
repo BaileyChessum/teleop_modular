@@ -4,12 +4,13 @@
 
 #ifndef EVENTLISTENERQUEUE_HPP
 #define EVENTLISTENERQUEUE_HPP
+
 #include <queue>
 #include <rclcpp/time.hpp>
 
 #include "teleop_modular/events/EventListener.hpp"
 
-namespace teleop_modular
+namespace teleop::internal
 {
 /**
  * Any event listeners to be invoked are added to this queue, and the execution of EventListener::on_event_invoked is
@@ -33,6 +34,6 @@ private:
   std::queue<EventListener::WeakPtr> queue_{};
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop::internal
 
 #endif  // EVENTLISTENERQUEUE_HPP

@@ -8,10 +8,10 @@
 #include "teleop_modular/inputs/InputManager.hpp"
 #include "teleop_modular/events/EventManager.hpp"
 
-using teleop_modular::Axis;
-using teleop_modular::Button;
-using teleop_modular::InputManager;
-using teleop_modular::internal::EventManager;
+using teleop::Axis;
+using teleop::Button;
+using teleop::InputManager;
+using teleop::internal::EventManager;
 
 class InputTest : public ::testing::Test
 {

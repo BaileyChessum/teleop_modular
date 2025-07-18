@@ -9,7 +9,7 @@
 #include "teleop_modular/events/EventListenerQueue.hpp"
 #include "teleop_modular/events/EventCollection.hpp"
 
-namespace teleop_modular::internal
+namespace teleop::internal
 {
 
 class EventManager final
@@ -27,10 +27,10 @@ public:
 private:
   InputManager& inputs_;
 
-  std::shared_ptr<EventListenerQueue> queue_;
+  std::shared_ptr<internal::EventListenerQueue> queue_;
   EventCollection items_;
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop::internal
 
 #endif  // TELEOP_MODULAR_EVENTMANAGER_HPP

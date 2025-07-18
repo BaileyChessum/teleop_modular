@@ -2,10 +2,10 @@
 // Created by nova on 6/28/25.
 //
 
-#include "../../include/teleop_modular/commands/CommandManager.hpp"
+#include "teleop_modular/commands/CommandManager.hpp"
 #include "teleop_modular/utilities/get_parameter.hpp"
 
-namespace teleop_modular
+namespace teleop::internal
 {
 
 void CommandManager::create_command(const std::string& name, EventCollection& events)
@@ -67,7 +67,7 @@ void CommandManager::configure(EventCollection& events)
                                  std::vector<std::string>();
 
   // Pluginlib for loading commands dynamically
-  loader_ = std::make_unique<pluginlib::ClassLoader<Command>>("teleop_modular", "teleop_modular::Command");
+  loader_ = std::make_unique<pluginlib::ClassLoader<Command>>("teleop_modular", "teleop::Command");
 
   // List available input source plugins
   try
@@ -112,12 +112,12 @@ bool CommandManager::get_type_for_command(const std::string& name, std::string& 
     source_type = type_param.as_string();
 
   // Declare parameter and get value for invocation_event_names
-  const auto on_any = get_parameter<std::vector<std::string>>(parameters, "commands." + name + ".on_any",
+  const auto on_any = utils::get_parameter<std::vector<std::string>>(parameters, "commands." + name + ".on_any",
                                                               "The name of the Events that should cause the \"" + name +
                                                                   "\" command to execute. This could be the name of a "
                                                                   "button \"button/down\" to execute when pressed "
                                                                   "down, or \"button/up\" when released.");
-  const auto on = get_parameter<std::string>(parameters, "commands." + name + ".on",
+  const auto on = utils::get_parameter<std::string>(parameters, "commands." + name + ".on",
                                              "The name of the Event that should cause the \"" + name +
                                                  "\" command to execute. This could be the name of a button "
                                                  "\"button/down\" to execute when pressed down, or \"button/up\" when "
@@ -146,4 +146,4 @@ void CommandManager::add(const std::string& key, const std::shared_ptr<Command>&
   items_.insert({ key, value });
 }
 
-}  // namespace teleop_modular
+}  // namespace teleop::internal

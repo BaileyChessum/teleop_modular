@@ -10,12 +10,11 @@
 , sensor-msgs
 , generate-parameter-library
 , pluginlib
-, rclcpp-components
-, realtime-tools
 , controller-manager-msgs
 , control-msgs
 , std-msgs
 , std-srvs
+, teleop-modular-control-mode
 }:
 
 buildRosPackage {
@@ -40,18 +39,22 @@ buildRosPackage {
     rclcpp
     std-srvs
     generate-parameter-library
-    realtime-tools
     geometry-msgs
     sensor-msgs
     pluginlib
-    rclcpp-components
-    realtime-tools
     controller-manager-msgs
     control-msgs
     std-msgs
+    teleop-modular-control-mode
   ];
 
-  propagatedBuildInputs = [ ];
+  propagatedBuildInputs = [ 
+    controller-manager-msgs
+    control-msgs 
+    std-srvs
+    std-msgs
+    teleop-modular-control-mode
+  ];
 
   # Enable running tests during build
   doCheck = true;

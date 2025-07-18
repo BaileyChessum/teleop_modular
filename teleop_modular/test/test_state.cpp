@@ -10,12 +10,12 @@
 #include "teleop_modular/inputs/state/StateCollection.hpp"
 #include "teleop_modular/inputs/state/StateManager.hpp"
 
-using teleop_modular::Axis;
-using teleop_modular::Button;
-using teleop_modular::InputManager;
-using teleop_modular::State;
-using teleop_modular::StateCollection;
-using teleop_modular::StateManager;
+using teleop::Axis;
+using teleop::Button;
+using teleop::InputManager;
+using teleop::state::State;
+using teleop::state::StateCollection;
+using teleop::state::StateManager;
 
 class StateTest : public ::testing::Test
 {

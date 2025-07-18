@@ -13,7 +13,7 @@
 #include "teleop_modular/utilities/WeakMapIterator.hpp"
 #include "teleop_modular/inputs/InputManager.hpp"
 
-namespace teleop_modular
+namespace teleop
 {
 
 /**
@@ -22,10 +22,10 @@ namespace teleop_modular
 class EventCollection
 {
 public:
-  explicit EventCollection(std::weak_ptr<EventListenerQueue> listener_queue, InputManager& inputs);
+  explicit EventCollection(std::weak_ptr<internal::EventListenerQueue> listener_queue, InputManager& inputs);
 
-  using iterator = WeakMapIterator<Event, false>;
-  using const_iterator = WeakMapIterator<Event, true>;
+  using iterator = utils::WeakMapIterator<Event, false>;
+  using const_iterator = utils::WeakMapIterator<Event, true>;
 
   Event::SharedPtr operator[](const std::string& index);
 
@@ -70,15 +70,15 @@ private:
   Event::SharedPtr create_event_for_name(const std::string& name);
 
   std::map<std::string, std::weak_ptr<Event>> items_{};
-  std::weak_ptr<EventListenerQueue> listener_queue_;
+  std::weak_ptr<internal::EventListenerQueue> listener_queue_;
 
-  using FactoryFunc = std::function<std::shared_ptr<teleop_modular::Event>(const std::string&,
-                                                                   const std::weak_ptr<teleop_modular::EventListenerQueue>&)>;
+  using FactoryFunc = std::function<std::shared_ptr<Event>(const std::string&,
+                                                                   const std::weak_ptr<internal::EventListenerQueue>&)>;
 
   /// Used to create special subclasses of Event for various different suffixes
   const std::unordered_map<std::string, FactoryFunc> factory_;
 };
 
-}  // namespace teleop_modular
+}  // namespace teleop
 
 #endif  // TELEOP_MODULAR_EVENTCOLLECTION_H

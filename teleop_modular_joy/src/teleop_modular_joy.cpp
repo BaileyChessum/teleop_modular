@@ -77,8 +77,8 @@ void JoyInputSource::on_update(const rclcpp::Time& now, InputValueSpans values)
   std::copy(joy_msg->axes.begin(), joy_msg->axes.begin() + static_cast<std::ptrdiff_t>(axis_count), values.axes.begin());
 }
 
-}  // namespace teleop_modular
+}  // namespace teleop_modular_joy
 
 #include <pluginlib/class_list_macros.hpp>
 
-CLASS_LOADER_REGISTER_CLASS(teleop_modular_joy::JoyInputSource, teleop_modular::InputSource);
+PLUGINLIB_EXPORT_CLASS(teleop_modular_joy::JoyInputSource, input_source::InputSource);
