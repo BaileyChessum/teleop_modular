@@ -140,9 +140,12 @@ void ControlModeManager::configure(InputManager& inputs)
   RCLCPP_INFO(logger, C_TITLE "Control Modes:" C_RESET "%s\n", registered_modes_log.str().c_str());
 
   // Configure each control mode
+  auto buttons = inputs.get_buttons().get_control_mode_compat();
+  auto axes = inputs.get_axes().get_control_mode_compat();
+
   control_mode::Inputs control_mode_inputs{
-    inputs.get_buttons(),
-    inputs.get_axes(),
+    buttons,
+    axes
   };
 
   for (const auto& [name, control_mode] : control_modes_)

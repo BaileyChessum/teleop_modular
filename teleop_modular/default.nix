@@ -53,6 +53,7 @@ buildRosPackage {
     control-msgs 
     std-srvs
     std-msgs
+    teleop-modular-control-mode
   ];
 
   # Enable running tests during build

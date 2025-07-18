@@ -3,7 +3,7 @@
 
 #include <rclcpp/time.hpp>
 #include "teleop_modular_twist/visibility_control.h"
-#include "../../../control_mode/include/control_mode/control_mode.hpp"
+#include "control_mode/control_mode.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
 #include "twist_control_mode_parameters.hpp"
 

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(control_mode)
+project(control_mode LANGUAGES CXX)
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
   pluginlib
@@ -30,7 +30,7 @@ add_library(${PROJECT_NAME}
 )
 
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
-target_compile_features(${PROJECT_NAME} PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)  # Require C++17
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)

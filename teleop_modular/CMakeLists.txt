@@ -40,7 +40,6 @@ target_include_directories(teleop_modular_parameters INTERFACE
 # Build the node executable
 add_executable(${PROJECT_NAME}_node
   src/teleop_modular.cpp
-  ../control_mode/src/control_mode.cpp
   src/control_modes/ControlModeManager.cpp
   src/input_sources/InputSourceManager.cpp
   src/input_sources/InputSource.cpp
@@ -67,7 +66,6 @@ add_executable(${PROJECT_NAME}_node
 
 # Add plugin implementations here!
 add_library(${PROJECT_NAME} SHARED
-  ../control_mode/src/control_mode.cpp
   src/commands/SwitchControlModeCommand.cpp
   src/commands/LogCommand.cpp
   src/commands/SetButtonCommand.cpp
@@ -78,7 +76,6 @@ add_library(${PROJECT_NAME} SHARED
   src/inputs/Axis.cpp
   src/commands/Command.cpp
   src/control_modes/ControlModeManager.cpp
-  ../control_mode/src/control_mode.cpp
   src/inputs/InputManager.cpp
   src/events/EventCollection.cpp
   src/events/EventListenerQueue.cpp
@@ -105,6 +102,11 @@ target_link_libraries(${PROJECT_NAME}_node
 target_link_libraries(${PROJECT_NAME}
   teleop_modular_parameters
 )
+
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)  # Require C++17
+target_include_directories(${PROJECT_NAME} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
 
 ament_target_dependencies(${PROJECT_NAME}_node ${THIS_PACKAGE_INCLUDE_DEPENDS})
 ament_target_dependencies(${PROJECT_NAME} ${THIS_PACKAGE_INCLUDE_DEPENDS})
