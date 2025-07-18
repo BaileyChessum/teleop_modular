@@ -37,32 +37,6 @@ target_include_directories(teleop_modular_parameters INTERFACE
   $<INSTALL_INTERFACE:include/teleop_modular_parameters>
 )
 
-# Build the node executable
-add_executable(${PROJECT_NAME}_node
-  src/teleop_modular.cpp
-  src/control_modes/ControlModeManager.cpp
-  src/input_sources/InputSourceManager.cpp
-  src/input_sources/InputSource.cpp
-  src/commands/Command.cpp
-  src/commands/CommandManager.cpp
-  src/events/EventListenerQueue.cpp
-  src/events/EventCollection.cpp
-  src/inputs/InputCommonSpecializations.cpp
-  src/inputs/InputManager.cpp
-  src/inputs/Button.cpp
-  src/inputs/Axis.cpp
-  src/inputs/InputCollection.cpp
-
-  # State
-  src/inputs/state/StateManager.cpp
-  src/inputs/state/StateCollection.cpp
-  src/inputs/state/State.cpp
-
-  src/input_sources/InputSourceHandle.cpp
-  src/events/ButtonEvent.cpp
-  src/events/Event.cpp
-  src/events/EventManager.cpp
-)
 
 # Add plugin implementations here!
 add_library(${PROJECT_NAME} SHARED
@@ -92,15 +66,24 @@ add_library(${PROJECT_NAME} SHARED
   src/events/ButtonEvent.cpp
   src/events/Event.cpp
   src/events/EventManager.cpp
+
+  src/input_sources/InputSourceManager.cpp
+  src/commands/CommandManager.cpp
 )
 
-target_link_libraries(${PROJECT_NAME}_node
-  teleop_modular_parameters
+# Build the node executable
+add_executable(${PROJECT_NAME}_node
+  src/teleop_modular.cpp
 )
 
 # Link parameter libraries for plugins here!
 target_link_libraries(${PROJECT_NAME}
   teleop_modular_parameters
+)
+
+target_link_libraries(${PROJECT_NAME}_node
+  teleop_modular_parameters
+  ${PROJECT_NAME}
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)  # Require C++17
