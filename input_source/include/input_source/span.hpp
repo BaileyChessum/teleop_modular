@@ -2,13 +2,13 @@
 // Created by nova on 7/6/25.
 //
 
-#ifndef TELEOP_MODULAR_SPAN_HPP
-#define TELEOP_MODULAR_SPAN_HPP
+#ifndef TELEOP_MODULAR_INPUT_SOURCE_SPAN_HPP
+#define TELEOP_MODULAR_INPUT_SOURCE_SPAN_HPP
 
 #include <vector>
 #include <cstddef>
 
-namespace teleop::utils
+namespace input_source
 {
 
 /**
@@ -72,6 +72,6 @@ struct span
   }
 };
 
-}  // namespace teleop::utils
+}  // namespace input_source
 
-#endif  // TELEOP_MODULAR_SPAN_HPP
+#endif  // TELEOP_MODULAR_INPUT_SOURCE_SPAN_HPP
