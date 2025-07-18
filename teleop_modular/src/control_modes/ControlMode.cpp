@@ -6,10 +6,13 @@ namespace control_mode
 
 ControlMode::~ControlMode()
 {
-  // Check from ControllerInterfaceBase
+  // Similar check to ControllerInterfaceBase
+  // https://github.com/ros-controls/ros2_control/blob/7061ac41/controller_interface/src/controller_interface_base.cpp#L28-L39
   if (node_.get() && rclcpp::ok() &&
       node_->get_current_state().id() != lifecycle_msgs::msg::State::PRIMARY_STATE_FINALIZED)
   {
+    RCLCPP_DEBUG(get_node()->get_logger(), "Calling shutdown on LifecycleNode due to destruction of ControlMode %s.",
+                 get_name().c_str());
     node_->shutdown();
   }
 }
@@ -50,6 +53,11 @@ const rclcpp_lifecycle::State& ControlMode::get_lifecycle_state() const
   }
 
   return node_->get_current_state();
+}
+
+bool ControlMode::is_active() const
+{
+  return get_lifecycle_state().id() == lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE;
 }
 
 const std::vector<std::string>& ControlMode::get_controllers() const

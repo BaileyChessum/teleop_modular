@@ -17,8 +17,8 @@
 namespace control_mode
 {
 
-/*
- * To replace returning bools to indicate whether an operation was successful, or failed due to some error. Used to
+/**
+ * To replace returning bools to indicate whether an operation was successful or failed due to some error. Used to
  * be more explicit. OK is false as to allow you to define functions without returning anything, and it should return
  * OK by default.
  */
@@ -110,6 +110,9 @@ public:
   CallbackReturn on_configure(const State&) override { return CallbackReturn::SUCCESS; };
 
   [[nodiscard]] const State& get_lifecycle_state() const;
+  [[nodiscard]] bool is_active() const;
+
+  /// Gets the names of all ros2_control controllers to activate alongside this control mode.
   [[nodiscard]] const std::vector<std::string>& get_controllers() const;
 
 protected:
