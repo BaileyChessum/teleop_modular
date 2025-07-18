@@ -20,6 +20,7 @@
   <depend>core</depend>
   <depend>nova_interfaces</depend>
   <depend>std_srvs</depend>
+  <depend>control_mode</depend>
 
   <exec_depend>joy</exec_depend>
 

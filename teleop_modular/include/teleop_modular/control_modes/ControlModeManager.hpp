@@ -11,8 +11,7 @@
 #include <controller_manager_msgs/srv/switch_controller.hpp>
 #include <pluginlib/class_loader.hpp>
 #include <rclcpp/executor.hpp>
-
-#include "ControlMode.hpp"
+#include "control_mode/control_mode.hpp"
 #include "teleop_modular/inputs/InputManager.hpp"
 
 namespace teleop::internal

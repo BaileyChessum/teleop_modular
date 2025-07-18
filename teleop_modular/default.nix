@@ -14,6 +14,7 @@
 , control-msgs
 , std-msgs
 , std-srvs
+, teleop-modular-control-mode
 }:
 
 buildRosPackage {
@@ -44,6 +45,7 @@ buildRosPackage {
     controller-manager-msgs
     control-msgs
     std-msgs
+    teleop-modular-control-mode
   ];
 
   propagatedBuildInputs = [ 

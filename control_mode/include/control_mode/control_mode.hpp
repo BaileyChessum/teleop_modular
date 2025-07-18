@@ -1,9 +1,9 @@
 //
-// Created by nova on 6/4/25.
+// Created by Bailey Chessum on 6/4/25.
 //
 
-#ifndef TELEOP_MODULAR_CONTROLMODE_HPP
-#define TELEOP_MODULAR_CONTROLMODE_HPP
+#ifndef TELEOP_MODULAR_CONTROL_MODE_HPP
+#define TELEOP_MODULAR_CONTROL_MODE_HPP
 
 #include <memory>
 #include <string>
@@ -20,8 +20,7 @@ namespace control_mode
 
 /**
  * To replace returning bools to indicate whether an operation was successful or failed due to some error. Used to
- * be more explicit. OK is false as to allow you to define functions without returning anything, and it should return
- * OK by default.
+ * be more explicit.
  */
 enum class return_type : bool
 {
@@ -35,9 +34,7 @@ using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface
 using State = rclcpp_lifecycle::State;
 
 // Definitions may be subject to change! Please use the names in control_mode::
-/// Provides access to boolean inputs. Store as a Button::SharedPtr.
 using Button = teleop::Button;
-/// Provides access to floating point number inputs. Store as an Axis::SharedPtr.
 using Axis = teleop::Axis;
 
 // Definitions may be subject to change! Please use the names in control_mode::
@@ -150,4 +147,4 @@ private:
 
 }  // namespace control_mode
 
-#endif  // TELEOP_MODULAR_CONTROLMODE_HPP
+#endif  // TELEOP_MODULAR_CONTROL_MODE_HPP
