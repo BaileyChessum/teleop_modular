@@ -5,51 +5,56 @@
 #ifndef TELEOP_MODULAR_INPUT_SOURCE_HPP
 #define TELEOP_MODULAR_INPUT_SOURCE_HPP
 
+#include "visibility_control.h"
 #include <rclcpp/node.hpp>
 
-#include "InputSourceUpdateDelegate.hpp"
-#include "teleop_modular/events/Event.hpp"
-#include "teleop_modular/inputs/InputCommon.hpp"
-#include "teleop_modular/inputs/InputManager.hpp"
-#include "teleop_modular/inputs/state/InputDeclaration.hpp"
-#include "teleop_modular/input_sources/InputDeclarationList.hpp"
-#include "teleop_modular/utilities/span.hpp"
+#include "input_source/visibility_control.h"
+#include "input_source/utilities/span.hpp"
+#include "input_source/update_delegate.hpp"
+#include "input_source/input_declaration_list.hpp"
 
 namespace teleop::internal
 {
-class InputSourceHandle;  // Forward declaration
+class INPUT_SOURCE_PUBLIC_TYPE InputSourceHandle;  // Forward declaration
 }
 
 namespace input_source
 {
 
-using teleop::utils::span;
+/**
+ * To replace returning bools to indicate whether an operation was successful or failed due to some error. Used to
+ * be more explicit than just a bool.
+ */
+enum class INPUT_SOURCE_PUBLIC_TYPE return_type : bool
+{
+  OK = false,
+  ERROR = true
+};
 
-//class InputSourceManager; // Forward declaration
+struct INPUT_SOURCE_PUBLIC_TYPE InputValueSpans
+{
+  span<uint8_t> buttons;
+  span<float> axes;
+};
+
+struct INPUT_SOURCE_PUBLIC_TYPE InputDeclarationSpans : InputValueSpans
+{
+  span<std::string> button_names;
+  span<std::string> axis_names;
+};
 
 /**
  * A base class for various sources of inputs and event invokers, such as joysticks, keyboards, the GUI, etc.
  */
-class InputSource
+class INPUT_SOURCE_PUBLIC InputSource
 {
 public:
-  struct InputValueSpans
-  {
-    span<uint8_t> buttons;
-    span<float> axes;
-  };
-
-  struct InputDeclarationSpans : InputValueSpans
-  {
-    span<std::string> button_names;
-    span<std::string> axis_names;
-  };
 
   virtual ~InputSource() = default;
 
-  void initialize(const std::shared_ptr<rclcpp::Node>& node, const std::string& name,
-                  const std::weak_ptr<InputSourceUpdateDelegate>& delegate);
-  void update(const rclcpp::Time& now);
+  return_type init(const std::shared_ptr<rclcpp::Node>& node, const std::string& name,
+            const std::weak_ptr<UpdateDelegate>& delegate);
+  return_type update(const rclcpp::Time& now);
 
   // Accessors
   [[nodiscard]] inline const std::string& get_name() const noexcept
@@ -62,8 +67,6 @@ public:
     return node_;
   }
 
-  // TODO: Better access control!
-
   /// Should only be called by InputSourceManager!
   InputDeclarationSpans export_inputs();
 
@@ -71,71 +74,51 @@ protected:
   /**
    * Called when starting up the input source, allowing the implementation to get configuration from it's node.
    */
-  virtual void on_initialize() = 0;
+  virtual return_type on_init() = 0;
 
   /**
-   * @brief Called after on_configure(), allows the input source to declare memory pointing to button values.
+   * @brief Called after on_configure(), allows the input source to declare the names of all the buttons, creating
+   * memory to store the values for each button as a side-effect.
    *
-   * @attention Be very careful to make sure you don't make a copy adding to the declarations vector. Everything needs
-   * to be a reference to a variable held by your class:
-   * @code
-   * // This will cause a segfault!!
-   * auto button = buttons_.emplace_back(button_name, button_config);
-   * declarations.emplace_back(button.name, button.value);
+   * When adding names to declarations, a VectorRef object will be returned, pointing to the memory that holds the value
+   * for the declared button.
    *
-   * // This is good, since we use a reference &
-   * auto & button = buttons_.emplace_back(button_name, button_config);
-   * declarations.emplace_back(button.name, button.value);
-   * @endcode
-   * If this causes a segfault, you've likely copied memory by accident.
-   *
-   * @param[out] declarations Information defining each button exposed by the input source, and a reference to the
-   * memory holding the value for that input.
+   * @param[out] declarations Information defining each button exposed by the input source.
    */
   virtual void export_buttons(InputDeclarationList<uint8_t>& declarations) = 0;
 
   /**
-   * @brief Called after on_configure(), allows the input source to declare memory pointing to axis values.
+   * @brief Called after on_configure(), allows the input source to declare the names of all the axes, creating memory
+   * to store the values for each axis as a side-effect.
    *
-   * @attention Be very careful to make sure you don't make a copy adding to the declarations vector. Everything needs
-   * to be a reference to a variable held by your class:
-   * @code
-   * // This will cause a segfault!!
-   * auto axis = this->axes_.emplace_back(axis_name, axis_config);
-   * declarations.emplace_back(axis.name, axis.value);
+   * When adding names to declarations, a VectorRef object will be returned, pointing to the memory that holds the value
+   * for the declared axis.
    *
-   * // This is good, since we use a reference &
-   * auto& axis = this->axes_.emplace_back(axis_name, axis_config);
-   * declarations.emplace_back(axis.name, axis.value);
-   * @endcode
-   * If this causes a segfault, you've likely copied memory by accident.
-   *
-   * @param[out] declarations Information defining each button exposed by the input source, and a reference to the
-   * memory holding the value for that input.
+   * @param[out] declarations Information defining each axis exposed by the input source.
    */
   virtual void export_axes(InputDeclarationList<float>& declarations) = 0;
 
   /**
    * Call this whenever you receive a new input and you want the InputManager to invoke a new update.
    */
-  bool request_update(const rclcpp::Time& now = rclcpp::Time()) const;
+  return_type request_update(const rclcpp::Time& now = rclcpp::Time()) const;
 
   /**
    * Called when new input should be processed, after requesting an update through request_update().
    * @param[in] now The time of the update, for synchronisation.
    * @param[out] values Modified by the InputSource to set the values for each button and axis.
    */
-  virtual void on_update(const rclcpp::Time& now, InputValueSpans values) {};
+  virtual return_type on_update(const rclcpp::Time& now, InputValueSpans values) = 0;
 
 private:
-//  friend class InputSourceManager;
+  //  friend class InputSourceManager;
   friend class InputSourceHandle;
 
   /// The ROS2 node created by teleop_modular, which we get params from (for base and child classes)
   std::shared_ptr<rclcpp::Node> node_ = nullptr;
 
   std::string name_;
-  std::weak_ptr<InputSourceUpdateDelegate> delegate_{};
+  std::weak_ptr<UpdateDelegate> delegate_{};
 
   std::vector<std::string> button_names_{};
   std::vector<uint8_t> button_values_{};
@@ -144,6 +127,6 @@ private:
   std::vector<float> axis_values_{};
 };
 
-}  // namespace teleop_modular
+}  // namespace input_source
 
 #endif  // TELEOP_MODULAR_INPUT_SOURCE_HPP

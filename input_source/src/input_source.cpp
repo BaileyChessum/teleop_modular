@@ -1,81 +1,57 @@
+//
+// Created by Bailey Chessum on 10/6/25.
+//
+
 #include "input_source/input_source.hpp"
-#include "lifecycle_msgs/msg/state.hpp"
 
 namespace input_source
 {
 
-ControlMode::~ControlMode()
+return_type InputSource::init(const std::shared_ptr<rclcpp::Node>& node, const std::string& name,
+                             const std::weak_ptr<UpdateDelegate>& delegate)
 {
-  // Similar check to ControllerInterfaceBase
-  // https://github.com/ros-controls/ros2_control/blob/7061ac41/controller_interface/src/controller_interface_base.cpp#L28-L39
-  if (node_.get() && rclcpp::ok() &&
-      node_->get_current_state().id() != lifecycle_msgs::msg::State::PRIMARY_STATE_FINALIZED)
-  {
-    RCLCPP_DEBUG(get_node()->get_logger(), "Calling shutdown on LifecycleNode due to destruction of ControlMode %s.",
-                 get_name().c_str());
-    node_->shutdown();
-  }
+  node_ = node;
+  name_ = name;
+  delegate_ = delegate;
+
+  return on_init();
 }
 
-return_type ControlMode::init(const std::string& name, const std::string& node_namespace,
-                              const rclcpp::NodeOptions& node_options,
-                              const std::shared_ptr<rclcpp::Executor>& executor, const CommonParams& common_params)
+return_type InputSource::update(const rclcpp::Time& now)
 {
-  name_ = name;
-  node_ = std::make_shared<rclcpp_lifecycle::LifecycleNode>(name_, node_namespace, node_options, false);
-  common_params_ = common_params;
+  InputValueSpans spans{ span(button_values_), span(axis_values_) };
 
-  const auto logger = get_node()->get_logger();
-  RCLCPP_DEBUG(logger, "Initializing ControlMode with name \"%s\" in namespace \"%s\"...", name_.c_str(),
-               node_namespace.c_str());
+  return on_update(now, spans);
+}
 
-  // Perform child class initialization
-  switch (on_init())
+return_type InputSource::request_update(const rclcpp::Time& now) const
+{
+  const auto delegate = delegate_.lock();
+
+  if (!delegate)
   {
-    case return_type::OK:
-      break;
-    default:
-      node_->shutdown();
-      return return_type::ERROR;
+    RCLCPP_FATAL(node_->get_logger(), "InputSource %s's delegate weak_ptr is invalid!", name_.c_str());
+    return return_type::ERROR;
   }
 
-  RCLCPP_DEBUG(logger, "Setting up LifecycleNode callbacks for \"%s\"...", name_.c_str());
-
-  node_->register_on_configure(std::bind(&ControlMode::on_configure, this, std::placeholders::_1));
-  node_->register_on_activate(std::bind(&ControlMode::on_configure, this, std::placeholders::_1));
-  node_->register_on_deactivate(std::bind(&ControlMode::on_deactivate, this, std::placeholders::_1));
-  node_->register_on_error(std::bind(&ControlMode::on_error, this, std::placeholders::_1));
-  node_->register_on_shutdown(std::bind(&ControlMode::on_shutdown, this, std::placeholders::_1));
-  node_->register_on_cleanup(std::bind(&ControlMode::on_cleanup, this, std::placeholders::_1));
-
-  RCLCPP_DEBUG(logger, "Adding LifecycleNode for \"%s\" to the executor.", name_.c_str());
-
-  executor->add_node(node_->get_node_base_interface());
-
-  RCLCPP_DEBUG(logger, "\"%s\" fully initialized.", name_.c_str());
-
+  const auto time_to_send = now.nanoseconds() == 0 ? node_->get_clock()->now() : now;
+  delegate->on_input_source_requested_update(time_to_send);
   return return_type::OK;
 }
 
-const rclcpp_lifecycle::State& ControlMode::get_lifecycle_state() const
+InputDeclarationSpans InputSource::export_inputs()
 {
-  if (!node_.get())
-  {
-    RCLCPP_ERROR(rclcpp::get_logger(get_name()), "Lifecycle node accessed without being initialized!");
-    throw std::runtime_error("Lifecycle node accessed without being initialized!");
-  }
+  button_names_.clear();
+  button_values_.clear();
+  InputDeclarationList button_declarations(button_names_, button_values_);
+  export_buttons(button_declarations);
 
-  return node_->get_current_state();
-}
+  axis_names_.clear();
+  axis_values_.clear();
+  InputDeclarationList axis_declarations(axis_names_, axis_values_);
+  export_axes(axis_declarations);
 
-bool ControlMode::is_active() const
-{
-  return get_lifecycle_state().id() == lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE;
-}
-
-const std::vector<std::string>& ControlMode::get_controllers() const
-{
-  return common_params_.controllers;
+  return InputDeclarationSpans{ {span(button_values_), span(axis_values_)}, span(button_names_), span(axis_names_) };
 }
 
 }  // namespace input_source

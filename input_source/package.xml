@@ -3,14 +3,13 @@
 <package format="3">
   <name>input_source</name>
   <version>0.0.3</version>
-  <description>teleop_modular control mode base classes.</description>
+  <description>teleop_modular input source base classes.</description>
   <maintainer email="bailey.chessum1@gmail.com">Bailey Chessum</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>pluginlib</depend>
-  <depend>rclcpp_lifecycle</depend>
   <depend>rclcpp</depend>
 
   <test_depend>ament_lint_auto</test_depend>

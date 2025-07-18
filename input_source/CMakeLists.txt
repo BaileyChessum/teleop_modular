@@ -4,7 +4,6 @@ project(input_source LANGUAGES CXX)
 set(THIS_PACKAGE_INCLUDE_DEPENDS
   pluginlib
   rclcpp
-  rclcpp_lifecycle
 )
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -26,7 +25,6 @@ include_directories(
 
 add_library(${PROJECT_NAME}
   src/input_source.cpp
-  include/input_source/input_collection.hpp
 )
 
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})

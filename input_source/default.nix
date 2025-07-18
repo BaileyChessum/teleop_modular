@@ -7,15 +7,14 @@
 , gtest
 , rclcpp
 , pluginlib
-, rclcpp-lifecycle
 }:
 
 buildRosPackage {
-  name = "teleop-modular-control-mode";
+  name = "teleop-modular-input-source";
   buildType = "ament_cmake";
 
   src = builtins.path rec {
-    name = "teleop-modular-control-mode-source";
+    name = "teleop-modular-input-source-source";
     path = ./.;
   };
 
@@ -32,9 +31,7 @@ buildRosPackage {
     pluginlib
   ];
 
-  propagatedBuildInputs = [
-    rclcpp-lifecycle
-  ];
+  propagatedBuildInputs = [ ];
 
   # Enable running tests during build
   doCheck = true;

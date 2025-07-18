@@ -1,11 +1,12 @@
 //
-// Created by nova on 7/6/25.
+// Created by Bailey Chessum on 7/6/25.
 //
 
-#ifndef TELEOP_MODULAR_INPUTDECLARATIONLIST_HPP
-#define TELEOP_MODULAR_INPUTDECLARATIONLIST_HPP
+#ifndef TELEOP_MODULAR_INPUT_SOURCE_INPUT_DECLARATION_LIST_HPP
+#define TELEOP_MODULAR_INPUT_SOURCE_INPUT_DECLARATION_LIST_HPP
 
-#include "teleop_modular/utilities/VectorRef.hpp"
+#include "visibility_control.h"
+#include "input_source/utilities/vector_ref.hpp"
 
 namespace input_source
 {
@@ -15,7 +16,7 @@ namespace input_source
  * values to be placed next to each other in memory
  */
 template <typename T>
-class InputDeclarationList
+class INPUT_SOURCE_PUBLIC InputDeclarationList
 {
 public:
   using Ref = teleop::utils::VectorRef<T>;
@@ -73,4 +74,4 @@ private:
 
 }  // namespace input_source
 
-#endif  // TELEOP_MODULAR_INPUTDECLARATIONLIST_HPP
+#endif  // TELEOP_MODULAR_INPUT_SOURCE_INPUT_DECLARATION_LIST_HPP
