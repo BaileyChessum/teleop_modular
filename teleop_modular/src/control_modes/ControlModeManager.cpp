@@ -122,15 +122,16 @@ void ControlModeManager::configure(InputManager& inputs)
         "The names of ros2_control controllers to use for this control mode.", std::vector<std::string>());
     const control_mode::ControlMode::CommonParams common_params{ controllers };
 
+    // Set up the control mode
     auto executor = executor_.lock();
-
-    if (!executor) {
+    if (!executor)
+    {
       RCLCPP_ERROR(logger, "Failed to get the executor when setting up control modes!");
       throw std::runtime_error("Failed to get the executor when setting up control modes!");
     }
 
-    // Initialize the control mode
     control_mode_class->init(control_mode_name, node_->get_namespace(), options, executor, common_params);
+    executor.reset();  // Release executor
 
     registered_modes_log << "\n\t- " << pretty_name << C_QUIET << "\t: " << control_mode_type << C_RESET;
     control_modes_[control_mode_name] = control_mode_class;
@@ -138,25 +139,20 @@ void ControlModeManager::configure(InputManager& inputs)
 
   RCLCPP_INFO(logger, C_TITLE "Control Modes:" C_RESET "%s\n", registered_modes_log.str().c_str());
 
-  auto executor = executor_.lock();
-
+  // Configure each control mode
   control_mode::Inputs control_mode_inputs{
-      inputs.get_buttons(),
-      inputs.get_axes(),
+    inputs.get_buttons(),
+    inputs.get_axes(),
   };
 
-  // Configure each control mode
   for (const auto& [name, control_mode] : control_modes_)
   {
     if (!control_mode)
       continue;
-    //executor->add_node(control_mode->get_node()->get_node_base_interface());
 
     control_mode->get_node()->configure();
     control_mode->capture_inputs(control_mode_inputs);
   }
-
-  executor.reset();
 }
 
 void ControlModeManager::activate_initial_control_mode()
@@ -180,31 +176,58 @@ bool ControlModeManager::set_control_mode(const std::string& name)
     RCLCPP_ERROR(logger, "Can't find control mode \"%s\".", name.c_str());
     return false;
   }
+  const auto new_control_mode = new_control_mode_it->second;
+
+  std::vector<std::string> new_controllers = new_control_mode->get_controllers();
+  const std::set<std::string> new_controllers_set(new_controllers.begin(), new_controllers.end());
 
   // Whether we successfully switch controllers in ros2_control
   bool switch_result = false;
 
   // Deactivate the previous control mode, then switch
   std::vector<std::string> deactivate_controllers_reversed;
+  std::set<std::string> deactivate_controllers_set;
+  std::set<std::string> common_controllers_set;
 
   // Get controllers to deactivate
-  for (const auto& [name, control_mode] : control_modes_)
+  // TODO: Preserve order of deactivations (deactivating 'ac' and 'abc' -> 'abc', not 'acb')
+  for (const auto& [deactivate_name, control_mode] : control_modes_)
   {
-    if (control_mode == new_control_mode_it->second)
-    {
+    if (control_mode == new_control_mode)
       continue;
-    }
 
-    if (control_mode->get_lifecycle_state().id() != lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE)
-    {
-      // This control mode isn't active
+    if (!control_mode->is_active())
       continue;
-    }
 
     control_mode->get_node()->deactivate();
 
     for (const auto& controller : control_mode->get_controllers())
+    {
+      if (deactivate_controllers_set.find(controller) != deactivate_controllers_set.end())
+        continue;
+
+      deactivate_controllers_set.insert(controller);
+
+      // Filter out anything common with the new control modes controllers
+      if (new_controllers_set.find(controller) != new_controllers_set.end())
+      {
+        common_controllers_set.insert(controller);
+        continue;
+      }
+
       deactivate_controllers_reversed.push_back(controller);
+    }
+  }
+
+  // Construct controllers_to_activate by filtering out controllers common to those being deactivated
+  std::vector<std::string> controllers_to_activate;
+  controllers_to_activate.reserve(new_controllers.size() - common_controllers_set.size());
+  for (const auto& controller : new_controllers)
+  {
+    if (common_controllers_set.find(controller) != common_controllers_set.end())
+      continue;
+
+    controllers_to_activate.push_back(controller);
   }
 
   // The order of deactivation needs to be opposite to the activation order. This is the reverse to the final order.
@@ -213,21 +236,29 @@ bool ControlModeManager::set_control_mode(const std::string& name)
   std::reverse_copy(deactivate_controllers_reversed.begin(), deactivate_controllers_reversed.end(),
                     controllers_to_deactivate.begin());
 
-  std::vector<std::string> controllers_to_activate;
-
   switch_result = switch_controllers(controllers_to_deactivate, controllers_to_activate);
 
   // Disable and enable controllers by calling controller manager
   if (!switch_result)
   {
+    std::stringstream log_msg{};
+    log_msg << "\nControllers to deactivate:";
+    for (const auto& controller : controllers_to_deactivate)
+      log_msg << "\n  - " << controller;
+    log_msg << "\nControllers to activate:";
+    for (const auto& controller : controllers_to_activate)
+      log_msg << "\n  - " << controller;
+
     // TODO: Error recovery here
-    RCLCPP_ERROR(logger, "Failed to switch ros2_control controllers for control mode switch to \"%s\".", name.c_str());
+    RCLCPP_ERROR(logger, "Failed to switch ros2_control controllers for control mode switch to \"%s\":%s", name.c_str(),
+                 log_msg.str().c_str());
     return false;
   }
 
   // Activate the new control mode
   //  current_control_mode_ = new_control_mode_it->second;
-  //  current_control_mode_->get_node()->activate();
+  new_control_mode->get_node()->activate();
+
   RCLCPP_INFO(logger, C_MODE "%s activated" C_RESET, snake_to_title(name).c_str());
 
   return true;
@@ -239,11 +270,8 @@ void ControlModeManager::update(const rclcpp::Time& now, const rclcpp::Duration&
 
   for (const auto& [name, control_mode] : control_modes_)
   {
-    if (control_mode->get_lifecycle_state().id() != lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE)
-    {
-      // This control mode isn't active
+    if (!control_mode->is_active())
       continue;
-    }
 
     control_mode->update(now, period);
     any_control_mode_updated = true;
@@ -251,7 +279,11 @@ void ControlModeManager::update(const rclcpp::Time& now, const rclcpp::Duration&
 
   if (!any_control_mode_updated)
   {
-    RCLCPP_WARN(node_->get_logger(), "ControlModeManager::update(): No mode is active!");
+    const auto logger = node_->get_logger();
+    RCLCPP_WARN(logger, "ControlModeManager::update(): No mode is active!");
+
+    for (const auto& [name, control_mode] : control_modes_)
+      RCLCPP_WARN(logger, "  - %s is %s", name.c_str(), control_mode->get_lifecycle_state().label().c_str());
   }
 }
 
@@ -276,8 +308,6 @@ bool ControlModeManager::switch_controllers(const std::vector<std::string>& cont
 {
   if (controllers_to_deactivate.empty() && controllers_to_activate.empty())
     return true;
-
-  // TODO: Reimplement 'controllers' param
 
   if (!switch_controller_client_->service_is_ready())
   {
