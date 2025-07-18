@@ -7,6 +7,8 @@
 
 #include <rclcpp/time.hpp>
 #include <utility>
+#include <string>
+#include "visibility_control.h"
 
 namespace control_mode
 {
@@ -15,11 +17,11 @@ namespace control_mode
  * @class An interface for objects providing input values to control modes.
  */
 template <typename T>
-class InputInterface
+class CONTROL_MODE_PUBLIC InputInterface
 {
 public:
-  using SharedPtr = std::shared_ptr<InputInterface>;
-  using WeakPtr = std::weak_ptr<InputInterface>;
+  using SharedPtr = std::shared_ptr<InputInterface<T>>;
+  using WeakPtr = std::weak_ptr<InputInterface<T>>;
 
   virtual T value() = 0;
 
@@ -39,15 +41,16 @@ protected:
   explicit InputInterface(std::string name) : name_(std::move(name))
   {
   }
+  ~InputInterface() = default;
 
 private:
   const std::string name_;
 };
 
 /// Provides access to boolean inputs. Store as a Button::SharedPtr.
-using Button = InputInterface<uint8_t>;
+using CONTROL_MODE_PUBLIC_TYPE Button = InputInterface<uint8_t>;
 /// Provides access to floating point number inputs. Store as an Axis::SharedPtr.
-using Axis = InputInterface<float>;
+using CONTROL_MODE_PUBLIC_TYPE Axis = InputInterface<float>;
 
 }  // namespace control_mode
 

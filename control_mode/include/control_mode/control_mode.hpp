@@ -11,9 +11,10 @@
 #include <rclcpp/node.hpp>
 #include <rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
-#include "teleop_modular/inputs/InputCommon.hpp"
-#include "teleop_modular/inputs/InputManager.hpp"
 #include <rclcpp/executor.hpp>
+#include "visibility_control.h"
+#include "input_interface.hpp"
+#include "input_collection.hpp"
 
 namespace control_mode
 {
@@ -22,7 +23,7 @@ namespace control_mode
  * To replace returning bools to indicate whether an operation was successful or failed due to some error. Used to
  * be more explicit.
  */
-enum class return_type : bool
+enum class CONTROL_MODE_PUBLIC_TYPE return_type : bool
 {
   OK = false,
   ERROR = true,
@@ -30,18 +31,9 @@ enum class return_type : bool
 
 // These usings are added with hopes to reduce the length of type names for implementers of control modes
 /// The return type of LifecycleNodeInterface callback
-using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
-using State = rclcpp_lifecycle::State;
-
-// Definitions may be subject to change! Please use the names in control_mode::
-using Button = teleop::Button;
-using Axis = teleop::Axis;
-
-// Definitions may be subject to change! Please use the names in control_mode::
-/// A set to acquire shared pointers to boolean inputs
-using ButtonCollection = teleop::InputCollection<Button>;
-/// A set to acquire shared pointers to floating point number inputs
-using AxisCollection = teleop::InputCollection<Axis>;
+using CONTROL_MODE_PUBLIC_TYPE CallbackReturn =
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
+using CONTROL_MODE_PUBLIC_TYPE State = rclcpp_lifecycle::State;
 
 /**
  * @brief Provides references to all collections of input objects that might be needed in a control_mode.
@@ -49,7 +41,7 @@ using AxisCollection = teleop::InputCollection<Axis>;
  * Including this extra struct affords abstraction for the providers of buttons, axes, and the potential expansion of
  * available inputs (events?)
  */
-struct Inputs
+struct CONTROL_MODE_PUBLIC_TYPE Inputs
 {
   ButtonCollection& buttons;
   AxisCollection& axes;

@@ -26,6 +26,7 @@ include_directories(
 
 add_library(${PROJECT_NAME}
   src/control_mode.cpp
+  include/control_mode/input_collection.hpp
 )
 
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
