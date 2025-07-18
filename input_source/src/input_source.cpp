@@ -2,46 +2,44 @@
 // Created by Bailey Chessum on 10/6/25.
 //
 
-#include "teleop_modular/input_sources/InputSource.hpp"
+#include "input_source/input_source.hpp"
 
 namespace input_source
 {
 
-using teleop::utils::span;
-
-void InputSource::initialize(const std::shared_ptr<rclcpp::Node>& node, const std::string& name,
-                             const std::weak_ptr<InputSourceUpdateDelegate>& delegate)
+return_type InputSource::init(const std::shared_ptr<rclcpp::Node>& node, const std::string& name,
+                             const std::weak_ptr<UpdateDelegate>& delegate)
 {
   node_ = node;
   name_ = name;
   delegate_ = delegate;
 
-  on_initialize();
+  return on_init();
 }
 
-void InputSource::update(const rclcpp::Time& now)
+return_type InputSource::update(const rclcpp::Time& now)
 {
   InputValueSpans spans{ span(button_values_), span(axis_values_) };
 
-  on_update(now, spans);
+  return on_update(now, spans);
 }
 
-bool InputSource::request_update(const rclcpp::Time& now) const
+return_type InputSource::request_update(const rclcpp::Time& now) const
 {
   const auto delegate = delegate_.lock();
 
   if (!delegate)
   {
     RCLCPP_FATAL(node_->get_logger(), "InputSource %s's delegate weak_ptr is invalid!", name_.c_str());
-    return false;
+    return return_type::ERROR;
   }
 
   const auto time_to_send = now.nanoseconds() == 0 ? node_->get_clock()->now() : now;
   delegate->on_input_source_requested_update(time_to_send);
-  return true;
+  return return_type::OK;
 }
 
-InputSource::InputDeclarationSpans InputSource::export_inputs()
+InputDeclarationSpans InputSource::export_inputs()
 {
   button_names_.clear();
   button_values_.clear();
@@ -53,7 +51,7 @@ InputSource::InputDeclarationSpans InputSource::export_inputs()
   InputDeclarationList axis_declarations(axis_names_, axis_values_);
   export_axes(axis_declarations);
 
-  return InputDeclarationSpans{ span(button_values_), span(axis_values_), span(button_names_), span(axis_names_) };
+  return InputDeclarationSpans{ {span(button_values_), span(axis_values_)}, span(button_names_), span(axis_names_) };
 }
 
 }  // namespace input_source

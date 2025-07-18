@@ -11,6 +11,7 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   std_msgs
   std_srvs
   control_mode
+  input_source
 )
 
 find_package(ament_cmake REQUIRED)
@@ -53,8 +54,6 @@ add_library(${PROJECT_NAME} SHARED
   src/events/EventCollection.cpp
   src/events/EventListenerQueue.cpp
   src/inputs/InputCollection.cpp
-
-  src/input_sources/InputSource.cpp
 
   # State
   src/inputs/state/StateManager.cpp

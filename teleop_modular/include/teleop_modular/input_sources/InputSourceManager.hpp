@@ -11,8 +11,8 @@
 #include <rclcpp/executor.hpp>
 #include <rclcpp/node.hpp>
 
-#include "InputSource.hpp"
-#include "InputSourceUpdateDelegate.hpp"
+#include "input_source/input_source.hpp"
+#include "input_source/update_delegate.hpp"
 #include "teleop_modular_parameters.hpp"
 #include "teleop_modular/utilities/SpawnableLog.hpp"
 #include "InputSourceHandle.hpp"
@@ -20,8 +20,8 @@
 namespace teleop::internal
 {
 
-class InputSourceManager final : public input_source::InputSourceUpdateDelegate,
-                                 public std::enable_shared_from_this<input_source::InputSourceUpdateDelegate>
+class InputSourceManager final : public input_source::UpdateDelegate,
+                                 public std::enable_shared_from_this<input_source::UpdateDelegate>
 {
 public:
   InputSourceManager() = default;

@@ -7,19 +7,18 @@
 
 #include <sensor_msgs/msg/joy.hpp>
 #include <utility>
-#include "teleop_modular/input_sources/InputSource.hpp"
+#include "input_source/input_source.hpp"
 #include "joy_input_source_parameters.hpp"
 
 namespace teleop_modular_joy
 {
-using input_source::InputSource;
-using input_source::InputDeclarationList;
+using namespace input_source;
 
 class JoyInputSource final : public InputSource
 {
 protected:
-  void on_initialize() override;
-  void on_update(const rclcpp::Time& now, InputValueSpans values) override;
+  return_type on_init() override;
+  return_type on_update(const rclcpp::Time& now, InputValueSpans values) override;
 
   void export_buttons(InputDeclarationList<uint8_t>& declarations) override;
   void export_axes(InputDeclarationList<float>& declarations) override;

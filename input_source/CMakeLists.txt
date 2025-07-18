@@ -1,13 +1,9 @@
 cmake_minimum_required(VERSION 3.8)
-project(teleop_modular_joy)
+project(input_source LANGUAGES CXX)
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
   pluginlib
   rclcpp
-  std_msgs
-  geometry_msgs
-  joy
-  input_source
 )
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -17,7 +13,6 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
-find_package(generate_parameter_library REQUIRED)
 foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
   find_package(${Dependency} REQUIRED)
 endforeach()
@@ -28,41 +23,28 @@ include_directories(
 
 # -- Libraries
 
-generate_parameter_library(
-  joy_input_source_parameters
-  src/joy_input_source_parameters.yaml
-)
-
 add_library(${PROJECT_NAME}
-  src/teleop_modular_joy.cpp
+  src/input_source.cpp
 )
 
-add_library(teleop_modular_joy::teleop_modular_joy ALIAS teleop_modular_joy)
-target_compile_features(teleop_modular_joy PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
-target_include_directories(teleop_modular_joy PUBLIC
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)  # Require C++17
+target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
-
-# Link the generate_parameter_library
-target_link_libraries(${PROJECT_NAME}
-  joy_input_source_parameters
-)
 
 ament_target_dependencies(${PROJECT_NAME} ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
 # Causes the visibility macros to use dllexport rather than dllimport,
 # which is appropriate when building the dll but not consuming it.
-target_compile_definitions(${PROJECT_NAME} PRIVATE "TELEOP_MODULAR_JOY_BUILDING_LIBRARY")
-
-pluginlib_export_plugin_description_file(teleop_modular plugins.xml)
+target_compile_definitions(${PROJECT_NAME} PRIVATE "TELEOP_MODULAR_INPUT_SOURCE_BUILDING_LIBRARY")
 
 install(
   DIRECTORY include/
-  DESTINATION include/${PROJECT_NAME}
+  DESTINATION include
 )
 install(
   TARGETS ${PROJECT_NAME}
-  joy_input_source_parameters
   EXPORT export_${PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
@@ -85,7 +67,7 @@ ament_export_include_directories(
   "include/${PROJECT_NAME}"
 )
 ament_export_libraries(
-  teleop_modular_joy
+  ${PROJECT_NAME}
 )
 ament_export_targets(
   export_${PROJECT_NAME}

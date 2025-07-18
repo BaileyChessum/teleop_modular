@@ -1,11 +1,14 @@
 //
-// Created by nova on 7/6/25.
+// Created by Bailey Chessum on 7/6/25.
 //
 
-#ifndef TELEOP_MODULAR_VECTORREF_HPP
-#define TELEOP_MODULAR_VECTORREF_HPP
+#ifndef TELEOP_MODULAR_INPUT_SOURCE_VECTOR_REF_HPP
+#define TELEOP_MODULAR_INPUT_SOURCE_VECTOR_REF_HPP
 
-namespace teleop::utils
+#include <vector>
+#include "input_source/visibility_control.h"
+
+namespace input_source
 {
 
 /**
@@ -17,7 +20,7 @@ namespace teleop::utils
  * export_buttons() or export_axes().
  */
 template <typename T>
-class VectorRef
+class INPUT_SOURCE_PUBLIC VectorRef
 {
 public:
   inline VectorRef(std::vector<T>& container, std::size_t index) noexcept : container_(&container), index_(index)
@@ -74,4 +77,4 @@ private:
 
 }  // namespace teleop::utils
 
-#endif  // TELEOP_MODULAR_VECTORREF_HPP
+#endif  // TELEOP_MODULAR_INPUT_SOURCE_VECTORREF_HPP

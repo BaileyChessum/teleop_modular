@@ -15,6 +15,7 @@
 , std-msgs
 , std-srvs
 , teleop-modular-control-mode
+, teleop-modular-input-source
 }:
 
 buildRosPackage {
@@ -46,6 +47,7 @@ buildRosPackage {
     control-msgs
     std-msgs
     teleop-modular-control-mode
+    teleop-modular-input-source
   ];
 
   propagatedBuildInputs = [ 
@@ -54,6 +56,7 @@ buildRosPackage {
     std-srvs
     std-msgs
     teleop-modular-control-mode
+    teleop-modular-input-source
   ];
 
   # Enable running tests during build
