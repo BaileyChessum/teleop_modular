@@ -41,7 +41,7 @@ buildRosPackage {
     teleop-modular-control-mode
   ];
 
-  propagatedBuildInputs = [ ];
+  propagatedBuildInputs = [ geometry-msgs ];
 
   # Enable running tests during build
   doCheck = true;

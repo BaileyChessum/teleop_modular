@@ -35,7 +35,6 @@ buildRosPackage {
     rclcpp
     std-msgs
     generate-parameter-library
-    geometry-msgs
     pluginlib
     teleop-modular-input-source
   ];

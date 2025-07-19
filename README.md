@@ -8,6 +8,8 @@
 
 # teleop_modular
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 `teleop_modular` is a generalized framework for teleoperation input handling in ROS2.
 
 > ⚠️ `teleop_modular` is experimental, and missing build processes and documentation needed for production use. 

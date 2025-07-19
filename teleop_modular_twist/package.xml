@@ -10,8 +10,15 @@
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake_ros</buildtool_depend>
+  <build_depend>generate_parameter_library</build_depend>
 
-  <depend>teleop_modular</depend>
+  <depend>pluginlib</depend>
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+  <depend>std_srvs</depend>
+  <depend>geometry-msgs</depend>
+
+  <depend>control_mode</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
