@@ -4,7 +4,7 @@
 #include <rclcpp/rclcpp.hpp>
 
 // generate_parameter_library_cpp include/teleop_modular/teleop_modular_parameters.hpp src/parameters.yaml
-#include <teleop_core/teleop_modular_parameters.hpp>
+#include "teleop_modular_parameters.hpp"
 #include "teleop_core/control_modes/ControlModeManager.hpp"
 #include "teleop_core/input_sources/InputSourceManager.hpp"
 #include "teleop_core/commands/CommandManager.hpp"
