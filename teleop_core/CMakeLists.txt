@@ -35,7 +35,7 @@ generate_parameter_library(
 # Export generated include directory
 target_include_directories(teleop_modular_parameters INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/teleop_modular_parameters>
-  $<INSTALL_INTERFACE:include>
+  $<INSTALL_INTERFACE:include/teleop_modular_parameters>
 )
 
 # Add plugin implementations here!
