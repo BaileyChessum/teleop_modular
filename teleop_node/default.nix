@@ -1,19 +1,21 @@
 { lib
 , buildRosPackage
 , ament-cmake
+, teleop-modular-core
 , teleop-modular-control-mode
 , teleop-modular-input-source
-, teleop-modular-core
-, teleop-modular-joy
-, teleop-modular-twist
-, teleop-modular-node
+, pluginlib
+, rclcpp
+, fmt
+, parameter-traits
+, rclcpp-lifecycle
 }:
 
 buildRosPackage {
-  name = "teleop-modular";
+  name = "teleop-modular-node";
 
   src = builtins.path rec {
-    name = "teleop-modular-source";
+    name = "teleop-modular-node-source";
     path = ./.;
   };
 
@@ -24,20 +26,25 @@ buildRosPackage {
   ];
 
   buildInputs = [
+    fmt
+    parameter-traits
+    rclcpp-lifecycle
+    rclcpp
     ament-cmake
+    pluginlib
+    teleop-modular-control-mode
+    teleop-modular-input-source
+    teleop-modular-core
   ];
 
   propagatedBuildInputs = [
     teleop-modular-control-mode
     teleop-modular-input-source
-    teleop-modular-twist
-    teleop-modular-joy
     teleop-modular-core
-    teleop-modular-node
   ];
 
   meta = {
-    description = "Metapackage for teleop_modular, the modular framework for teleoperation in ROS2.";
+    description = "ROS2 Node for teleop_modular.";
     license = with lib.licenses; [ asl20 ];
   };
 }
