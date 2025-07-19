@@ -4,7 +4,7 @@ self: super:
     rosSelf: rosSuper: {
       teleop-modular-control-mode = rosSuper.callPackage ./control_mode { };
       teleop-modular-input-source = rosSuper.callPackage ./input_source { };
-      teleop-modular = rosSuper.callPackage ./teleop_modular { };
+      teleop-modular-core = rosSuper.callPackage ./teleop_modular_core { };
       teleop-modular-twist = rosSuper.callPackage ./teleop_modular_twist { };
       teleop-modular-joy = rosSuper.callPackage ./teleop_modular_joy { };
     }
