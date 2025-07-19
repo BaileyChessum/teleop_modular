@@ -1,28 +1,28 @@
 <svg width="274" height="210" viewBox="0 0 274 210" fill="none" xmlns="http://www.w3.org/2000/svg">
   <rect width="274" height="210"/>
   <g clip-path="url(#clip0_7_135)">
-    <circle cx="80.7078" cy="49" r="16" fill="white"/>
-    <circle cx="136.708" cy="105" r="16" fill="white"/>
-    <circle cx="192.708" cy="49" r="16" fill="white"/>
+    <circle cx="80.7078" cy="49" r="16" fill="#D1D7E0"/>
+    <circle cx="136.708" cy="105" r="16" fill="#D1D7E0"/>
+    <circle cx="192.708" cy="49" r="16" fill="#D1D7E0"/>
     <g clip-path="url(#clip1_7_135)">
-      <circle cx="192.708" cy="105" r="13" stroke="white" stroke-width="6"/>
+      <circle cx="192.708" cy="105" r="13" stroke="#D1D7E0" stroke-width="6"/>
     </g>
-    <circle cx="192.708" cy="161" r="16" fill="white"/>
-    <path d="M80.7078 58V105H108.708" stroke="white" stroke-width="6"/>
-    <path d="M108.708 100L115.708 105L108.708 110V100Z" stroke="white" stroke-width="6"/>
-    <path d="M164.708 100L171.708 105L164.708 110V100Z" stroke="white" stroke-width="6"/>
-    <path d="M164.708 44L171.708 49L164.708 54V44Z" stroke="white" stroke-width="6"/>
-    <path d="M136.708 94V49H165.708" stroke="white" stroke-width="6"/>
-    <path d="M136.708 145C136.708 145 109.208 145 107.708 145C91.2078 145 58.7078 210.364 35.7078 202C12.7078 193.636 2.70781 182.5 8.70782 145C14.7078 107.5 35.7078 30 53.2078 18.5C70.7078 7 84.2078 7 95.2078 7C106.208 7 123.708 25 136.708 25H158.5" stroke="white" stroke-width="6" stroke-linecap="round"/>
-    <path d="M237.792 202C260.792 193.636 270.792 182.5 264.792 145C258.792 107.5 237.792 30.0001 220.292 18.5001" stroke="white" stroke-width="6" stroke-linecap="round"/>
-    <path d="M148.708 105H163.208" stroke="white" stroke-width="6"/>
+    <circle cx="192.708" cy="161" r="16" fill="#D1D7E0"/>
+    <path d="M80.7078 58V105H108.708" stroke="#D1D7E0" stroke-width="6"/>
+    <path d="M108.708 100L115.708 105L108.708 110V100Z" stroke="#D1D7E0" stroke-width="6"/>
+    <path d="M164.708 100L171.708 105L164.708 110V100Z" stroke="#D1D7E0" stroke-width="6"/>
+    <path d="M164.708 44L171.708 49L164.708 54V44Z" stroke="#D1D7E0" stroke-width="6"/>
+    <path d="M136.708 94V49H165.708" stroke="#D1D7E0" stroke-width="6"/>
+    <path d="M136.708 145C136.708 145 109.208 145 107.708 145C91.2078 145 58.7078 210.364 35.7078 202C12.7078 193.636 2.70781 182.5 8.70782 145C14.7078 107.5 35.7078 30 53.2078 18.5C70.7078 7 84.2078 7 95.2078 7C106.208 7 123.708 25 136.708 25H158.5" stroke="#D1D7E0" stroke-width="6" stroke-linecap="round"/>
+    <path d="M237.792 202C260.792 193.636 270.792 182.5 264.792 145C258.792 107.5 237.792 30.0001 220.292 18.5001" stroke="#D1D7E0" stroke-width="6" stroke-linecap="round"/>
+    <path d="M148.708 105H163.208" stroke="#D1D7E0" stroke-width="6"/>
   </g>
   <defs>
     <clipPath id="clip0_7_135">
-      <rect width="266" height="202" fill="white" transform="translate(4 4)"/>
+      <rect width="266" height="202" fill="#D1D7E0" transform="translate(4 4)"/>
     </clipPath>
     <clipPath id="clip1_7_135">
-      <rect width="32" height="32" fill="white" transform="translate(176.708 89)"/>
+      <rect width="32" height="32" fill="#D1D7E0" transform="translate(176.708 89)"/>
     </clipPath>
   </defs>
 </svg>
