@@ -12,7 +12,7 @@ on:
 
 jobs:
   ci:
-    name: ROS2 ${{ matrix.env.ROS_DISTRO }}-${{ matrix.env.ROS_REPO }}
+    name: ROS2 ${{ matrix.ROS_DISTRO }}-${{ matrix.ROS_REPO }}
     strategy:
       fail-fast: false
       matrix:
@@ -21,6 +21,7 @@ jobs:
 
     env:
       CCACHE_DIR: "${{ github.workspace }}/.ccache" # directory for ccache (and how we enable ccache in industrial_ci)
+      ADDITIONAL_DEBS: ros-${{ matrix.ROS_DISTRO }}-ros2-control
 
     runs-on: ubuntu-latest
     steps:
