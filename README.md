@@ -1,3 +1,11 @@
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: light)" srcset="docs/assets/teleop_modular_logo.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/teleop_modular_logo_dark.svg">
+    <img src="docs/assets/teleop_modular_logo.svg" width="200px" alt="teleop_modular logo">
+  </picture>
+</div>
+
 # teleop_modular
 
 `teleop_modular` is a generalized framework for teleoperation input handling in ROS2.
