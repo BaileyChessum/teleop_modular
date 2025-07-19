@@ -16,18 +16,18 @@ class TwistControlMode : public ControlMode
 public:
   TwistControlMode();
 
-  void publish_halt_message(const rclcpp::Time& now) const;
+  void publish_halt_message(const rclcpp::Time & now) const;
 
   return_type on_init() override;
   void capture_inputs(Inputs inputs) override;
-  return_type update(const rclcpp::Time& now, const rclcpp::Duration& period) override;
+  return_type update(const rclcpp::Time & now, const rclcpp::Duration & period) override;
 
-  CallbackReturn on_configure(const State& previous_state) override;
-  CallbackReturn on_activate(const State& previous_state) override;
-  CallbackReturn on_deactivate(const State& previous_state) override;
-  CallbackReturn on_cleanup(const State& previous_state) override;
-  CallbackReturn on_error(const State& previous_state) override;
-  CallbackReturn on_shutdown(const State& previous_state) override;
+  CallbackReturn on_configure(const State & previous_state) override;
+  CallbackReturn on_activate(const State & previous_state) override;
+  CallbackReturn on_deactivate(const State & previous_state) override;
+  CallbackReturn on_cleanup(const State & previous_state) override;
+  CallbackReturn on_error(const State & previous_state) override;
+  CallbackReturn on_shutdown(const State & previous_state) override;
 
 protected:
   ~TwistControlMode() override;

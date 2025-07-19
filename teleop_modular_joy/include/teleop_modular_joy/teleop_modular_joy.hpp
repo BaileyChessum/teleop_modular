@@ -18,10 +18,10 @@ class JoyInputSource final : public InputSource
 {
 protected:
   return_type on_init() override;
-  return_type on_update(const rclcpp::Time& now, InputValueSpans values) override;
+  return_type on_update(const rclcpp::Time & now, InputValueSpans values) override;
 
-  void export_buttons(InputDeclarationList<uint8_t>& declarations) override;
-  void export_axes(InputDeclarationList<float>& declarations) override;
+  void export_buttons(InputDeclarationList<uint8_t> & declarations) override;
+  void export_axes(InputDeclarationList<float> & declarations) override;
 
 private:
   void joy_callback(sensor_msgs::msg::Joy::SharedPtr msg);
