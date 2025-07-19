@@ -1,0 +1,41 @@
+# This config uses industrial_ci (https://github.com/ros-industrial/industrial_ci.git).
+# For troubleshooting, see readme (https://github.com/ros-industrial/industrial_ci/blob/master/README.rst)
+
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  ci:
+    name: ROS2 ${{ matrix.env.ROS_DISTRO }}-${{ matrix.env.ROS_REPO }}
+    strategy:
+      fail-fast: false
+      matrix:
+        env:
+          - ROS_DISTRO: [rolling, jazzy, humble]
+            ROS_REPO: [main]
+
+    env:
+      CCACHE_DIR: "${{ github.workspace }}/.ccache" # directory for ccache (and how we enable ccache in industrial_ci)
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          # This configuration will always create a new ccache cache starting off from the previous one (if any).
+          # In this simple version it will be shared between all builds of the same ROS_REPO and ROS_REPO
+          # and might need some fine-tuning to match the use case
+          key: ccache-${{ matrix.ROS_DISTRO }}-${{ matrix.ROS_REPO }}-${{github.run_id}}
+          restore-keys: |
+            ccache-${{ matrix.ROS_DISTRO }}-${{ matrix.ROS_REPO }}-      
+      - uses: 'ros-industrial/industrial_ci@master' # run industrial_ci
+        env: # either pass all entries explicitly
+          ROS_DISTRO: ${{ matrix.ROS_DISTRO }}
+          ROS_REPO: ${{ matrix.ROS_REPO }}
