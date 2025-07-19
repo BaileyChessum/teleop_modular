@@ -1,22 +1,18 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>control_mode</name>
+  <name>teleop_node</name>
   <version>0.0.3</version>
-  <description>teleop_modular control mode base classes.</description>
+  <description>ROS2 Node for teleop_modular.</description>
   <maintainer email="bailey.chessum1@gmail.com">Bailey Chessum</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>pluginlib</depend>
+  <depend>fmt</depend>
   <depend>rclcpp</depend>
-
-  <test_depend>ament_lint_auto</test_depend>
-  <test_depend>ament_lint_common</test_depend>
-
-  <build_depend>rclcpp_lifecycle</build_depend>
-  <build_export_depend>rclcpp_lifecycle</build_export_depend>
+  <depend>teleop_core</depend>
+  <depend>rclcpp_lifecycle</depend>
 
   <export>
     <build_type>ament_cmake</build_type>

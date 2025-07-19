@@ -69,19 +69,9 @@ add_library(${PROJECT_NAME} SHARED
   src/commands/CommandManager.cpp
 )
 
-# Build the node executable
-add_executable(${PROJECT_NAME}_node
-  src/teleop_modular.cpp
-)
-
 # Link parameter libraries for plugins here!
 target_link_libraries(${PROJECT_NAME}
   teleop_modular_parameters
-)
-
-target_link_libraries(${PROJECT_NAME}_node
-  teleop_modular_parameters
-  ${PROJECT_NAME}
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)  # Require C++17
@@ -89,7 +79,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
 
-ament_target_dependencies(${PROJECT_NAME}_node ${THIS_PACKAGE_INCLUDE_DEPENDS})
 ament_target_dependencies(${PROJECT_NAME} ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
 # Stuff for plugins
@@ -125,26 +114,11 @@ install(FILES plugins.xml
 
 # -- Install
 
-# Install the executable
-install(
-  TARGETS
-    ${PROJECT_NAME}_node
-    ${PROJECT_NAME}
-    teleop_modular_parameters
-  DESTINATION lib/${PROJECT_NAME}
-)
-
 # Install header files
 install(
   DIRECTORY include/
   DESTINATION include
 )
-
-# Install launch files
-#install(
-#  DIRECTORY launch/
-#  DESTINATION share/${PROJECT_NAME}/launch
-#)
 
 # Install config files
 install(

@@ -14,7 +14,8 @@
   <buildtool_depend>generate_parameter_library</buildtool_depend>
 
   <depend>rclcpp</depend>
-  <depend>control_mode</depend>
+  <build_depend>control_mode</build_depend>
+  <build_export_depend>control_mode</build_export_depend>
   <depend>input_source</depend>
 
   <test_depend>ament_lint_auto</test_depend>

@@ -16,6 +16,7 @@
 , std-srvs
 , teleop-modular-control-mode
 , teleop-modular-input-source
+, rclcpp-lifecycle
 }:
 
 buildRosPackage {
@@ -57,6 +58,7 @@ buildRosPackage {
     std-msgs
     teleop-modular-control-mode
     teleop-modular-input-source
+    rclcpp-lifecycle
   ];
 
   # Enable running tests during build
