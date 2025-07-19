@@ -13,7 +13,6 @@
 
 #include "input_source/input_source.hpp"
 #include "input_source/update_delegate.hpp"
-#include "teleop_modular_parameters.hpp"
 #include "teleop_core/utilities/SpawnableLog.hpp"
 #include "InputSourceHandle.hpp"
 
@@ -57,18 +56,11 @@ public:
   bool create_input_source(const std::string& input_source_name);
 
 private:
-  /// Used to associate any additional information with handles (such as for remapping)
-//  template <typename T, typename InputT>
-//  struct InputDeclarationHandle
-//  {
-//    InputDeclaration<T> declaration;
-//    std::shared_ptr<InputT> input;
-//  };
+  struct Params {
+    double min_update_rate = 0.0;
+  };
 
-//  internal::InputSourceHandle create_input_source_handle(const std::shared_ptr<InputSource>& input_source_class) const;
-//  void add_input_source_input_definitions(internal::InputSourceHandle& handle) const;
-//  /// Takes away the inputs added by add_input_source_input_definitions from inputs_.
-//  void remove_input_source_input_definitions(internal::InputSourceHandle& handle) const;
+
   void setup_input_sources();
 
   /// The owning teleop_modular ROS2 node.
@@ -78,8 +70,7 @@ private:
   /// A reference to the input manager used for linking
   std::reference_wrapper<InputManager> inputs_;
 
-  std::weak_ptr<teleop_modular_params::ParamListener> param_listener_;
-  teleop_modular_params::Params params_;
+  Params params_;
 
   /// Loads the control modes, and needs to stay alive during the whole lifecycle of the control modes.
   std::unique_ptr<pluginlib::ClassLoader<input_source::InputSource>> source_loader_;

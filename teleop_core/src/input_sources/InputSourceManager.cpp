@@ -6,16 +6,19 @@
 
 #include "teleop_core/colors.hpp"
 #include "teleop_core/utilities/utils.hpp"
+#include "teleop_core/utilities/get_parameter.hpp"
 
 namespace teleop::internal
 {
 
-void InputSourceManager::configure(const std::shared_ptr<teleop_modular_params::ParamListener>& param_listener, InputManager& inputs)
+void InputSourceManager::configure(const std::shared_ptr<rclcpp::Node>& parameters, InputManager& inputs)
 {
   const auto logger = node_->get_logger();
 
-  param_listener_ = param_listener;
-  params_ = param_listener->get_params();
+  params_.min_update_rate = utils::get_parameter_or_default(param_listener, "min_update_rate",
+                                                            "The minimum rate at which updates occur. Leaving this "
+                                                            "unset will allow for indefinite lapses between updates.",
+                                                            0.0);
 
   setup_input_sources();
 }
@@ -151,7 +154,9 @@ void InputSourceManager::setup_input_sources()
   node_->get_parameter("input_sources.names", input_sources_param);
 
   // Pluginlib for loading control modes dynamically
-  source_loader_ = std::make_unique<pluginlib::ClassLoader<input_source::InputSource>>("teleop_modular", "input_source::InputSource");
+  source_loader_ =
+      std::make_unique<pluginlib::ClassLoader<input_source::InputSource>>("teleop_modular", "input_source::"
+                                                                                            "InputSource");
 
   // List available input source plugins
   try

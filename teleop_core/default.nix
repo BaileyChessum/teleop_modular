@@ -8,7 +8,6 @@
 , rclcpp
 , geometry-msgs
 , sensor-msgs
-, generate-parameter-library
 , pluginlib
 , controller-manager-msgs
 , control-msgs
@@ -40,7 +39,6 @@ buildRosPackage {
     control-msgs
     rclcpp
     std-srvs
-    generate-parameter-library
     geometry-msgs
     sensor-msgs
     pluginlib

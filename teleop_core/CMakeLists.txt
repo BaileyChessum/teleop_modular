@@ -15,7 +15,6 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
 )
 
 find_package(ament_cmake REQUIRED)
-find_package(generate_parameter_library REQUIRED)
 foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
   find_package(${Dependency} REQUIRED)
 endforeach()
@@ -25,18 +24,6 @@ include_directories(
 )
 
 # -- Libraries
-
-# Generate parameter library
-generate_parameter_library(
-  teleop_modular_parameters
-  src/parameters.yaml
-)
-
-# Export generated include directory
-target_include_directories(teleop_modular_parameters INTERFACE
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/teleop_modular_parameters>
-  $<INSTALL_INTERFACE:include/teleop_modular_parameters>
-)
 
 # Add plugin implementations here!
 add_library(${PROJECT_NAME} SHARED
@@ -67,11 +54,7 @@ add_library(${PROJECT_NAME} SHARED
 
   src/input_sources/InputSourceManager.cpp
   src/commands/CommandManager.cpp
-)
-
-# Link parameter libraries for plugins here!
-target_link_libraries(${PROJECT_NAME}
-  teleop_modular_parameters
+  include/teleop_core/base_node_params.hpp
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)  # Require C++17
@@ -127,7 +110,6 @@ install(
 )
 
 install(TARGETS ${PROJECT_NAME}
-  teleop_modular_parameters
   EXPORT export_${PROJECT_NAME}
   RUNTIME DESTINATION bin
   ARCHIVE DESTINATION lib
