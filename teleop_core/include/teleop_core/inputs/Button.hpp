@@ -20,7 +20,8 @@ public:
 
   using ControlModeType = control_mode::Button;
 
-  explicit Button(std::string name) : InputCommon<uint8_t>(std::move(name))
+  explicit Button(std::string name)
+  : InputCommon<uint8_t>(std::move(name))
   {
   }
 };

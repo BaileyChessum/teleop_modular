@@ -24,7 +24,8 @@ public:
 
   virtual ~Command() = default;
   Command() = default;
-  explicit Command(std::string name) : name_(std::move(name))
+  explicit Command(std::string name)
+  : name_(std::move(name))
   {
   }
 
@@ -35,9 +36,10 @@ public:
    * @param logging    The logging interface to use.
    * @param parameters The parameter interface to use when configuring the command.
    */
-  void initialize(const CommandDelegate::WeakPtr& context, const std::string& name,
-                  const std::vector<Event::SharedPtr>& on, const LoggingInterface::SharedPtr& logging,
-                  const ParameterInterface::SharedPtr& parameters);
+  void initialize(
+    const CommandDelegate::WeakPtr & context, const std::string & name,
+    const std::vector<Event::SharedPtr> & on, const LoggingInterface::SharedPtr & logging,
+    const ParameterInterface::SharedPtr & parameters);
 
   /**
    * Allows command implementations to perform implementation specific configuration through the given parameters
@@ -45,7 +47,9 @@ public:
    * @param prefix[in]      The prefix string to prepend to all parameter definitions. E.g. "commands.name."
    * @param parameters[in]  Interface to allow the command to get parameters
    */
-  virtual void on_initialize(const std::string& prefix, const ParameterInterface::SharedPtr& parameters) = 0;
+  virtual void on_initialize(
+    const std::string & prefix,
+    const ParameterInterface::SharedPtr & parameters) = 0;
 
   /**
    * Method to execute the functionality for the command implementation, called when any of the command's "on" events
@@ -53,25 +57,26 @@ public:
    * @param context An interface providing access to the internals of Teleop_Modular, for the command to mess with.
    * @param now     The time from the input that caused this execution.
    */
-  virtual void execute(CommandDelegate& context, const rclcpp::Time& now) = 0;
+  virtual void execute(CommandDelegate & context, const rclcpp::Time & now) = 0;
 
   /**
    * Called when the "on" events are invoked.
    */
-  void on_event_invoked(const rclcpp::Time& now) override;
+  void on_event_invoked(const rclcpp::Time & now) override;
 
   /// accessor for the name of the command
-  [[nodiscard]] const std::string& get_name() const
+  [[nodiscard]] const std::string & get_name() const
   {
     return name_;
   }
 
 protected:
   /// Accessor for the commands held copied logger object. prevents implementations from modifying the logger
-  [[nodiscard]] const rclcpp::Logger& get_logger()
+  [[nodiscard]] const rclcpp::Logger & get_logger()
   {
-    if (logger_.has_value())
+    if (logger_.has_value()) {
       return logger_.value();
+    }
     logger_ = rclcpp::get_logger(name_);
     return logger_.value();
   }

@@ -20,10 +20,12 @@ public:
    * @param down  When true, the event will be invoked when the button is pressed. When false, the event will be invoked
    * when the event is released.
    */
-  ButtonEvent(std::string name, std::weak_ptr<EventListenerQueue> listener_queue, bool down, InputCollection<Button>& buttons);
+  ButtonEvent(
+    std::string name, std::weak_ptr<EventListenerQueue> listener_queue, bool down,
+    InputCollection<Button> & buttons);
 
 protected:
-  void on_update(const rclcpp::Time &now) override;
+  void on_update(const rclcpp::Time & now) override;
 
 private:
   /// The button to listen to

@@ -15,44 +15,45 @@ constexpr float EPSILON = 1e-1f;
 namespace teleop
 {
 
-template <>
+template<>
 bool InputCommon<bool>::value()
 {
   return accumulate_value();
 }
 
-template <>
+template<>
 uint8_t InputCommon<uint8_t>::value()
 {
   return accumulate_value();
 }
 
-template <>
+template<>
 double InputCommon<double>::value()
 {
   return accumulate_value();
 }
 
-template <>
+template<>
 float InputCommon<float>::value()
 {
   return accumulate_value();
 }
 
-template <>
-void InputCommon<uint8_t>::debounce(const rclcpp::Time& now)
+template<>
+void InputCommon<uint8_t>::debounce(const rclcpp::Time & now)
 {
   previous_debounce_value_ = current_debounce_value_;
   current_debounce_value_ = value();
-};
+}
 
-template <>
-void InputCommon<float>::debounce(const rclcpp::Time& now)
+template<>
+void InputCommon<float>::debounce(const rclcpp::Time & now)
 {
   previous_debounce_value_ = current_debounce_value_;
   // Only change if the change is big enough
-  if (const float new_value = value(); std::abs(previous_debounce_value_ - new_value) > EPSILON)
+  if (const float new_value = value(); std::abs(previous_debounce_value_ - new_value) > EPSILON) {
     current_debounce_value_ = new_value;
-};
+  }
+}
 
 }  // namespace teleop

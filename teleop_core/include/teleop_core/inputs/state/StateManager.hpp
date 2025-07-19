@@ -16,16 +16,17 @@ namespace teleop::state
 class StateManager
 {
 public:
-  explicit StateManager(InputManager& inputs) : buttons_(inputs.get_buttons()), axes_(inputs.get_axes())
+  explicit StateManager(InputManager & inputs)
+  : buttons_(inputs.get_buttons()), axes_(inputs.get_axes())
   {
   }
 
   // Accessors
-  [[nodiscard]] StateCollection<uint8_t, Button>& get_buttons()
+  [[nodiscard]] StateCollection<uint8_t, Button> & get_buttons()
   {
     return buttons_;
   }
-  [[nodiscard]] StateCollection<float, Axis>& get_axes()
+  [[nodiscard]] StateCollection<float, Axis> & get_axes()
   {
     return axes_;
   }

@@ -7,15 +7,13 @@
 namespace teleop
 {
 
-void InputManager::update(const rclcpp::Time& now)
+void InputManager::update(const rclcpp::Time & now)
 {
-  for (auto& button : buttons_)
-  {
+  for (auto & button : buttons_) {
     button->debounce(now);
   }
 
-  for (auto& axis : axes_)
-  {
+  for (auto & axis : axes_) {
     axis->debounce(now);
   }
 }

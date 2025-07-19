@@ -14,24 +14,28 @@ namespace input_source
 /**
  * Substitute for std::span to support more C++ versions
  */
-template <typename T>
+template<typename T>
 struct span
 {
-  using iterator = T*;
+  using iterator = T *;
 
-  T* data_;
+  T * data_;
   std::size_t size_;
 
-  constexpr span() noexcept : data_(nullptr), size_(0)
+  constexpr span() noexcept
+  : data_(nullptr), size_(0)
   {
   }
-  constexpr span(T* data, std::size_t size) noexcept : data_(data), size_(size)
+  constexpr span(T * data, std::size_t size) noexcept
+  : data_(data), size_(size)
   {
   }
-  constexpr explicit span(std::vector<T>& vector) noexcept : data_(vector.data()), size_(vector.size())
+  constexpr explicit span(std::vector<T> & vector) noexcept
+  : data_(vector.data()), size_(vector.size())
   {
   }
-  constexpr explicit span(const std::vector<T>& vector) noexcept : data_(vector.data()), size_(vector.size())
+  constexpr explicit span(const std::vector<T> & vector) noexcept
+  : data_(vector.data()), size_(vector.size())
   {
   }
 
@@ -44,19 +48,19 @@ struct span
     return size_ == 0;
   }
 
-  constexpr T& operator[](std::size_t idx) const noexcept
+  constexpr T & operator[](std::size_t idx) const noexcept
   {
     assert(idx < size_);
     return data_[idx];
   }
 
-  constexpr T& front() const noexcept
+  constexpr T & front() const noexcept
   {
     assert(size_ > 0);
     return data_[0];
   }
 
-  constexpr T& back() const noexcept
+  constexpr T & back() const noexcept
   {
     assert(size_ > 0);
     return data_[size_ - 1];

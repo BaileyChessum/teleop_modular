@@ -9,34 +9,33 @@
 
 namespace teleop::utils
 {
-template <typename KeyT, typename ValueT>
+template<typename KeyT, typename ValueT>
 class better_multimap
 {
 public:
-  using iterator = typename std::map<KeyT, std::vector<ValueT> >::iterator;
-  using const_iterator = typename std::map<KeyT, std::vector<ValueT> >::const_iterator;
+  using iterator = typename std::map<KeyT, std::vector<ValueT>>::iterator;
+  using const_iterator = typename std::map<KeyT, std::vector<ValueT>>::const_iterator;
 
-  std::vector<ValueT>& operator[](const KeyT& key)
+  std::vector<ValueT> & operator[](const KeyT & key)
   {
     return items_[key];
   }
 
-  iterator find(const KeyT& key)
+  iterator find(const KeyT & key)
   {
     return items_.find(key);
   }
 
-  void insert(const KeyT& key, ValueT value)
+  void insert(const KeyT & key, ValueT value)
   {
     auto it = items_.find(key);
 
-    if (it != items_.end())
-    {
+    if (it != items_.end()) {
       it->second.emplace_back(value);
       return;
     }
 
-    items_.insert({ key, { value } });
+    items_.insert({key, {value}});
   }
 
   constexpr iterator begin() noexcept
@@ -65,7 +64,7 @@ public:
   }
 
 private:
-  std::map<KeyT, std::vector<ValueT> > items_{};
+  std::map<KeyT, std::vector<ValueT>> items_{};
 };
 }  // namespace teleop::utils
 

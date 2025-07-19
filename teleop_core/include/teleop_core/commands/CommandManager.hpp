@@ -22,8 +22,10 @@ namespace teleop::internal
 class CommandManager final
 {
 public:
-  explicit CommandManager(const std::shared_ptr<rclcpp::Node>& node, CommandDelegate::WeakPtr context)
-    : node_(node), context_(std::move(context))
+  explicit CommandManager(
+    const std::shared_ptr<rclcpp::Node> & node,
+    CommandDelegate::WeakPtr context)
+  : node_(node), context_(std::move(context))
   {
   }
 
@@ -32,12 +34,12 @@ public:
    * @param name The name of the command to add
    * @param inputs
    */
-  void create_command(const std::string& name, EventCollection& events);
+  void create_command(const std::string & name, EventCollection & events);
 
   /**
    * Populates the sources_ from the params in node_.
    */
-  void configure(EventCollection& events);
+  void configure(EventCollection & events);
 
   /**
    * Gets the command plugin class type name for a given command name, to be given to pluginlib to load.
@@ -47,12 +49,13 @@ public:
    * @param[out] invocation_event_names The names of the events the command should be invoked by.
    * @return True if the type name was found. False otherwise.
    */
-  bool get_type_for_command(const std::string& name, std::string& source_type,
-                            std::vector<std::string>& invocation_event_names) const;
+  bool get_type_for_command(
+    const std::string & name, std::string & source_type,
+    std::vector<std::string> & invocation_event_names) const;
 
-  std::shared_ptr<Command> operator[](const std::string& index);
+  std::shared_ptr<Command> operator[](const std::string & index);
 
-  void add(const std::string& key, const std::shared_ptr<Command>& value);
+  void add(const std::string & key, const std::shared_ptr<Command> & value);
 
   using iterator = typename std::map<std::string, std::shared_ptr<Command>>::iterator;
   using const_iterator = typename std::map<std::string, std::shared_ptr<Command>>::const_iterator;

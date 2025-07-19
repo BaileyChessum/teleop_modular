@@ -16,7 +16,7 @@ namespace control_mode
 /**
  * @class An interface for objects providing input values to control modes.
  */
-template <typename T>
+template<typename T>
 class CONTROL_MODE_PUBLIC InputInterface
 {
 public:
@@ -26,7 +26,7 @@ public:
   virtual T value() = 0;
 
   // Accessors
-  [[nodiscard]] const std::string& get_name() const
+  [[nodiscard]] const std::string & get_name() const
   {
     return name_;
   }
@@ -38,7 +38,8 @@ public:
   }
 
 protected:
-  explicit InputInterface(std::string name) : name_(std::move(name))
+  explicit InputInterface(std::string name)
+  : name_(std::move(name))
   {
   }
   ~InputInterface() = default;

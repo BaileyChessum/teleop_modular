@@ -8,28 +8,24 @@ namespace teleop
 {
 
 Event::Event(std::string name, std::weak_ptr<internal::EventListenerQueue> listener_queue)
-    : name_(std::move(name)), listener_queue_(std::move(listener_queue))
+: name_(std::move(name)), listener_queue_(std::move(listener_queue))
 {
 }
 
 void Event::invoke()
 {
-  if (const auto listener_queue = listener_queue_.lock(); listener_queue)
-  {
-    for (const auto& listener : listeners_)
-    {
+  if (const auto listener_queue = listener_queue_.lock(); listener_queue) {
+    for (const auto & listener : listeners_) {
       listener_queue->enqueue(listener);
     }
-  }
-  else
-  {
+  } else {
     RCLCPP_ERROR(rclcpp::get_logger(name_), "Failed to get the listener queue.");
   }
 
   invoked_ = true;
 }
 
-void Event::update(const rclcpp::Time& now)
+void Event::update(const rclcpp::Time & now)
 {
   on_update(now);
 
@@ -37,7 +33,7 @@ void Event::update(const rclcpp::Time& now)
   invoked_ = false;
 }
 
-void Event::subscribe(const EventListener::WeakPtr& listener)
+void Event::subscribe(const EventListener::WeakPtr & listener)
 {
   listeners_.emplace_back(listener);
 }

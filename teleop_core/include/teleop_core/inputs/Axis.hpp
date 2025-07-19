@@ -19,7 +19,8 @@ public:
 
   using ControlModeType = control_mode::Axis;
 
-  explicit Axis(std::string name) : InputCommon<float>(std::move(name))
+  explicit Axis(std::string name)
+  : InputCommon<float>(std::move(name))
   {
   }
 };

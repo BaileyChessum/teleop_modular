@@ -9,8 +9,10 @@
 namespace teleop::internal
 {
 
-ButtonEvent::ButtonEvent(std::string name, std::weak_ptr<EventListenerQueue> listener_queue, bool down, InputCollection<Button>& buttons)
-  : Event(std::move(name), std::move(listener_queue)), down_(down)
+ButtonEvent::ButtonEvent(
+  std::string name, std::weak_ptr<EventListenerQueue> listener_queue,
+  bool down, InputCollection<Button> & buttons)
+: Event(std::move(name), std::move(listener_queue)), down_(down)
 {
   // To get the name of the button to use, we need to remove the suffix beginning with a /, such as "/down" or "/up"
   // from the end of the event name.
@@ -20,23 +22,24 @@ ButtonEvent::ButtonEvent(std::string name, std::weak_ptr<EventListenerQueue> lis
     button_ = buttons[button_name];
   } else {
     rclcpp::Logger logger = rclcpp::get_logger("event/" + get_name());
-    RCLCPP_WARN(logger, "Could not find the /down or /up suffix in the event name. Using the event name as the button name.");
+    RCLCPP_WARN(
+      logger,
+      "Could not find the /down or /up suffix in the event name. Using the event name as the button name.");
     button_ = buttons[get_name()];
   }
 }
 
-void ButtonEvent::on_update(const rclcpp::Time& now)
+void ButtonEvent::on_update(const rclcpp::Time & now)
 {
   if (button_->changed()) {
-    if (down_)
-    {
-      if (button_->value())
+    if (down_) {
+      if (button_->value()) {
         invoke();
-    }
-    else
-    {
-      if (!button_->value())
+      }
+    } else {
+      if (!button_->value()) {
         invoke();
+      }
     }
   }
 }

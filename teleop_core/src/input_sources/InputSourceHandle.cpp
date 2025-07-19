@@ -19,89 +19,97 @@ using input_source::InputSource;
 }  // namespace
 
 
-InputSourceHandle::InputSourceHandle(const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr& parameters,
-                                     InputManager& inputs, const std::shared_ptr<InputSource>& source)
-  : inputs_(std::ref(inputs)), parameters_(parameters), source_(source)
+InputSourceHandle::InputSourceHandle(
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & parameters,
+  InputManager & inputs, const std::shared_ptr<InputSource> & source)
+: inputs_(std::ref(inputs)), parameters_(parameters), source_(source)
 {
   declare_and_link_inputs();
 }
 
-InputSourceHandle::InputSourceHandle(InputManager& inputs, const std::shared_ptr<InputSource>& source)
-  : inputs_(std::ref(inputs)), source_(source), parameters_(source->get_node()->get_node_parameters_interface())
+InputSourceHandle::InputSourceHandle(
+  InputManager & inputs,
+  const std::shared_ptr<InputSource> & source)
+: inputs_(std::ref(inputs)), source_(source),
+  parameters_(source->get_node()->get_node_parameters_interface())
 {
   declare_and_link_inputs();
 }
 
-template <>
+template<>
 inline void
 InputSourceHandle::TransformedRemapValue<uint8_t, InputSourceHandle::TransformedRemapButtonFromAxis,
-                                         InputSourceHandle::ButtonTransformParams>::update(const rclcpp::Time& now)
+  InputSourceHandle::ButtonTransformParams>::update(const rclcpp::Time & now)
 {
   value = 0;
 
-  if (from.has_value())
+  if (from.has_value()) {
     value = from.value().get();
-
-  // Apply button from axis
-  if (from_other.has_value())
-  {
-    auto& from_axis = from_other.value();
-
-    if (from_axis.axis.get() < from_axis.threshold)
-      value = 1;
   }
 
-  if (!transform.has_value())
+  // Apply button from axis
+  if (from_other.has_value()) {
+    auto & from_axis = from_other.value();
+
+    if (from_axis.axis.get() < from_axis.threshold) {
+      value = 1;
+    }
+  }
+
+  if (!transform.has_value()) {
     return;
+  }
 
   // Apply transformations
-  if (transform.value().invert)
+  if (transform.value().invert) {
     value = !value;
+  }
 }
 
-template <>
+template<>
 inline void
 InputSourceHandle::TransformedRemapValue<float, InputSourceHandle::TransformedRemapAxisFromButtons,
-                                         InputSourceHandle::AxisTransformParams>::update(const rclcpp::Time& now)
+  InputSourceHandle::AxisTransformParams>::update(const rclcpp::Time & now)
 {
   value = 0.0f;
 
-  if (from.has_value())
+  if (from.has_value()) {
     value = from.value().get();
-
-  // Apply axis from buttons
-  if (from_other.has_value())
-  {
-    auto& from_buttons = from_other.value();
-
-    if (from_buttons.negative.has_value() && from_buttons.negative.value().get())
-      value -= 1.0f;
-
-    if (from_buttons.positive.has_value() && from_buttons.positive.value().get())
-      value += 1.0f;
   }
 
-  if (!transform.has_value())
+  // Apply axis from buttons
+  if (from_other.has_value()) {
+    auto & from_buttons = from_other.value();
+
+    if (from_buttons.negative.has_value() && from_buttons.negative.value().get()) {
+      value -= 1.0f;
+    }
+
+    if (from_buttons.positive.has_value() && from_buttons.positive.value().get()) {
+      value += 1.0f;
+    }
+  }
+
+  if (!transform.has_value()) {
     return;
+  }
 
   const auto params = transform.value();
 
   // Apply transformations
-  if (params.invert)
+  if (params.invert) {
     value = -value;
+  }
 
   // Apply range remapping
-  if (params.range.has_value())
-  {
+  if (params.range.has_value()) {
     const auto in = params.range.value().in;
 
-    if (params.range->clamp)
-    {
+    if (params.range->clamp) {
       value = std::clamp(value, in[0], in[1]);
     }
 
-    if (params.range->out.has_value())
-    {
+    if (params.range->out.has_value()) {
       const auto out = params.range.value().out.value();
 
       // Inverse lerp to get interpolator in the input range
@@ -112,36 +120,42 @@ InputSourceHandle::TransformedRemapValue<float, InputSourceHandle::TransformedRe
     }
   }
 
-  if (params.power.has_value())
-  {
-    if (value >= 0.0f)
+  if (params.power.has_value()) {
+    if (value >= 0.0f) {
       value = std::pow(value, params.power.value());
-    else
+    } else {
       value = -std::pow(-value, params.power.value());
+    }
   }
 }
 
-void InputSourceHandle::update(const rclcpp::Time& now)
+void InputSourceHandle::update(const rclcpp::Time & now)
 {
   source_->update(now);
 
-  for (auto& button : transformed_buttons_)
+  for (auto & button : transformed_buttons_) {
     button.update(now);
+  }
 
-  for (auto& axis : transformed_axes_)
+  for (auto & axis : transformed_axes_) {
     axis.update(now);
+  }
 }
 
 void InputSourceHandle::add_definitions_to_inputs() const
 {
   // Add declarations to inputs
-  for (auto& button : button_definitions_)
-    for (auto& definition : button.references)
+  for (auto & button : button_definitions_) {
+    for (auto & definition : button.references) {
       button.input->add_definition(definition);
+    }
+  }
 
-  for (auto& axis : axis_definitions_)
-    for (auto& definition : axis.references)
+  for (auto & axis : axis_definitions_) {
+    for (auto & definition : axis.references) {
       axis.input->add_definition(definition);
+    }
+  }
 }
 
 void InputSourceHandle::declare_and_link_inputs()
@@ -159,154 +173,180 @@ void InputSourceHandle::declare_and_link_inputs()
 InputSourceHandle::RemapParams InputSourceHandle::get_remap_params()
 {
   RemapParams remap_params;
-  auto& inputs = inputs_.get();
+  auto & inputs = inputs_.get();
 
-  for (const auto& button : inputs.get_buttons())
-    if (auto params = get_remap_button_params(button->get_name()); params.has_value())
+  for (const auto & button : inputs.get_buttons()) {
+    if (auto params = get_remap_button_params(button->get_name()); params.has_value()) {
       remap_params.buttons.emplace_back(*params);
+    }
+  }
 
-  for (const auto& axis : inputs.get_axes())
-    if (auto params = get_remap_axis_params(axis->get_name()); params.has_value())
+  for (const auto & axis : inputs.get_axes()) {
+    if (auto params = get_remap_axis_params(axis->get_name()); params.has_value()) {
       remap_params.axes.emplace_back(*params);
+    }
+  }
 
   return remap_params;
 }
 
-std::optional<InputSourceHandle::RemapButtonParams> InputSourceHandle::get_remap_button_params(const std::string& name)
+std::optional<InputSourceHandle::RemapButtonParams> InputSourceHandle::get_remap_button_params(
+  const std::string & name)
 {
   const auto logger = source_->get_node()->get_logger();
   const auto prefix = "remap.buttons." + name + ".";
 
   // Declare 'from' params first to check if we can exit early
   const auto from =
-      get_parameter<std::string>(parameters_, prefix + "from", "The name of the button to remap values from.");
+    get_parameter<std::string>(
+    parameters_, prefix + "from",
+    "The name of the button to remap values from.");
 
-  const auto from_axis_name = get_parameter<std::string>(parameters_, prefix + "from_axis.name",
-                                                         "The name of the axis to read the button value from.");
+  const auto from_axis_name = get_parameter<std::string>(
+    parameters_, prefix + "from_axis.name",
+    "The name of the axis to read the button value from.");
 
   // Exit early if nothing is defined
-  if (!from.has_value() && !from_axis_name.has_value())
+  if (!from.has_value() && !from_axis_name.has_value()) {
     return std::nullopt;
+  }
 
   std::optional<ButtonFromAxisParams> from_axis_params = std::nullopt;
-  if (from_axis_name.has_value())
-  {
+  if (from_axis_name.has_value()) {
     const auto threshold = get_parameter_or_default<float>(
-        parameters_, prefix + "from_axis.threshold", "The threshold below which the button will be triggered.", 0.0);
-    from_axis_params = ButtonFromAxisParams{ from_axis_name.value(), threshold };
+      parameters_, prefix + "from_axis.threshold",
+      "The threshold below which the button will be triggered.", 0.0);
+    from_axis_params = ButtonFromAxisParams{from_axis_name.value(), threshold};
   }
 
   const auto transform_params = get_button_transform_params(name);
 
-  return RemapButtonParams{ name, from, transform_params, from_axis_params };
+  return RemapButtonParams{name, from, transform_params, from_axis_params};
 }
 
 std::optional<InputSourceHandle::ButtonTransformParams>
-InputSourceHandle::get_button_transform_params(const std::string& name)
+InputSourceHandle::get_button_transform_params(const std::string & name)
 {
   const auto logger = source_->get_node()->get_logger();
   const auto prefix = "remap.buttons." + name + ".";
 
   InputSourceHandle::ButtonTransformParams params;
 
-  params.invert = get_parameter_or_default<bool>(parameters_, prefix + "invert", "Invert the button value.", false);
+  params.invert = get_parameter_or_default<bool>(
+    parameters_, prefix + "invert",
+    "Invert the button value.", false);
 
   // When nullopt is returned, memory will be mapped directly. Otherwise, an intermediate value in memory will be set up
-  if (params.invert)
+  if (params.invert) {
     return params;
-  else
+  } else {
     return std::nullopt;
+  }
 }
 
-std::optional<InputSourceHandle::RemapAxisParams> InputSourceHandle::get_remap_axis_params(const std::string& name)
+std::optional<InputSourceHandle::RemapAxisParams> InputSourceHandle::get_remap_axis_params(
+  const std::string & name)
 {
   const auto logger = source_->get_node()->get_logger();
   const auto prefix = "remap.axes." + name + ".";
 
   // Declare 'from' params first to check if we can exit early
   const auto from =
-      get_parameter<std::string>(parameters_, prefix + "from", "The name of the button to remap values from.");
+    get_parameter<std::string>(
+    parameters_, prefix + "from",
+    "The name of the button to remap values from.");
 
-  const auto from_button_negative = get_parameter<std::string>(parameters_, prefix + "from_buttons.negative",
-                                                               "A button that when pressed will cause the axis to be "
-                                                               "negative.");
-  const auto from_button_positive = get_parameter<std::string>(parameters_, prefix + "from_buttons.positive",
-                                                               "A button that when pressed will cause the axis to be "
-                                                               "positive.");
+  const auto from_button_negative = get_parameter<std::string>(
+    parameters_, prefix + "from_buttons.negative",
+    "A button that when pressed will cause the axis to be "
+    "negative.");
+  const auto from_button_positive = get_parameter<std::string>(
+    parameters_, prefix + "from_buttons.positive",
+    "A button that when pressed will cause the axis to be "
+    "positive.");
 
   // Exit early if nothing is defined
-  if (!from.has_value() && !from_button_negative.has_value() && !from_button_positive.has_value())
+  if (!from.has_value() && !from_button_negative.has_value() && !from_button_positive.has_value()) {
     return std::nullopt;
+  }
 
   std::optional<AxisFromButtonsParams> from_buttons_params = std::nullopt;
-  if (from_button_negative.has_value() || from_button_positive.has_value())
-  {
-    from_buttons_params = AxisFromButtonsParams{ from_button_positive, from_button_negative };
+  if (from_button_negative.has_value() || from_button_positive.has_value()) {
+    from_buttons_params = AxisFromButtonsParams{from_button_positive, from_button_negative};
   }
 
   const auto transform_params = get_axis_transform_params(name);
 
-  return RemapAxisParams{ name, from, transform_params, from_buttons_params };
+  return RemapAxisParams{name, from, transform_params, from_buttons_params};
 }
 
 std::optional<InputSourceHandle::AxisTransformParams>
-InputSourceHandle::get_axis_transform_params(const std::string& name)
+InputSourceHandle::get_axis_transform_params(const std::string & name)
 {
   const auto logger = source_->get_node()->get_logger();
   const auto prefix = "remap.axes." + name + ".";
 
   InputSourceHandle::AxisTransformParams params;
 
-  params.invert = get_parameter_or_default<bool>(parameters_, prefix + "invert", "Invert the axis value.", false);
+  params.invert = get_parameter_or_default<bool>(
+    parameters_, prefix + "invert",
+    "Invert the axis value.", false);
 
-  auto range_out = get_parameter<std::vector<double>>(parameters_, prefix + "range.out",
-                                                      "What range.in should be linearly mapped to.");
-  auto range_clamp = get_parameter_or_default<bool>(parameters_, prefix + "range.clamp",
-                                                    "Whether to clamp values to the specified range.", false);
+  auto range_out = get_parameter<std::vector<double>>(
+    parameters_, prefix + "range.out",
+    "What range.in should be linearly mapped to.");
+  auto range_clamp = get_parameter_or_default<bool>(
+    parameters_, prefix + "range.clamp",
+    "Whether to clamp values to the specified range.", false);
 
-  if (range_clamp || range_out.has_value())
-  {
+  if (range_clamp || range_out.has_value()) {
     auto range_in =
-        get_parameter<std::vector<double>>(parameters_, prefix + "range.in", "The original range of input values.");
+      get_parameter<std::vector<double>>(
+      parameters_, prefix + "range.in",
+      "The original range of input values.");
 
     // Enforce range_in must have 2 elements
-    if (range_in.has_value() && range_in.value().size() != 2)
-    {
-      RCLCPP_ERROR(logger,
-                   "Parameter %s.range.in should have exactly two elements, representing the upper and lower bound "
-                   "respectively.",
-                   prefix.c_str());
+    if (range_in.has_value() && range_in.value().size() != 2) {
+      RCLCPP_ERROR(
+        logger,
+        "Parameter %s.range.in should have exactly two elements, representing the upper and lower bound "
+        "respectively.",
+        prefix.c_str());
       range_in = std::nullopt;
     }
 
     // Enforce range_out must have 2 elements
-    if (range_out.has_value() && range_out.value().size() != 2)
-    {
-      RCLCPP_ERROR(logger,
-                   "Parameter %s.range.out should have exactly two elements, representing the upper and lower bound "
-                   "respectively.",
-                   prefix.c_str());
+    if (range_out.has_value() && range_out.value().size() != 2) {
+      RCLCPP_ERROR(
+        logger,
+        "Parameter %s.range.out should have exactly two elements, representing the upper and lower bound "
+        "respectively.",
+        prefix.c_str());
       range_in = std::nullopt;
     }
 
     // Enforce default value for range_in
-    if (!range_in.has_value())
-      range_in = std::vector<double>{ -1.0, 1.0 };
+    if (!range_in.has_value()) {
+      range_in = std::vector<double>{-1.0, 1.0};
+    }
 
-    auto in = std::array<float, 2>{ static_cast<float>(range_in.value()[0]), static_cast<float>(range_in.value()[1]) };
+    auto in = std::array<float, 2>{static_cast<float>(range_in.value()[0]),
+      static_cast<float>(range_in.value()[1])};
     std::optional<std::array<float, 2>> out;
-    if (range_out.has_value())
-      out = std::array<float, 2>{ static_cast<float>(range_out.value()[0]), static_cast<float>(range_out.value()[1]) };
+    if (range_out.has_value()) {
+      out = std::array<float, 2>{static_cast<float>(range_out.value()[0]),
+        static_cast<float>(range_out.value()[1])};
+    }
 
-    params.range = AxisTransformParams::Range{ in, out, range_clamp };
+    params.range = AxisTransformParams::Range{in, out, range_clamp};
   }
 
-  params.power = get_parameter<float>(parameters_, prefix + "power",
-                                      "The exponent to apply to this input. Negative numbers are made "
-                                      "positive before raising to a fractional power.");
+  params.power = get_parameter<float>(
+    parameters_, prefix + "power",
+    "The exponent to apply to this input. Negative numbers are made "
+    "positive before raising to a fractional power.");
 
-  if (!params.invert && !params.range.has_value() && !params.power.has_value())
-  {
+  if (!params.invert && !params.range.has_value() && !params.power.has_value()) {
     RCLCPP_DEBUG(logger, "Remapped axis %s does not define a transform", name.c_str());
     return std::nullopt;
   }
@@ -314,10 +354,12 @@ InputSourceHandle::get_axis_transform_params(const std::string& name)
   return params;
 }
 
-void InputSourceHandle::remap(input_source::InputDeclarationSpans declarations, RemapParams remap_params)
+void InputSourceHandle::remap(
+  input_source::InputDeclarationSpans declarations,
+  RemapParams remap_params)
 {
   const auto logger = source_->get_node()->get_logger();
-  auto& inputs = inputs_.get();
+  auto & inputs = inputs_.get();
 
   // Stores, for each exported button, whether the button is remapped
   std::vector<bool> is_button_remapped(declarations.button_names.size(), false);
@@ -332,65 +374,64 @@ void InputSourceHandle::remap(input_source::InputDeclarationSpans declarations, 
   transformed_buttons_deferred_registration.reserve(remap_params.buttons.size());
 
   // Create definitions for each remapped input, marking which ones have been remapped
-  auto& buttons = inputs.get_buttons();
-  for (auto& [name, from, transform, from_axis] : remap_params.buttons)
-  {
+  auto & buttons = inputs.get_buttons();
+  for (auto & [name, from, transform, from_axis] : remap_params.buttons) {
     // Find if there is a direct renaming
     std::optional<std::reference_wrapper<uint8_t>> reference = std::nullopt;
-    if (from.has_value())
-    {  // Find the index for the 'from' param in button_names
-      const auto it = std::find(declarations.button_names.begin(), declarations.button_names.end(), from);
+    if (from.has_value()) { // Find the index for the 'from' param in button_names
+      const auto it = std::find(
+        declarations.button_names.begin(), declarations.button_names.end(),
+        from);
 
-      if (it != declarations.button_names.end())
-      {
+      if (it != declarations.button_names.end()) {
         const size_t index = std::distance(declarations.button_names.begin(), it);
         is_button_remapped[index] = true;
 
         reference = std::ref(declarations.buttons[index]);
-      }
-      else
-      {
+      } else {
         // TODO: Recursively declare the missing 'from', merging transforms until reaching a valid original input
-        RCLCPP_WARN(logger,
-                    "You tried to remap button %s to \"%s\", but it can't be found in the set of button names exported "
-                    "by the input source %s.",
-                    name.c_str(), from->c_str(), source_->get_name().c_str());
+        RCLCPP_WARN(
+          logger,
+          "You tried to remap button %s to \"%s\", but it can't be found in the set of button names exported "
+          "by the input source %s.",
+          name.c_str(), from->c_str(), source_->get_name().c_str());
       }
     }
 
     // Exit early if we can just register the original memory address under a different name
     const bool needs_extra_memory = transform.has_value() || from_axis.has_value();
-    if (!needs_extra_memory)
-    {
-      if (!reference.has_value())
+    if (!needs_extra_memory) {
+      if (!reference.has_value()) {
         continue;
+      }
 
-      button_definitions_.emplace_back(buttons[name], reference.has_value() ?
-                                                          (std::vector{ reference.value() }) :
-                                                          (std::vector<std::reference_wrapper<uint8_t>>{}));
+      button_definitions_.emplace_back(
+        buttons[name], reference.has_value() ?
+        (std::vector{reference.value()}) :
+        (std::vector<std::reference_wrapper<uint8_t>>{}));
       continue;
     }
 
     // Find if there is a remapping from an axis
     std::optional<TransformedRemapButtonFromAxis> from_axis_transform;
-    if (from_axis.has_value())
-    {
+    if (from_axis.has_value()) {
       const auto axis_it =
-          std::find(declarations.axis_names.begin(), declarations.axis_names.end(), from_axis.value().name);
+        std::find(
+        declarations.axis_names.begin(), declarations.axis_names.end(),
+        from_axis.value().name);
 
-      if (axis_it != declarations.axis_names.end())
-      {
+      if (axis_it != declarations.axis_names.end()) {
         const size_t axis_index = std::distance(declarations.axis_names.begin(), axis_it);
         const auto axis_reference = std::ref(declarations.axes[axis_index]);
-        from_axis_transform = TransformedRemapButtonFromAxis{ axis_reference, from_axis.value().threshold };
+        from_axis_transform = TransformedRemapButtonFromAxis{axis_reference,
+          from_axis.value().threshold};
         is_axis_remapped[axis_index] = true;
-      }
-      else
-      {
-        RCLCPP_WARN(logger,
-                    "You tried to remap button %s to axis \"%s\", but it can't be found in the set of axis names "
-                    "exported by the input source %s.",
-                    name.c_str(), from_axis.value().name.c_str(), source_->get_name().c_str());
+      } else {
+        RCLCPP_WARN(
+          logger,
+          "You tried to remap button %s to axis \"%s\", but it can't be found in the set of axis names "
+          "exported by the input source %s.",
+          name.c_str(), from_axis.value().name.c_str(), source_->get_name().c_str());
       }
     }
 
@@ -400,11 +441,10 @@ void InputSourceHandle::remap(input_source::InputDeclarationSpans declarations, 
   }
 
   // Register deferred transform buttons
-  for (size_t i = 0; i < transformed_buttons_deferred_registration.size(); ++i)
-  {
-    auto& transformed_button = transformed_buttons_[i];
-    const auto& button = transformed_buttons_deferred_registration[i];
-    button_definitions_.emplace_back(button, std::vector{ std::ref(transformed_button.value) });
+  for (size_t i = 0; i < transformed_buttons_deferred_registration.size(); ++i) {
+    auto & transformed_button = transformed_buttons_[i];
+    const auto & button = transformed_buttons_deferred_registration[i];
+    button_definitions_.emplace_back(button, std::vector{std::ref(transformed_button.value)});
   }
 
   // Reset definitions
@@ -416,94 +456,93 @@ void InputSourceHandle::remap(input_source::InputDeclarationSpans declarations, 
   transformed_axes_deferred_registration.reserve(remap_params.axes.size());
 
   // Create definitions for each remapped input, marking which ones have been remapped
-  auto& axes = inputs.get_axes();
-  for (auto& [name, from, transform, from_buttons] : remap_params.axes)
-  {
+  auto & axes = inputs.get_axes();
+  for (auto & [name, from, transform, from_buttons] : remap_params.axes) {
     // Find if there is a direct renaming
     std::optional<std::reference_wrapper<float>> reference = std::nullopt;
-    if (from.has_value())
-    {  // Find the index for the 'from' param in axis_names
-      const auto it = std::find(declarations.axis_names.begin(), declarations.axis_names.end(), from);
+    if (from.has_value()) { // Find the index for the 'from' param in axis_names
+      const auto it = std::find(
+        declarations.axis_names.begin(), declarations.axis_names.end(),
+        from);
 
-      if (it != declarations.axis_names.end())
-      {
+      if (it != declarations.axis_names.end()) {
         const size_t index = std::distance(declarations.axis_names.begin(), it);
         is_axis_remapped[index] = true;
 
         reference = std::ref(declarations.axes[index]);
-      }
-      else
-      {
+      } else {
         // TODO: Recursively declare the missing 'from', merging transforms until reaching a valid original input
-        RCLCPP_WARN(logger,
-                    "You tried to remap axis %s to \"%s\", but it can't be found in the set of axis names exported by "
-                    "the input source %s.",
-                    name.c_str(), from->c_str(), source_->get_name().c_str());
+        RCLCPP_WARN(
+          logger,
+          "You tried to remap axis %s to \"%s\", but it can't be found in the set of axis names exported by "
+          "the input source %s.",
+          name.c_str(), from->c_str(), source_->get_name().c_str());
       }
     }
 
     // Exit early if we can just register the original memory address under a different name
     const bool needs_extra_memory = transform.has_value() || from_buttons.has_value();
-    if (!needs_extra_memory)
-    {
-      if (!reference.has_value())
+    if (!needs_extra_memory) {
+      if (!reference.has_value()) {
         continue;
+      }
 
-      axis_definitions_.emplace_back(axes[name], reference.has_value() ?
-                                                     (std::vector{ reference.value() }) :
-                                                     (std::vector<std::reference_wrapper<float>>{}));
+      axis_definitions_.emplace_back(
+        axes[name], reference.has_value() ?
+        (std::vector{reference.value()}) :
+        (std::vector<std::reference_wrapper<float>>{}));
       continue;
     }
 
     // Find if there is a remapping from an axis
     std::optional<TransformedRemapAxisFromButtons> from_buttons_transform;
-    if (from_buttons.has_value())
-    {
+    if (from_buttons.has_value()) {
       std::optional<std::reference_wrapper<uint8_t>> negative_reference = std::nullopt;
-      if (from_buttons.value().negative.has_value())
-      {
-        const auto negative_it = std::find(declarations.button_names.begin(), declarations.button_names.end(),
-                                           from_buttons.value().negative.value());
+      if (from_buttons.value().negative.has_value()) {
+        const auto negative_it = std::find(
+          declarations.button_names.begin(), declarations.button_names.end(),
+          from_buttons.value().negative.value());
 
-        if (negative_it != declarations.button_names.end())
-        {
-          const size_t negative_index = std::distance(declarations.button_names.begin(), negative_it);
+        if (negative_it != declarations.button_names.end()) {
+          const size_t negative_index = std::distance(
+            declarations.button_names.begin(),
+            negative_it);
           negative_reference = std::ref(declarations.buttons[negative_index]);
           is_button_remapped[negative_index] = true;
-        }
-        else
-        {
+        } else {
           // TODO: Recursively declare the missing 'from', merging transforms until reaching a valid original input
-          RCLCPP_WARN(logger,
-                      "You tried to remap axis %s to button \"%s\", but it can't be found in the set of button names "
-                      "exported by the input source %s.",
-                      name.c_str(), from_buttons->negative->c_str(), source_->get_name().c_str());
+          RCLCPP_WARN(
+            logger,
+            "You tried to remap axis %s to button \"%s\", but it can't be found in the set of button names "
+            "exported by the input source %s.",
+            name.c_str(), from_buttons->negative->c_str(), source_->get_name().c_str());
         }
       }
 
       std::optional<std::reference_wrapper<uint8_t>> positive_reference = std::nullopt;
-      if (from_buttons.value().positive.has_value())
-      {
-        const auto positive_it = std::find(declarations.button_names.begin(), declarations.button_names.end(),
-                                           from_buttons.value().positive.value());
+      if (from_buttons.value().positive.has_value()) {
+        const auto positive_it = std::find(
+          declarations.button_names.begin(), declarations.button_names.end(),
+          from_buttons.value().positive.value());
 
-        if (positive_it != declarations.button_names.end())
-        {
-          const size_t positive_index = std::distance(declarations.button_names.begin(), positive_it);
+        if (positive_it != declarations.button_names.end()) {
+          const size_t positive_index = std::distance(
+            declarations.button_names.begin(),
+            positive_it);
           positive_reference = std::ref(declarations.buttons[positive_index]);
           is_button_remapped[positive_index] = true;
-        }
-        else
-        {
+        } else {
           // TODO: Recursively declare the missing 'from', merging transforms until reaching a valid original input
-          RCLCPP_WARN(logger,
-                      "You tried to remap axis %s to button \"%s\", but it can't be found in the set of button names "
-                      "exported by the input source %s.",
-                      name.c_str(), from_buttons->positive->c_str(), source_->get_name().c_str());
+          RCLCPP_WARN(
+            logger,
+            "You tried to remap axis %s to button \"%s\", but it can't be found in the set of button names "
+            "exported by the input source %s.",
+            name.c_str(), from_buttons->positive->c_str(), source_->get_name().c_str());
         }
       }
 
-      from_buttons_transform = TransformedRemapAxisFromButtons{ negative_reference, positive_reference };
+      from_buttons_transform = TransformedRemapAxisFromButtons{negative_reference,
+        positive_reference};
     }
 
     // Create the transform, but defer registration to after all the transformed axes have been created.
@@ -512,35 +551,34 @@ void InputSourceHandle::remap(input_source::InputDeclarationSpans declarations, 
   }
 
   // Register deferred transform axes
-  for (size_t i = 0; i < transformed_axes_deferred_registration.size(); ++i)
-  {
-    auto& transformed_axis = transformed_axes_[i];
-    const auto& axis = transformed_axes_deferred_registration[i];
-    axis_definitions_.emplace_back(axis, std::vector{ std::ref(transformed_axis.value) });
+  for (size_t i = 0; i < transformed_axes_deferred_registration.size(); ++i) {
+    auto & transformed_axis = transformed_axes_[i];
+    const auto & axis = transformed_axes_deferred_registration[i];
+    axis_definitions_.emplace_back(axis, std::vector{std::ref(transformed_axis.value)});
   }
 
   // Create definitions for unmapped inputs
-  for (size_t i = 0; i < declarations.button_names.size(); ++i)
-  {
-    if (is_button_remapped[i])
+  for (size_t i = 0; i < declarations.button_names.size(); ++i) {
+    if (is_button_remapped[i]) {
       continue;
+    }
 
-    const auto& name = declarations.button_names[i];
+    const auto & name = declarations.button_names[i];
     const auto reference = std::ref(declarations.buttons[i]);
 
-    button_definitions_.emplace_back(buttons[name], std::vector{ reference });
+    button_definitions_.emplace_back(buttons[name], std::vector{reference});
   }
 
   // Create definitions for unmapped inputs
-  for (size_t i = 0; i < declarations.axis_names.size(); ++i)
-  {
-    if (is_axis_remapped[i])
+  for (size_t i = 0; i < declarations.axis_names.size(); ++i) {
+    if (is_axis_remapped[i]) {
       continue;
+    }
 
-    const auto& name = declarations.axis_names[i];
+    const auto & name = declarations.axis_names[i];
     const auto reference = std::ref(declarations.axes[i]);
 
-    axis_definitions_.emplace_back(axes[name], std::vector{ reference });
+    axis_definitions_.emplace_back(axes[name], std::vector{reference});
   }
 }
 

@@ -19,36 +19,37 @@ namespace teleop::state
  * @tparam T The type of value held in the state.
  * @tparam InputT The input type wrapping T (Button for bool, Axis for double).
  */
-template <typename T, typename InputT>
+template<typename T, typename InputT>
 class StateCollection
 {
 public:
-  static_assert(std::is_base_of_v<InputCommon<T>, InputT>,
-                "InputT must be an input type inheriting from InputCommon (Button, Axis).");
+  static_assert(
+    std::is_base_of_v<InputCommon<T>, InputT>,
+    "InputT must be an input type inheriting from InputCommon (Button, Axis).");
 
-  explicit StateCollection(InputCollection<InputT>& inputs) : inputs_(std::ref(inputs))
+  explicit StateCollection(InputCollection<InputT> & inputs)
+  : inputs_(std::ref(inputs))
   {
   }
 
   // Delete copy constructor, assignment, and move
-  StateCollection(StateCollection&& other) = delete;
-  StateCollection& operator=(StateCollection&& other) = delete;
-  StateCollection(const StateCollection&) = delete;
-  StateCollection& operator=(const StateCollection&) = delete;
+  StateCollection(StateCollection && other) = delete;
+  StateCollection & operator=(StateCollection && other) = delete;
+  StateCollection(const StateCollection &) = delete;
+  StateCollection & operator=(const StateCollection &) = delete;
 
   /**
    * @brief Gets the state for a given key, and returns nullptr when there is no item with that key.
    * @param key The name of the input that the state is registered for.
    * @return a shared pointer to the state with the given key as a name if it exists, nullptr otherwise.
    */
-  std::shared_ptr<State<T>> operator[](const std::string& key)
+  std::shared_ptr<State<T>> operator[](const std::string & key)
   {
     // Find the element
     auto it = items_.find(key);
     std::shared_ptr<State<T>> ptr = nullptr;
 
-    if (it != items_.end())
-    {
+    if (it != items_.end()) {
       ptr = it->second.state;
     }
 
@@ -60,36 +61,34 @@ public:
    * @param name name The name of the input to define the value for.
    * @param value value The value to define under that input
    */
-  void set(const std::string& name, T value)
+  void set(const std::string & name, T value)
   {
-    if (std::shared_ptr<State<T>> ptr = (*this)[name])
-    {
+    if (std::shared_ptr<State<T>> ptr = (*this)[name]) {
       ptr->value = value;
       return;
     }
 
     // Make and register a new state
     const auto state = std::make_shared<State<T>>(name, value);
-    const auto& input = inputs_.get()[name];
+    const auto & input = inputs_.get()[name];
 
-    StateHandle handle{ state, input };
+    StateHandle handle{state, input};
 
     input->add_definition(handle.state->reference);
 
-    items_.insert({ name, handle });
+    items_.insert({name, handle});
   }
 
   /**
    * Remove the input definition with the given name.
    * @param name The name of the input to clear.
    */
-  void clear(const std::string& name)
+  void clear(const std::string & name)
   {
     // Find the element
     auto it = items_.find(name);
 
-    if (it == items_.end())
-    {
+    if (it == items_.end()) {
       // Do nothing, as its already undefined
       return;
     }

@@ -15,17 +15,17 @@ namespace teleop::internal
 class EventManager final
 {
 public:
-  explicit EventManager(InputManager& inputs);
+  explicit EventManager(InputManager & inputs);
 
-  [[nodiscard]] EventCollection& get_events()
+  [[nodiscard]] EventCollection & get_events()
   {
     return items_;
   }
 
-  void update(const rclcpp::Time& now);
+  void update(const rclcpp::Time & now);
 
 private:
-  InputManager& inputs_;
+  InputManager & inputs_;
 
   std::shared_ptr<internal::EventListenerQueue> queue_;
   EventCollection items_;

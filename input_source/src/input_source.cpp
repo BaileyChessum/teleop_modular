@@ -7,8 +7,9 @@
 namespace input_source
 {
 
-return_type InputSource::init(const std::shared_ptr<rclcpp::Node>& node, const std::string& name,
-                             const std::weak_ptr<UpdateDelegate>& delegate)
+return_type InputSource::init(
+  const std::shared_ptr<rclcpp::Node> & node, const std::string & name,
+  const std::weak_ptr<UpdateDelegate> & delegate)
 {
   node_ = node;
   name_ = name;
@@ -17,20 +18,21 @@ return_type InputSource::init(const std::shared_ptr<rclcpp::Node>& node, const s
   return on_init();
 }
 
-return_type InputSource::update(const rclcpp::Time& now)
+return_type InputSource::update(const rclcpp::Time & now)
 {
-  InputValueSpans spans{ span(button_values_), span(axis_values_) };
+  InputValueSpans spans{span(button_values_), span(axis_values_)};
 
   return on_update(now, spans);
 }
 
-return_type InputSource::request_update(const rclcpp::Time& now) const
+return_type InputSource::request_update(const rclcpp::Time & now) const
 {
   const auto delegate = delegate_.lock();
 
-  if (!delegate)
-  {
-    RCLCPP_FATAL(node_->get_logger(), "InputSource %s's delegate weak_ptr is invalid!", name_.c_str());
+  if (!delegate) {
+    RCLCPP_FATAL(
+      node_->get_logger(), "InputSource %s's delegate weak_ptr is invalid!",
+      name_.c_str());
     return return_type::ERROR;
   }
 
@@ -51,7 +53,8 @@ InputDeclarationSpans InputSource::export_inputs()
   InputDeclarationList axis_declarations(axis_names_, axis_values_);
   export_axes(axis_declarations);
 
-  return InputDeclarationSpans{ {span(button_values_), span(axis_values_)}, span(button_names_), span(axis_names_) };
+  return InputDeclarationSpans{{span(button_values_), span(axis_values_)}, span(button_names_),
+    span(axis_names_)};
 }
 
 }  // namespace input_source

@@ -24,9 +24,10 @@ struct SpawnableLog
   /// Unset when succeeded. Set when there was an issue.
   std::optional<std::string> error = std::nullopt;
 
-  explicit SpawnableLog(std::string name, const std::optional<std::string>& type = std::nullopt,
-                        const std::optional<std::string>& error = std::nullopt)
-    : name(std::move(name)), type(type), error(error)
+  explicit SpawnableLog(
+    std::string name, const std::optional<std::string> & type = std::nullopt,
+    const std::optional<std::string> & error = std::nullopt)
+  : name(std::move(name)), type(type), error(error)
   {
   }
 
@@ -34,12 +35,9 @@ struct SpawnableLog
   {
     std::stringstream output;
 
-    if (error.has_value())
-    {
+    if (error.has_value()) {
       output << C_FAIL_QUIET;
-    }
-    else
-    {
+    } else {
       // Success color here. Left blank to use the default color.
     }
 
@@ -47,13 +45,11 @@ struct SpawnableLog
     // plugin " << input_source_type << ") " << C_RESET;
     output << "\t- " << name;
 
-    if (type.has_value() && !error.has_value())
-    {
+    if (type.has_value() && !error.has_value()) {
       output << "\t" C_QUIET << type.value();
     }
 
-    if (error.has_value())
-    {
+    if (error.has_value()) {
       output << C_FAIL_QUIET "(failed - " << error.value() << ")";
     }
 

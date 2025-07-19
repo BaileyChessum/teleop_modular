@@ -7,9 +7,10 @@
 namespace teleop
 {
 
-void Command::initialize(const CommandDelegate::WeakPtr& context, const std::string& name,
-                         const std::vector<Event::SharedPtr>& on, const LoggingInterface::SharedPtr& logging,
-                         const ParameterInterface::SharedPtr& parameters)
+void Command::initialize(
+  const CommandDelegate::WeakPtr & context, const std::string & name,
+  const std::vector<Event::SharedPtr> & on, const LoggingInterface::SharedPtr & logging,
+  const ParameterInterface::SharedPtr & parameters)
 {
   context_ = context;
   name_ = name;
@@ -19,8 +20,7 @@ void Command::initialize(const CommandDelegate::WeakPtr& context, const std::str
   // Subscribe to the given events
   const auto logger = get_logger();
   RCLCPP_DEBUG(logger, "Command %s has %lu invocation events:", get_name().c_str(), on_.size());
-  for (const auto& event : on)
-  {
+  for (const auto & event : on) {
     RCLCPP_DEBUG(logger, "  - Subscribing to event %s", event->get_name().c_str());
     event->subscribe(shared_from_this());
   }
@@ -29,10 +29,11 @@ void Command::initialize(const CommandDelegate::WeakPtr& context, const std::str
   on_initialize("commands." + name + ".", parameters);
 }
 
-void Command::on_event_invoked(const rclcpp::Time& now)
+void Command::on_event_invoked(const rclcpp::Time & now)
 {
-  if (const auto context = context_.lock())
+  if (const auto context = context_.lock()) {
     execute(*context, now);
+  }
 }
 
 }  // namespace teleop

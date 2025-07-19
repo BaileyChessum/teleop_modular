@@ -19,46 +19,47 @@ namespace input_source
  * requiring implementers to index directly into the values array during on_update(), by holding onto a VectorRef in
  * export_buttons() or export_axes().
  */
-template <typename T>
+template<typename T>
 class INPUT_SOURCE_PUBLIC VectorRef
 {
 public:
-  inline VectorRef(std::vector<T>& container, std::size_t index) noexcept : container_(&container), index_(index)
+  inline VectorRef(std::vector<T> & container, std::size_t index) noexcept
+  : container_(&container), index_(index)
   {
   }
 
-  [[nodiscard]] inline T& get() const noexcept
+  [[nodiscard]] inline T & get() const noexcept
   {
     assert(index_ < container_->size());
     return (*container_)[index_];
   }
 
-  inline operator T&() const noexcept
+  inline operator T &() const noexcept
   {
     return get();
   }
 
-  inline T* operator->() const noexcept
+  inline T * operator->() const noexcept
   {
     return &get();
   }
 
-  inline T& operator*() const noexcept
+  inline T & operator*() const noexcept
   {
     return get();
   }
 
   // Delete assignment from other wrappers
-  VectorRef& operator=(const VectorRef&) = delete;
-  VectorRef& operator=(VectorRef&&) = delete;
+  VectorRef & operator=(const VectorRef &) = delete;
+  VectorRef & operator=(VectorRef &&) = delete;
 
   // Allow assignment to modify the held value
-  inline VectorRef& operator=(const T& value) noexcept
+  inline VectorRef & operator=(const T & value) noexcept
   {
     get() = value;
     return *this;
   }
-  inline VectorRef& operator=(T&& value) noexcept
+  inline VectorRef & operator=(T && value) noexcept
   {
     get() = std::move(value);
     return *this;
@@ -71,7 +72,7 @@ public:
   }
 
 private:
-  std::vector<T>* container_;
+  std::vector<T> * container_;
   std::size_t index_;
 };
 

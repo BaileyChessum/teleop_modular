@@ -14,19 +14,16 @@ inline std::string snake_to_title(const std::string_view in)
   out.reserve(in.size());  // 1‑for‑1 replacement, no re‑allocs
 
   bool new_word = true;  // first char should be capitalised
-  for (const char ch : in)
-  {
-    if (ch == '_')
-    {  // underscore -> space, next char starts a word
+  for (const char ch : in) {
+    if (ch == '_') { // underscore -> space, next char starts a word
       out.push_back(' ');
       new_word = true;
-    }
-    else
-    {
-      if (new_word && std::isalpha(static_cast<unsigned char>(ch)))
+    } else {
+      if (new_word && std::isalpha(static_cast<unsigned char>(ch))) {
         out.push_back(static_cast<char>(std::toupper(static_cast<unsigned char>(ch))));
-      else
+      } else {
         out.push_back(static_cast<char>(std::tolower(static_cast<unsigned char>(ch))));
+      }
       new_word = false;
     }
   }

@@ -49,20 +49,20 @@ struct INPUT_SOURCE_PUBLIC_TYPE InputDeclarationSpans : InputValueSpans
 class INPUT_SOURCE_PUBLIC InputSource
 {
 public:
-
   virtual ~InputSource() = default;
 
-  return_type init(const std::shared_ptr<rclcpp::Node>& node, const std::string& name,
-            const std::weak_ptr<UpdateDelegate>& delegate);
-  return_type update(const rclcpp::Time& now);
+  return_type init(
+    const std::shared_ptr<rclcpp::Node> & node, const std::string & name,
+    const std::weak_ptr<UpdateDelegate> & delegate);
+  return_type update(const rclcpp::Time & now);
 
   // Accessors
-  [[nodiscard]] inline const std::string& get_name() const noexcept
+  [[nodiscard]] inline const std::string & get_name() const noexcept
   {
     return name_;
   }
 
-  [[nodiscard]] inline const std::shared_ptr<rclcpp::Node>& get_node() const noexcept
+  [[nodiscard]] inline const std::shared_ptr<rclcpp::Node> & get_node() const noexcept
   {
     return node_;
   }
@@ -85,7 +85,7 @@ protected:
    *
    * @param[out] declarations Information defining each button exposed by the input source.
    */
-  virtual void export_buttons(InputDeclarationList<uint8_t>& declarations) = 0;
+  virtual void export_buttons(InputDeclarationList<uint8_t> & declarations) = 0;
 
   /**
    * @brief Called after on_configure(), allows the input source to declare the names of all the axes, creating memory
@@ -96,19 +96,19 @@ protected:
    *
    * @param[out] declarations Information defining each axis exposed by the input source.
    */
-  virtual void export_axes(InputDeclarationList<float>& declarations) = 0;
+  virtual void export_axes(InputDeclarationList<float> & declarations) = 0;
 
   /**
    * Call this whenever you receive a new input and you want the InputManager to invoke a new update.
    */
-  return_type request_update(const rclcpp::Time& now = rclcpp::Time()) const;
+  return_type request_update(const rclcpp::Time & now = rclcpp::Time()) const;
 
   /**
    * Called when new input should be processed, after requesting an update through request_update().
    * @param[in] now The time of the update, for synchronisation.
    * @param[out] values Modified by the InputSource to set the values for each button and axis.
    */
-  virtual return_type on_update(const rclcpp::Time& now, InputValueSpans values) = 0;
+  virtual return_type on_update(const rclcpp::Time & now, InputValueSpans values) = 0;
 
 private:
   //  friend class InputSourceManager;

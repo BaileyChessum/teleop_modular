@@ -17,13 +17,14 @@ namespace input_source
  * A class to be given to InputSource implementation to declare their buttons and axes, in a way that allows button
  * values to be placed next to each other in memory
  */
-template <typename T>
+template<typename T>
 class INPUT_SOURCE_PUBLIC InputDeclarationList
 {
 public:
   using Ref = VectorRef<T>;
 
-  InputDeclarationList(std::vector<std::string>& names, std::vector<T>& values) : names_(names), values_(values)
+  InputDeclarationList(std::vector<std::string> & names, std::vector<T> & values)
+  : names_(names), values_(values)
   {
   }
 
@@ -35,7 +36,7 @@ public:
    * `operator=` during on_update() to change the value of the declared input. Alternatively, you can set the value
    * directly in your InputSource by assigning `this->buttons_[i]` or `this->axes_[i]` to avoid a layer of indirection.
    */
-  inline Ref add(const std::string& name) noexcept
+  inline Ref add(const std::string & name) noexcept
   {
     auto idx = values_.size();
     names_.emplace_back(name);
@@ -52,7 +53,7 @@ public:
    * `operator=` during on_update() to change the value of the declared input. Alternatively, you can set the value
    * directly in your InputSource by assigning `this->buttons_[i]` or `this->axes_[i]` to avoid a layer of indirection.
    */
-  inline Ref add(const std::string& name, T initial_value) noexcept
+  inline Ref add(const std::string & name, T initial_value) noexcept
   {
     auto idx = values_.size();
     names_.emplace_back(name);
@@ -70,8 +71,8 @@ public:
   }
 
 private:
-  std::vector<std::string>& names_;
-  std::vector<T>& values_;
+  std::vector<std::string> & names_;
+  std::vector<T> & values_;
 };
 
 }  // namespace input_source

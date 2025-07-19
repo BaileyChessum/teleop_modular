@@ -24,7 +24,7 @@ public:
    * Alerts the owner of the calling InputSource that a new input has been received, and to request an update.
    * @param now The time to associate with the input the update is being requested for.
    */
-  virtual void on_input_source_requested_update(const rclcpp::Time& now) = 0;
+  virtual void on_input_source_requested_update(const rclcpp::Time & now) = 0;
 };
 
 }  // namespace input_source

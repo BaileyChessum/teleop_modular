@@ -13,20 +13,22 @@ namespace teleop::state
  * data we care about, tied with a name, and any other additional information we might include in the future, like a
  * description.
  */
-template <typename T>
+template<typename T>
 struct InputDeclaration
 {
   std::string name;
   std::reference_wrapper<T> reference;
 
-  InputDeclaration(std::string name, T& reference) : name(std::move(name)), reference(std::ref(reference))
+  InputDeclaration(std::string name, T & reference)
+  : name(std::move(name)), reference(std::ref(reference))
   {
-    static_assert(!std::is_rvalue_reference<decltype(reference)>::value,
-                  "The given reference must be memory held by your input source. An InputDeclaration simply tells "
-                  "teleop_modular where the "
-                  "value of the input is stored, and doesn't own the memory.\n\n"
-                  "Incorrect:\n\tdeclarations.emplace_back(\"joe\", 0.0);\n"
-                  "Correct:\n\tdeclarations.emplace_back(\"joe\", this->joe);");
+    static_assert(
+      !std::is_rvalue_reference<decltype(reference)>::value,
+      "The given reference must be memory held by your input source. An InputDeclaration simply tells "
+      "teleop_modular where the "
+      "value of the input is stored, and doesn't own the memory.\n\n"
+      "Incorrect:\n\tdeclarations.emplace_back(\"joe\", 0.0);\n"
+      "Correct:\n\tdeclarations.emplace_back(\"joe\", this->joe);");
   }
 };
 

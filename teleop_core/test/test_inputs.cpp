@@ -95,7 +95,7 @@ TEST_F(InputTest, InputManagerButtonScope)
   std::cout << "Starting test" << std::endl;
   {
     InputManager inputs;
-    EventManager events{ inputs };
+    EventManager events{inputs};
     std::cout << "Created InputManager" << std::endl;
 
     uint8_t button_value = true;
@@ -167,22 +167,26 @@ TEST_F(InputTest, InputManagerAxisScope)
   {
     // This should theoretically be a different axis, since we let it go out of scope
     auto axis = inputs.get_axes()["test_axis"];
-    EXPECT_NEAR(axis->value(), 0.0, 1e-10) << "The InputCollection remembered the axis, even though it went out of "
-                                              "scope";
+    EXPECT_NEAR(
+      axis->value(), 0.0,
+      1e-10) << "The InputCollection remembered the axis, even though it went out of "
+      "scope";
   }
 }
 
 TEST_F(InputTest, InputManagerButtonEvents)
 {
   InputManager inputs;
-  EventManager events{ inputs };
+  EventManager events{inputs};
   inputs.update(rclcpp::Time(0));
 
   auto event1 = events.get_events()["test_button/down"];
   auto event3 = events.get_events()["test_button/up"];
 
   ASSERT_EQ(events.get_events().size(), 2);
-  ASSERT_EQ(inputs.get_buttons().size(), 1) << "Events aren't holding a shared pointer to the button.";
+  ASSERT_EQ(
+    inputs.get_buttons().size(),
+    1) << "Events aren't holding a shared pointer to the button.";
 
   uint8_t button_value = false;
 

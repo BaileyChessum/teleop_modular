@@ -21,23 +21,22 @@ class InputManager
 {
 public:
   InputManager()
-    : buttons_()
+  : buttons_()
     , axes_()
   {
   }
 
   // Add move constructor
-  InputManager(InputManager&& other) noexcept
-    : buttons_(std::move(other.buttons_))
+  InputManager(InputManager && other) noexcept
+  : buttons_(std::move(other.buttons_))
     , axes_(std::move(other.axes_))
   {
   }
 
   // Add move assignment
-  InputManager& operator=(InputManager&& other) noexcept
+  InputManager & operator=(InputManager && other) noexcept
   {
-    if (this != &other)
-    {
+    if (this != &other) {
       buttons_ = std::move(other.buttons_);
       axes_ = std::move(other.axes_);
     }
@@ -45,15 +44,15 @@ public:
   }
 
   // Delete copy constructor and assignment
-  InputManager(const InputManager&) = delete;
-  InputManager& operator=(const InputManager&) = delete;
+  InputManager(const InputManager &) = delete;
+  InputManager & operator=(const InputManager &) = delete;
 
   // Accessors
-  [[nodiscard]] InputCollection<Button>& get_buttons()
+  [[nodiscard]] InputCollection<Button> & get_buttons()
   {
     return buttons_;
   }
-  [[nodiscard]] InputCollection<Axis>& get_axes()
+  [[nodiscard]] InputCollection<Axis> & get_axes()
   {
     return axes_;
   }
@@ -64,20 +63,20 @@ public:
    *   - Triggers event updates based on input state
    *   - Services all registered event listeners
    */
-  void update(const rclcpp::Time& now);
+  void update(const rclcpp::Time & now);
 
 protected:
   /**
    * All boolean inputs referenced by an input source or control mode. This collection only holds weak references, and
    * allows Events to be dropped.
    */
-  InputCollection<Button> buttons_{ };
+  InputCollection<Button> buttons_{};
 
   /**
    * All double inputs referenced by an input source or control mode. This collection only holds weak references, and
    * allows Events to be dropped.
    */
-  InputCollection<Axis> axes_{ };
+  InputCollection<Axis> axes_{};
 };
 
 }  // namespace teleop

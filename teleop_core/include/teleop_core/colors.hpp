@@ -1,4 +1,3 @@
-
 // Define all colors
 #define C_TITLE "\033[1;94m"
 #define C_FAIL "\033[;31m"

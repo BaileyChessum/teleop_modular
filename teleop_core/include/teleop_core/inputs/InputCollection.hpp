@@ -16,53 +16,50 @@
 namespace teleop
 {
 
-template <typename InputT>
+template<typename InputT>
 class InputCollection
 {
 public:
   explicit InputCollection() = default;
 
   // Add move constructor
-  InputCollection(InputCollection&& other) noexcept : items_(std::move(other.items_))
+  InputCollection(InputCollection && other) noexcept
+  : items_(std::move(other.items_))
   {
   }
 
   // Add move assignment
-  InputCollection& operator=(InputCollection&& other) noexcept
+  InputCollection & operator=(InputCollection && other) noexcept
   {
-    if (this != &other)
-    {
+    if (this != &other) {
       items_ = std::move(other.items_);
     }
     return *this;
   }
 
   // Delete copy constructor and assignment
-  InputCollection(const InputCollection&) = delete;
-  InputCollection& operator=(const InputCollection&) = delete;
+  InputCollection(const InputCollection &) = delete;
+  InputCollection & operator=(const InputCollection &) = delete;
 
   // Container type aliases
   using iterator = utils::WeakMapIterator<InputT, false>;
   using const_iterator = utils::WeakMapIterator<InputT, true>;
 
-  std::shared_ptr<InputT> operator[](const std::string& name)
+  std::shared_ptr<InputT> operator[](const std::string & name)
   {
     // Find the element
     auto it = items_.find(name);
     std::shared_ptr<InputT> ptr;
 
-    if (it != items_.end())
-    {
+    if (it != items_.end()) {
       ptr = it->second.lock();
-      if (!ptr)
-      {
+      if (!ptr) {
         // If the weak_ptr expired, remove it from the map
         items_.erase(it);
       }
     }
 
-    if (!ptr)
-    {
+    if (!ptr) {
       // Create new input if we don't have a valid one
       ptr = std::make_shared<InputT>(name);
       setup_new_item(ptr);
@@ -102,14 +99,10 @@ public:
    */
   void clean_up()
   {
-    for (auto it = items_.begin(); it != items_.end();)
-    {
-      if (it->second.expired())
-      {
+    for (auto it = items_.begin(); it != items_.end(); ) {
+      if (it->second.expired()) {
         it = items_.erase(it);
-      }
-      else
-      {
+      } else {
         ++it;
       }
     }
@@ -121,48 +114,47 @@ public:
   [[nodiscard]] size_t size() const
   {
     size_t count = 0;
-    for (const auto& item : items_)
-    {
-      if (!item.second.expired())
-      {
+    for (const auto & item : items_) {
+      if (!item.second.expired()) {
         ++count;
       }
     }
     return count;
   }
 
-  class ControlModeCompat : public control_mode::InputCollection<typename InputT::ControlModeType> 
+  class ControlModeCompat : public control_mode::InputCollection<typename InputT::ControlModeType>
   {
-  public:
-    ControlModeCompat(InputCollection& parent) : parent_(parent) 
+public:
+    ControlModeCompat(InputCollection & parent)
+    : parent_(parent)
     {
     }
 
-    typename InputT::ControlModeType::SharedPtr operator[](const std::string& name) override 
+    typename InputT::ControlModeType::SharedPtr operator[](const std::string & name) override
     {
       return parent_[name];
     }
 
-  private:
-    InputCollection& parent_;
+private:
+    InputCollection & parent_;
   };
 
-  ControlModeCompat get_control_mode_compat() 
+  ControlModeCompat get_control_mode_compat()
   {
-    return ControlModeCompat(*this); 
+    return ControlModeCompat(*this);
   }
 
 private:
-  void setup_new_item(const std::shared_ptr<InputT>& item);
+  void setup_new_item(const std::shared_ptr<InputT> & item);
   std::map<std::string, std::weak_ptr<InputT>> items_{};
   //  std::reference_wrapper<EventCollection> events_;
 };
 
-template <>
-void InputCollection<Button>::setup_new_item(const std::shared_ptr<Button>& item);
+template<>
+void InputCollection<Button>::setup_new_item(const std::shared_ptr<Button> & item);
 
-template <>
-void InputCollection<Axis>::setup_new_item(const std::shared_ptr<Axis>& item);
+template<>
+void InputCollection<Axis>::setup_new_item(const std::shared_ptr<Axis> & item);
 
 }  // namespace teleop
 

@@ -16,8 +16,10 @@ namespace teleop
 class SetButtonCommand final : public Command
 {
 public:
-  void on_initialize(const std::string& prefix, const ParameterInterface::SharedPtr& parameters) override;
-  void execute(CommandDelegate& context, const rclcpp::Time& now) override;
+  void on_initialize(
+    const std::string & prefix,
+    const ParameterInterface::SharedPtr & parameters) override;
+  void execute(CommandDelegate & context, const rclcpp::Time & now) override;
 
 protected:
   struct Params

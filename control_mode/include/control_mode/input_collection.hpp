@@ -18,7 +18,7 @@ namespace control_mode
  * You do not own the lifecycle of the InputCollection. Do not hold a reference to the object. Attempting to use an
  * InputCollection outside of ControlMode::capture_inputs() will cause a segfault.
  */
-template <typename InputT>
+template<typename InputT>
 class CONTROL_MODE_PUBLIC InputCollection
 {
 public:
@@ -32,17 +32,17 @@ public:
    *
    * Names of returned inputs may be remapped, such that (*this)[name]->get_name() may not equal name.
    */
-  virtual typename InputT::SharedPtr operator[](const std::string& name) = 0;
+  virtual typename InputT::SharedPtr operator[](const std::string & name) = 0;
 
 protected:
   InputCollection() = default;
   ~InputCollection() = default;
 
   // Prevent copy/move by default
-  InputCollection(const InputCollection&) = delete;
-  InputCollection(InputCollection&&) = delete;
-  InputCollection& operator=(const InputCollection&) = delete;
-  InputCollection& operator=(InputCollection&&) = delete;
+  InputCollection(const InputCollection &) = delete;
+  InputCollection(InputCollection &&) = delete;
+  InputCollection & operator=(const InputCollection &) = delete;
+  InputCollection & operator=(InputCollection &&) = delete;
 };
 
 /// A set to acquire shared pointers to boolean inputs

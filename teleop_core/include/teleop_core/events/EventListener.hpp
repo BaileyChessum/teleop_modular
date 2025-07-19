@@ -19,7 +19,7 @@ public:
   using WeakPtr = std::weak_ptr<EventListener>;
   using SharedPtr = std::shared_ptr<EventListener>;
 
-  virtual void on_event_invoked(const rclcpp::Time& now) = 0;
+  virtual void on_event_invoked(const rclcpp::Time & now) = 0;
 };
 
 }  // namespace teleop

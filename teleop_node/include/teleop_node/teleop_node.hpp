@@ -23,11 +23,11 @@ public:
    * @brief Constructor for TeleopNode.
    * @param node The ROS2 node to use for parameters, topics, and services
    */
-  explicit TeleopNode(const std::shared_ptr<rclcpp::Node>& node);
+  explicit TeleopNode(const std::shared_ptr<rclcpp::Node> & node);
 
   ~TeleopNode() override;
 
-  void initialize(const std::weak_ptr<rclcpp::Executor>& executor);
+  void initialize(const std::weak_ptr<rclcpp::Executor> & executor);
   void log_all_inputs();
   void log_existing_inputs();
 
@@ -37,9 +37,10 @@ public:
   void service_input_updates();
 
   [[nodiscard]] std::shared_ptr<rclcpp::Node> get_node() const override;
-  [[nodiscard]] const InputManager& get_inputs() const override;
-  [[nodiscard]] state::StateManager& get_states() override;
-  [[nodiscard]] const std::shared_ptr<internal::ControlModeManager> get_control_modes() const override;
+  [[nodiscard]] const InputManager & get_inputs() const override;
+  [[nodiscard]] state::StateManager & get_states() override;
+  [[nodiscard]] const std::shared_ptr<internal::ControlModeManager> get_control_modes() const
+  override;
 
   /**
    * Ends any running threads

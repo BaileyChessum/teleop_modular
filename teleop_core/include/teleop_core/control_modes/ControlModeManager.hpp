@@ -23,53 +23,56 @@ namespace teleop::internal
 class ControlModeManager final
 {
 public:
-  explicit ControlModeManager(const std::shared_ptr<rclcpp::Node>& node,
-                              const std::weak_ptr<rclcpp::Executor>& executor)
-    : node_(node), executor_(executor)
+  explicit ControlModeManager(
+    const std::shared_ptr<rclcpp::Node> & node,
+    const std::weak_ptr<rclcpp::Executor> & executor)
+  : node_(node), executor_(executor)
   {
   }
 
   /**
    * Populates the control_modes_ from the params in node_.
    */
-  void configure(InputManager& inputs);
+  void configure(InputManager & inputs);
 
   /**
    * @brief Attempts to activate a control mode.
    * @param name The name of the control mode to load.
    * @return True if successfully switched to the control mode.
    */
-  bool set_control_mode(const std::string& name);
+  bool set_control_mode(const std::string & name);
 
   /**
    * Update the active node
    */
-  auto update(const rclcpp::Time& now, const rclcpp::Duration& period) const -> void;
+  auto update(const rclcpp::Time & now, const rclcpp::Duration & period) const -> void;
 
   // Collection<ControlMode> implementation
-  std::shared_ptr<control_mode::ControlMode> operator[](const std::string& index);
+  std::shared_ptr<control_mode::ControlMode> operator[](const std::string & index);
 
-  using iterator = typename std::map<std::string, std::shared_ptr<control_mode::ControlMode>>::iterator;
-  using const_iterator = typename std::map<std::string, std::shared_ptr<control_mode::ControlMode>>::const_iterator;
+  using iterator = typename std::map<std::string,
+      std::shared_ptr<control_mode::ControlMode>>::iterator;
+  using const_iterator = typename std::map<std::string,
+      std::shared_ptr<control_mode::ControlMode>>::const_iterator;
 
   iterator begin()
   {
     return control_modes_.begin();
-  };
+  }
   [[nodiscard]] const_iterator begin() const
   {
     return control_modes_.begin();
-  };
+  }
   iterator end()
   {
     return control_modes_.end();
-  };
+  }
   [[nodiscard]] const_iterator end() const
   {
     return control_modes_.end();
-  };
+  }
 
-  void add(const std::string& key, const std::shared_ptr<control_mode::ControlMode>& value);
+  void add(const std::string & key, const std::shared_ptr<control_mode::ControlMode> & value);
 
   void activate_initial_control_mode();
 
@@ -85,8 +88,9 @@ private:
    * @param controllers_to_activate the control mode being activated.
    * @return True if the request was made successfully. False otherwise.
    */
-  [[nodiscard]] bool switch_controllers(const std::vector<std::string>& controllers_to_deactivate,
-                                        const std::vector<std::string>& controllers_to_activate) const;
+  [[nodiscard]] bool switch_controllers(
+    const std::vector<std::string> & controllers_to_deactivate,
+    const std::vector<std::string> & controllers_to_activate) const;
 
   /**
    * Gets the control mode plugin class type name for a given control mode name, to be given to pluginlib to load.
@@ -95,7 +99,7 @@ private:
    * @param[out] control_mode_type The output control mode plugin type name to be given to pluginlib.
    * @return True if the type name was found. False otherwise.
    */
-  bool get_type_for_control_mode(const std::string& name, std::string& control_mode_type) const;
+  bool get_type_for_control_mode(const std::string & name, std::string & control_mode_type) const;
 
   /// The owning teleop_modular ROS2 node.
   std::shared_ptr<rclcpp::Node> node_;
@@ -113,7 +117,8 @@ private:
 
   // Service calls
   /// Client to call the service on the controller manager to change the currently active controllers.
-  rclcpp::Client<controller_manager_msgs::srv::SwitchController>::SharedPtr switch_controller_client_ = nullptr;
+  rclcpp::Client<controller_manager_msgs::srv::SwitchController>::SharedPtr
+    switch_controller_client_ = nullptr;
 };
 
 }  // namespace teleop::internal

@@ -22,13 +22,13 @@ public:
   /**
    * Clears the queue, after calling on_event_invoked for elements in the queue
    */
-  void service(const rclcpp::Time& now);
+  void service(const rclcpp::Time & now);
 
   /**
    * Adds a listener to the queue to be invoked in the future when serviced.
    * @param listener A listener to have on_event_invoked called when serviced.
    */
-  void enqueue(const EventListener::WeakPtr& listener);
+  void enqueue(const EventListener::WeakPtr & listener);
 
 private:
   std::queue<EventListener::WeakPtr> queue_{};

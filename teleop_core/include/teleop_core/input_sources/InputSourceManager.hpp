@@ -20,20 +20,21 @@ namespace teleop::internal
 {
 
 class InputSourceManager final : public input_source::UpdateDelegate,
-                                 public std::enable_shared_from_this<input_source::UpdateDelegate>
+  public std::enable_shared_from_this<input_source::UpdateDelegate>
 {
 public:
   InputSourceManager() = default;
-  explicit InputSourceManager(const std::shared_ptr<rclcpp::Node>& node,
-                              const std::weak_ptr<rclcpp::Executor>& executor, InputManager& inputs)
-    : node_(node), executor_(executor), inputs_(std::ref(inputs))
+  explicit InputSourceManager(
+    const std::shared_ptr<rclcpp::Node> & node,
+    const std::weak_ptr<rclcpp::Executor> & executor, InputManager & inputs)
+  : node_(node), executor_(executor), inputs_(std::ref(inputs))
   {
   }
 
   /**
    * Populates the sources_ from the params in node_.
    */
-  void configure(InputManager& inputs);
+  void configure(InputManager & inputs);
 
   /**
    * Gets the control mode plugin class type name for a given input source name, to be given to pluginlib to load.
@@ -42,21 +43,22 @@ public:
    * @param[out] source_type The output input source plugin type name to be given to pluginlib.
    * @return True if the type name was found. False otherwise.
    */
-  bool get_type_for_input_source(const std::string& name, std::string& source_type) const;
+  bool get_type_for_input_source(const std::string & name, std::string & source_type) const;
 
-  void on_input_source_requested_update(const rclcpp::Time& now) override;
+  void on_input_source_requested_update(const rclcpp::Time & now) override;
 
   /**
    * Blocks the current thread until an update is requested by an input source.
    */
   rclcpp::Time wait_for_update();
 
-  void update(const rclcpp::Time& now);
+  void update(const rclcpp::Time & now);
 
-  bool create_input_source(const std::string& input_source_name);
+  bool create_input_source(const std::string & input_source_name);
 
 private:
-  struct Params {
+  struct Params
+  {
     double min_update_rate = 0.0;
   };
 

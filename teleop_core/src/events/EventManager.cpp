@@ -7,16 +7,16 @@
 namespace teleop::internal
 {
 
-EventManager::EventManager(InputManager& inputs)
-  : inputs_(inputs)
+EventManager::EventManager(InputManager & inputs)
+: inputs_(inputs)
   , queue_(std::make_unique<EventListenerQueue>())
   , items_(queue_, inputs)
 {
 }
 
-void EventManager::update(const rclcpp::Time& now)
+void EventManager::update(const rclcpp::Time & now)
 {
-  for (auto& item : items_) {
+  for (auto & item : items_) {
     item->update(now);
   }
 

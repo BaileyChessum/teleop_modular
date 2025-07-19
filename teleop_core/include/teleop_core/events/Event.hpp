@@ -32,12 +32,12 @@ public:
   /**
    * Makes the given listener be notified whenever the event is invoked.
    */
-  void subscribe(const EventListener::WeakPtr& listener);
+  void subscribe(const EventListener::WeakPtr & listener);
 
   /**
    * Called to mark the end of the frame, and update the value of is_invoked()
    */
-  void update(const rclcpp::Time& now);
+  void update(const rclcpp::Time & now);
 
   /**
    * Returns true if this event was invoked before update() was last called
@@ -48,7 +48,7 @@ public:
   explicit operator bool();
 
   // Accessors
-  [[nodiscard]] const std::string& get_name() const
+  [[nodiscard]] const std::string & get_name() const
   {
     return name_;
   }
@@ -74,7 +74,7 @@ public:
   }
 
 protected:
-  virtual void on_update(const rclcpp::Time& now)
+  virtual void on_update(const rclcpp::Time & now)
   {
   }
 

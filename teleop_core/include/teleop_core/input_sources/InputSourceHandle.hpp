@@ -21,12 +21,15 @@ class InputSourceHandle
   using ParameterInterface = rclcpp::node_interfaces::NodeParametersInterface;
 
 public:
-  explicit InputSourceHandle(const ParameterInterface::SharedPtr& parameters, InputManager& inputs,
-                             const std::shared_ptr<input_source::InputSource>& source);
+  explicit InputSourceHandle(
+    const ParameterInterface::SharedPtr & parameters, InputManager & inputs,
+    const std::shared_ptr<input_source::InputSource> & source);
 
-  explicit InputSourceHandle(InputManager& inputs, const std::shared_ptr<input_source::InputSource>& source);
+  explicit InputSourceHandle(
+    InputManager & inputs,
+    const std::shared_ptr<input_source::InputSource> & source);
 
-  void update(const rclcpp::Time& now);
+  void update(const rclcpp::Time & now);
 
   void add_definitions_to_inputs() const;
 
@@ -43,7 +46,7 @@ private:
 
     struct Range
     {
-      std::array<float, 2> in = { -1.0f, 1.0f };
+      std::array<float, 2> in = {-1.0f, 1.0f};
       std::optional<std::array<float, 2>> out;
       bool clamp = false;
     };
@@ -63,7 +66,7 @@ private:
     std::optional<std::string> negative;
   };
 
-  template <typename transformT, typename fromOtherParamsT>
+  template<typename transformT, typename fromOtherParamsT>
   struct RemapRenameParams
   {
     std::string name;
@@ -82,7 +85,7 @@ private:
   };
 
   /// The thing that actually holds the result of remap transformations in memory
-  template <typename T, typename fromOtherT, typename transformT>
+  template<typename T, typename fromOtherT, typename transformT>
   struct TransformedRemapValue
   {
     T value;
@@ -90,13 +93,14 @@ private:
     std::optional<fromOtherT> from_other;
     std::optional<transformT> transform;
 
-    TransformedRemapValue(T value, std::optional<std::reference_wrapper<T>> from, std::optional<fromOtherT> from_other,
-                          std::optional<transformT> transform)
-      : value(value), from(from), from_other(from_other), transform(transform)
+    TransformedRemapValue(
+      T value, std::optional<std::reference_wrapper<T>> from, std::optional<fromOtherT> from_other,
+      std::optional<transformT> transform)
+    : value(value), from(from), from_other(from_other), transform(transform)
     {
     }
 
-    inline void update(const rclcpp::Time& now);
+    inline void update(const rclcpp::Time & now);
   };
 
   struct TransformedRemapButtonFromAxis
@@ -110,22 +114,27 @@ private:
     std::optional<std::reference_wrapper<uint8_t>> positive;
   };
 
-  using TransformedRemapButton = TransformedRemapValue<uint8_t, TransformedRemapButtonFromAxis, ButtonTransformParams>;
-  using TransformedRemapAxis = TransformedRemapValue<float, TransformedRemapAxisFromButtons, AxisTransformParams>;
+  using TransformedRemapButton = TransformedRemapValue<uint8_t, TransformedRemapButtonFromAxis,
+      ButtonTransformParams>;
+  using TransformedRemapAxis = TransformedRemapValue<float, TransformedRemapAxisFromButtons,
+      AxisTransformParams>;
 
   /// This is an actual connection of an input to a defining value
-  template <typename T, typename InputT>
+  template<typename T, typename InputT>
   struct Definition
   {
-    static_assert(std::is_base_of_v<InputCommon<T>, InputT>,
-                  "InputT must be an input type inheriting from InputCommon (Button, Axis).");
+    static_assert(
+      std::is_base_of_v<InputCommon<T>, InputT>,
+      "InputT must be an input type inheriting from InputCommon (Button, Axis).");
 
     /// We hold a shared pointer to keep any exported input alive
     std::shared_ptr<InputT> input;
     std::vector<std::reference_wrapper<T>> references;
 
-    Definition(const std::shared_ptr<InputT> input, const std::vector<std::reference_wrapper<T>>& references)
-      : input(input), references(references)
+    Definition(
+      const std::shared_ptr<InputT> input,
+      const std::vector<std::reference_wrapper<T>> & references)
+    : input(input), references(references)
     {
     }
   };
@@ -133,11 +142,11 @@ private:
   void remap(input_source::InputDeclarationSpans declarations, RemapParams remap_params);
   RemapParams get_remap_params();
 
-  std::optional<RemapButtonParams> get_remap_button_params(const std::string& name);
-  std::optional<ButtonTransformParams> get_button_transform_params(const std::string& name);
+  std::optional<RemapButtonParams> get_remap_button_params(const std::string & name);
+  std::optional<ButtonTransformParams> get_button_transform_params(const std::string & name);
 
-  std::optional<RemapAxisParams> get_remap_axis_params(const std::string& name);
-  std::optional<AxisTransformParams> get_axis_transform_params(const std::string& name);
+  std::optional<RemapAxisParams> get_remap_axis_params(const std::string & name);
+  std::optional<AxisTransformParams> get_axis_transform_params(const std::string & name);
 
   std::vector<Definition<uint8_t, Button>> button_definitions_;
   std::vector<Definition<float, Axis>> axis_definitions_;
