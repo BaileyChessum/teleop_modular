@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:teleop_node/src/teleop_node.cpp
 #include "teleop_node/teleop_node.hpp"
-========
-#include "teleop_core/teleop_modular.hpp"
->>>>>>>> main:teleop_core/src/teleop_modular.cpp
 
 #include "teleop_core/colors.hpp"
 #include "teleop_core/control_modes/ControlModeManager.hpp"

@@ -5,17 +5,10 @@
 
 // generate_parameter_library_cpp include/teleop_modular/teleop_modular_parameters.hpp src/parameters.yaml
 #include "teleop_modular_parameters.hpp"
-<<<<<<<< HEAD:teleop_node/include/teleop_node/teleop_node.hpp
 #include "teleop_core/control_modes/ControlModeManager.hpp"
 #include "teleop_core/input_sources/InputSourceManager.hpp"
 #include "teleop_core/commands/CommandManager.hpp"
 #include "teleop_core/inputs/state/StateManager.hpp"
-========
-#include "control_modes/ControlModeManager.hpp"
-#include "input_sources/InputSourceManager.hpp"
-#include "commands/CommandManager.hpp"
-#include "inputs/state/StateManager.hpp"
->>>>>>>> main:teleop_core/include/teleop_core/teleop_modular.hpp
 #include "teleop_core/events/EventManager.hpp"
 
 namespace teleop
