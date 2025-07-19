@@ -16,7 +16,7 @@
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>
   <depend>std_srvs</depend>
-  <depend>geometry-msgs</depend>
+  <depend>geometry_msgs</depend>
 
   <depend>control_mode</depend>
 
