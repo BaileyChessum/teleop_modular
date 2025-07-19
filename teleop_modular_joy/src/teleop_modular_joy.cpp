@@ -53,7 +53,7 @@ void JoyInputSource::joy_callback(sensor_msgs::msg::Joy::SharedPtr msg)
   }
 }
 
-return_type JoyInputSource::on_update(const rclcpp::Time& now, InputValueSpans values)
+return_type JoyInputSource::on_update(const rclcpp::Time&, InputValueSpans values)
 {
   sensor_msgs::msg::Joy::SharedPtr joy_msg;
 

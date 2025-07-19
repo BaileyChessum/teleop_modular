@@ -15,7 +15,7 @@ return_type TwistControlMode::on_init()
   return return_type::OK;
 }
 
-CallbackReturn TwistControlMode::on_configure(const State& previous_state)
+CallbackReturn TwistControlMode::on_configure(const State&)
 {
   const auto logger = get_node()->get_logger();
 
@@ -45,12 +45,12 @@ void TwistControlMode::capture_inputs(Inputs inputs)
   yaw_ = inputs.axes[params_.input_names.twist_yaw];
 }
 
-CallbackReturn TwistControlMode::on_activate(const State& previous_state)
+CallbackReturn TwistControlMode::on_activate(const State&)
 {
   return CallbackReturn::SUCCESS;
 }
 
-CallbackReturn TwistControlMode::on_deactivate(const State& previous_state)
+CallbackReturn TwistControlMode::on_deactivate(const State&)
 {
   publish_halt_message(get_node()->now());
 
@@ -64,7 +64,7 @@ void TwistControlMode::publish_halt_message(const rclcpp::Time& now) const
   publisher_->publish(std::move(msg));
 }
 
-return_type TwistControlMode::update(const rclcpp::Time& now, const rclcpp::Duration& period)
+return_type TwistControlMode::update(const rclcpp::Time& now, const rclcpp::Duration&)
 {
   auto logger = get_node()->get_logger();
 
@@ -117,17 +117,17 @@ double TwistControlMode::norm(double x, double y, double z)
   return std::sqrt(x * x + y * y + z * z);
 }
 
-CallbackReturn TwistControlMode::on_error(const State& previous_state)
+CallbackReturn TwistControlMode::on_error(const State&)
 {
   return CallbackReturn::SUCCESS;
 }
 
-CallbackReturn TwistControlMode::on_cleanup(const State& previous_state)
+CallbackReturn TwistControlMode::on_cleanup(const State&)
 {
   return CallbackReturn::SUCCESS;
 }
 
-CallbackReturn TwistControlMode::on_shutdown(const State& previous_state)
+CallbackReturn TwistControlMode::on_shutdown(const State&)
 {
   return CallbackReturn::SUCCESS;
 }
