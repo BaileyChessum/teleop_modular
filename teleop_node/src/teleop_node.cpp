@@ -1,3 +1,5 @@
+// Copyright 2025 Bailey Chessum
+// SPDX-License-Identifier: Apache-2.0
 #include "teleop_node/teleop_node.hpp"
 
 #include "teleop_core/colors.hpp"

@@ -1,3 +1,5 @@
+// Copyright 2025 Bailey Chessum
+// SPDX-License-Identifier: Apache-2.0
 #include "control_mode/control_mode.hpp"
 #include "lifecycle_msgs/msg/state.hpp"
 

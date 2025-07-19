@@ -1,3 +1,5 @@
+// Copyright 2025 Bailey Chessum
+// SPDX-License-Identifier: Apache-2.0
 #ifndef INPUT_SOURCE__VISIBILITY_CONTROL_H_
 #define INPUT_SOURCE__VISIBILITY_CONTROL_H_
 

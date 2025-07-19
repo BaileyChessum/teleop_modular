@@ -1,3 +1,5 @@
+// Copyright 2025 Bailey Chessum
+// SPDX-License-Identifier: Apache-2.0
 #include "teleop_modular_twist/teleop_modular_twist.hpp"
 
 namespace teleop_modular_twist

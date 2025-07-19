@@ -1,3 +1,5 @@
+// Copyright 2025 Bailey Chessum
+// SPDX-License-Identifier: Apache-2.0
 #ifndef TELEOP_MODULAR_TWIST__TELEOP_MODULAR_TWIST_HPP_
 #define TELEOP_MODULAR_TWIST__TELEOP_MODULAR_TWIST_HPP_
 

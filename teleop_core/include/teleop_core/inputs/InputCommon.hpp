@@ -1,3 +1,5 @@
+// Copyright 2025 Bailey Chessum
+// SPDX-License-Identifier: Apache-2.0
 //
 // Created by Bailey Chessum on 4/6/25.
 //
