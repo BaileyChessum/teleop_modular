@@ -38,6 +38,7 @@ buildRosPackage {
   buildInputs = [
     control-msgs
     rclcpp
+    rclcpp-lifecycle
     std-srvs
     geometry-msgs
     sensor-msgs

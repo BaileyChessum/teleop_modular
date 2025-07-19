@@ -3,6 +3,7 @@
 #include "teleop_core/colors.hpp"
 #include "teleop_core/control_modes/ControlModeManager.hpp"
 #include <iostream>
+#include "teleop_core/utilities/get_parameter.hpp"
 
 using namespace std::chrono_literals;
 
@@ -11,9 +12,17 @@ namespace teleop
 
 TeleopNode::TeleopNode(const std::shared_ptr<rclcpp::Node>& node) : node_(node), states_(inputs_), events_(inputs_)
 {
+  auto parameters = node->get_node_parameters_interface();
+
   // Create publishers
-  param_listener_ = std::make_shared<teleop_modular_params::ParamListener>(TeleopNode::get_node());
-  params_ = param_listener_->get_params();
+  params_.log_inputs = utils::get_parameter_or_default<bool>(
+      parameters, "log_inputs", "When true, all inputs will be logged to help with configuration.", false);
+  params_.update_rate = utils::get_parameter_or_default<double>(parameters, "update_rate",
+                                                                "The maximum rate at which updates should occur, and "
+                                                                "hence the max rate at which commands are sent. "
+                                                                "Leaving this unset makes the max update rate "
+                                                                "unlimited.",
+                                                                0.0);
 }
 
 void TeleopNode::initialize(const std::weak_ptr<rclcpp::Executor>& executor)
@@ -27,7 +36,7 @@ void TeleopNode::initialize(const std::weak_ptr<rclcpp::Executor>& executor)
 
   RCLCPP_DEBUG(logger, "TeleopNode::init(): Creating commands.");
   commands_ = std::make_shared<internal::CommandManager>(get_node(), shared_from_this());
-  commands_->configure(events_.get_events());;
+  commands_->configure(events_.get_events());
 
   log_existing_inputs();
 
@@ -35,8 +44,7 @@ void TeleopNode::initialize(const std::weak_ptr<rclcpp::Executor>& executor)
   // populated.
   RCLCPP_DEBUG(logger, "TeleopNode::init(): Creating input sources.");
   input_source_manager_ = std::make_shared<internal::InputSourceManager>(get_node(), executor, inputs_);
-  input_source_manager_->configure(param_listener_, inputs_);
-
+  input_source_manager_->configure(inputs_);
 
   RCLCPP_DEBUG(logger, "TeleopNode::init(): Starting...");
   control_mode_manager_->activate_initial_control_mode();
@@ -89,18 +97,22 @@ void TeleopNode::log_existing_inputs()
 {
   std::stringstream log;
 
-  if (inputs_.get_axes().size() > 0) {
+  if (inputs_.get_axes().size() > 0)
+  {
     log << C_INPUT "\tAxes:\n" C_RESET;
 
-    for (const auto& axis : inputs_.get_axes()) {
+    for (const auto& axis : inputs_.get_axes())
+    {
       log << C_INPUT "\t  " << axis->get_name() << "\t" << axis->value() << "\n" C_RESET;
     }
   }
 
-  if (inputs_.get_buttons().size() > 0) {
+  if (inputs_.get_buttons().size() > 0)
+  {
     log << C_INPUT "\tButtons:\n" C_RESET;
 
-    for (const auto& button : inputs_.get_buttons()) {
+    for (const auto& button : inputs_.get_buttons())
+    {
       log << C_INPUT "\t  " << button->get_name() << "\t" << button->value() << "\n" C_RESET;
     }
   }

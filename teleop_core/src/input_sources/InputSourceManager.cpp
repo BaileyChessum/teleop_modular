@@ -11,14 +11,16 @@
 namespace teleop::internal
 {
 
-void InputSourceManager::configure(const std::shared_ptr<rclcpp::Node>& parameters, InputManager& inputs)
+void InputSourceManager::configure(InputManager& inputs)
 {
   const auto logger = node_->get_logger();
 
-  params_.min_update_rate = utils::get_parameter_or_default(param_listener, "min_update_rate",
-                                                            "The minimum rate at which updates occur. Leaving this "
-                                                            "unset will allow for indefinite lapses between updates.",
-                                                            0.0);
+  auto parameters = node_->get_node_parameters_interface();
+  params_.min_update_rate = utils::get_parameter_or_default<double>(parameters, "min_update_rate",
+                                                                    "The minimum rate at which updates occur. Leaving "
+                                                                    "this unset will allow for indefinite lapses "
+                                                                    "between updates.",
+                                                                    0.0);
 
   setup_input_sources();
 }
@@ -154,9 +156,9 @@ void InputSourceManager::setup_input_sources()
   node_->get_parameter("input_sources.names", input_sources_param);
 
   // Pluginlib for loading control modes dynamically
-  source_loader_ =
-      std::make_unique<pluginlib::ClassLoader<input_source::InputSource>>("teleop_modular", "input_source::"
-                                                                                            "InputSource");
+  source_loader_ = std::make_unique<pluginlib::ClassLoader<input_source::InputSource>>("teleop_modular",
+                                                                                       "input_source::"
+                                                                                       "InputSource");
 
   // List available input source plugins
   try

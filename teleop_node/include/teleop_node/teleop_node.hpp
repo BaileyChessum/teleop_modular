@@ -3,8 +3,6 @@
 
 #include <rclcpp/rclcpp.hpp>
 
-// generate_parameter_library_cpp include/teleop_modular/teleop_modular_parameters.hpp src/parameters.yaml
-#include "teleop_modular_parameters.hpp"
 #include "teleop_core/control_modes/ControlModeManager.hpp"
 #include "teleop_core/input_sources/InputSourceManager.hpp"
 #include "teleop_core/commands/CommandManager.hpp"
@@ -49,10 +47,14 @@ public:
   void stop();
 
 private:
+  struct Params {
+    bool log_inputs;
+    double update_rate;
+  };
+
   std::shared_ptr<rclcpp::Node> node_;
 
-  std::shared_ptr<teleop_modular_params::ParamListener> param_listener_;
-  teleop_modular_params::Params params_;
+  Params params_;
 
   InputManager inputs_;
   state::StateManager states_;

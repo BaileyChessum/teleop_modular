@@ -2,12 +2,13 @@ cmake_minimum_required(VERSION 3.5)
 project(teleop_core LANGUAGES CXX)
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
+  rclcpp
+  rclcpp_lifecycle
   control_msgs
   controller_manager_msgs
   geometry_msgs
   sensor_msgs
   pluginlib
-  rclcpp
   std_msgs
   std_srvs
   control_mode
@@ -54,7 +55,6 @@ add_library(${PROJECT_NAME} SHARED
 
   src/input_sources/InputSourceManager.cpp
   src/commands/CommandManager.cpp
-  include/teleop_core/base_node_params.hpp
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)  # Require C++17

@@ -33,7 +33,7 @@ public:
   /**
    * Populates the sources_ from the params in node_.
    */
-  void configure(const std::shared_ptr<teleop_modular_params::ParamListener>& param_listener, InputManager& inputs);
+  void configure(InputManager& inputs);
 
   /**
    * Gets the control mode plugin class type name for a given input source name, to be given to pluginlib to load.
