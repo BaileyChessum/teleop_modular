@@ -11,7 +11,6 @@
   <author email="bailey.chessum1@gmail.com">Bailey Chessum</author>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
-  <buildtool_depend>generate_parameter_library</buildtool_depend>
 
   <depend>control_msgs</depend>
   <depend>controller_manager_msgs</depend>
