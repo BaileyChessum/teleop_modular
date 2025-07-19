@@ -13,16 +13,25 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>generate_parameter_library</buildtool_depend>
 
+  <depend>control_msgs</depend>
+  <depend>control_manager_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>pluginlib</depend>
   <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+  <depend>std_srvs</depend>
   <build_depend>control_mode</build_depend>
   <build_export_depend>control_mode</build_export_depend>
-  <depend>input_source</depend>
+  <build_depend>input_source</build_depend>
+  <build_export_depend>input_source</build_export_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
   <test_depend>launch_ros</test_depend>
   <test_depend>launch_testing_ament_cmake</test_depend>
   <test_depend>launch_testing_ros</test_depend>
+  <test_depend>ament_cmake_gtest</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
