@@ -15,11 +15,10 @@ namespace teleop::internal
 
 namespace
 {
+using input_source::InputSource;
 using utils::get_parameter;
 using utils::get_parameter_or_default;
-using input_source::InputSource;
 }  // namespace
-
 
 InputSourceHandle::InputSourceHandle(
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & parameters,
@@ -163,7 +162,7 @@ void InputSourceHandle::add_definitions_to_inputs() const
 void InputSourceHandle::declare_and_link_inputs()
 {
   const auto logger = source_->get_node()->get_logger();
-  // TODO: Check if inputs are already linked, and unlink them
+  // TODO(BaileyChessum): Check if inputs are already linked, and unlink them
 
   auto declarations = source_->export_inputs();
   const auto remap_params = get_remap_params();
@@ -380,7 +379,7 @@ void InputSourceHandle::remap(
   for (auto & [name, from, transform, from_axis] : remap_params.buttons) {
     // Find if there is a direct renaming
     std::optional<std::reference_wrapper<uint8_t>> reference = std::nullopt;
-    if (from.has_value()) { // Find the index for the 'from' param in button_names
+    if (from.has_value()) {  // Find the index for the 'from' param in button_names
       const auto it = std::find(
         declarations.button_names.begin(), declarations.button_names.end(),
         from);
@@ -391,7 +390,8 @@ void InputSourceHandle::remap(
 
         reference = std::ref(declarations.buttons[index]);
       } else {
-        // TODO: Recursively declare the missing 'from', merging transforms until reaching a valid original input
+        // TODO(BaileyChessum): Recursively declare the missing 'from', merging transforms until reaching a valid
+        // original input
         RCLCPP_WARN(
           logger,
           "You tried to remap button %s to \"%s\", but it can't be found in the set of button names exported "
@@ -462,7 +462,7 @@ void InputSourceHandle::remap(
   for (auto & [name, from, transform, from_buttons] : remap_params.axes) {
     // Find if there is a direct renaming
     std::optional<std::reference_wrapper<float>> reference = std::nullopt;
-    if (from.has_value()) { // Find the index for the 'from' param in axis_names
+    if (from.has_value()) {  // Find the index for the 'from' param in axis_names
       const auto it = std::find(
         declarations.axis_names.begin(), declarations.axis_names.end(),
         from);
@@ -473,7 +473,8 @@ void InputSourceHandle::remap(
 
         reference = std::ref(declarations.axes[index]);
       } else {
-        // TODO: Recursively declare the missing 'from', merging transforms until reaching a valid original input
+        // TODO(BaileyChessum): Recursively declare the missing 'from', merging transforms until reaching a valid
+        // original input
         RCLCPP_WARN(
           logger,
           "You tried to remap axis %s to \"%s\", but it can't be found in the set of axis names exported by "
@@ -512,7 +513,8 @@ void InputSourceHandle::remap(
           negative_reference = std::ref(declarations.buttons[negative_index]);
           is_button_remapped[negative_index] = true;
         } else {
-          // TODO: Recursively declare the missing 'from', merging transforms until reaching a valid original input
+          // TODO(BaileyChessum): Recursively declare the missing 'from', merging transforms until reaching a valid
+          // original input
           RCLCPP_WARN(
             logger,
             "You tried to remap axis %s to button \"%s\", but it can't be found in the set of button names "
@@ -534,7 +536,8 @@ void InputSourceHandle::remap(
           positive_reference = std::ref(declarations.buttons[positive_index]);
           is_button_remapped[positive_index] = true;
         } else {
-          // TODO: Recursively declare the missing 'from', merging transforms until reaching a valid original input
+          // TODO(BaileyChessum): Recursively declare the missing 'from', merging transforms until reaching a valid
+          // original input
           RCLCPP_WARN(
             logger,
             "You tried to remap axis %s to button \"%s\", but it can't be found in the set of button names "

@@ -32,11 +32,11 @@ bool InputSourceManager::get_type_for_input_source(
   const std::string & name,
   std::string & source_type) const
 {
-  // TODO: Check that the parameter hasn't already been defined
+  // TODO(BaileyChessum): Check that the parameter hasn't already been defined
   node_->declare_parameter(
     "input_sources." + name + ".type",
     rclcpp::ParameterType::PARAMETER_STRING);
-  // TODO: Remember that this parameter has already been defined
+  // TODO(BaileyChessum): Remember that this parameter has already been defined
 
   rclcpp::Parameter param;
   const auto result = node_->get_parameter("input_sources." + name + ".type", param);

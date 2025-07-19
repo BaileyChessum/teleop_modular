@@ -50,4 +50,4 @@ Event::operator bool()
   return is_invoked();
 }
 
-} // teleop
+}  // teleop
