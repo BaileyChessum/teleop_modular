@@ -18,7 +18,8 @@
   <depend>std_srvs</depend>
   <depend>geometry_msgs</depend>
 
-  <depend>control_mode</depend>
+  <build_depend>control_mode</build_depend>
+  <build_export_depend>control_mode</build_export_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

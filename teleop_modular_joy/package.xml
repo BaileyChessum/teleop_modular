@@ -15,8 +15,10 @@
   <depend>pluginlib</depend>
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>
-  <depend>input_source</depend>
   <depend>joy</depend>
+
+  <build_depend>input_source</build_depend>
+  <build_export_depend>input_source</build_export_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
