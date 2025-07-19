@@ -9,7 +9,7 @@
 namespace teleop
 {
 
-// TODO: Make these redundant
+// TODO(BaileyChessum): Make these redundant
 template<>
 void InputCollection<Button>::setup_new_item(const std::shared_ptr<Button> & item)
 {
@@ -20,4 +20,4 @@ void InputCollection<Axis>::setup_new_item(const std::shared_ptr<Axis> & item)
 {
 }
 
-}  // namespace teleop_modular
+}  // namespace teleop
