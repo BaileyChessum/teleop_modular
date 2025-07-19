@@ -50,7 +50,7 @@ struct CONTROL_MODE_PUBLIC_TYPE Inputs
 /**
  * Base class for a control mode used in teleoperation.
  */
-class ControlMode : public rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface
+class CONTROL_MODE_PUBLIC ControlMode : public rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface
 {
 public:
   /**
