@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>input_source</name>
-  <version>0.0.3</version>
+  <version>0.1.0</version>
   <description>teleop_modular input source base classes.</description>
   <maintainer email="bailey.chessum1@gmail.com">Bailey Chessum</maintainer>
   <license>Apache-2.0</license>
