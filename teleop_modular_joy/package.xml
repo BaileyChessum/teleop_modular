@@ -5,7 +5,6 @@
   <version>0.1.0</version>
   <description>An input source for joysticks, such as xbox controllers.</description>
   <maintainer email="bailey.chessum1@gmail.com">Bailey Chessum</maintainer>
-  <url type="website"></url>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake_ros</buildtool_depend>
