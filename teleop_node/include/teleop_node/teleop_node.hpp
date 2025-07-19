@@ -47,7 +47,8 @@ public:
   void stop();
 
 private:
-  struct Params {
+  struct Params
+  {
     bool log_inputs;
     double update_rate;
   };
