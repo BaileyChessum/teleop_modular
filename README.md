@@ -12,7 +12,7 @@
 [![CI (Rolling, Jazzy, and Humble)](https://github.com/BaileyChessum/teleop_modular/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/BaileyChessum/teleop_modular/actions/workflows/ci.yml?query=branch%3Amain)
 
 
-`teleop_modular` is a generalized framework for teleoperation input handling in ROS2.
+The `teleop_modular` package is a general framework for creating multimodal teleoperation nodes in ROS2.
 
 > ⚠️ `teleop_modular` is experimental, and missing build processes and documentation needed for production use. 
 > 
