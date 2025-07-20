@@ -2,7 +2,7 @@
 <picture align="left">
   <source media="(prefers-color-scheme: light)" srcset="assets/logo.svg">
   <source media="(prefers-color-scheme: dark)" srcset="assets/logo_white.svg">
-  <img src="assets/logo.svg" alt="teleop_modular logo" align="left" height="66">
+  <img src="assets/logo.svg" alt="teleop_modular logo" align="left" height="100">
 </picture>
 
 # Teleop Modular Documentation
