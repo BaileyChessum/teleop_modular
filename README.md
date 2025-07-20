@@ -1,24 +1,21 @@
-<div align="center">
-  <picture>
-    <source media="(prefers-color-scheme: light)" srcset="docs/assets/teleop_modular_logo.svg">
-    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/teleop_modular_logo_dark.svg">
-    <img src="docs/assets/teleop_modular_logo.svg" width="200px" alt="teleop_modular logo">
-  </picture>
-</div>
+<a href="https://github.com/BaileyChessum/teleop_modular/tree/main/docs/README.md">
+  <div align="center">
+    <picture>
+      <source media="(prefers-color-scheme: light)" srcset="docs/assets/logo_text.svg">
+      <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo_white_text.svg">
+      <img src="docs/assets/logo_text.svg" width="625px" alt="teleop_modular logo">
+    </picture>
+  </div>
+</a>
 
-# teleop_modular
+<br/>
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![CI (Rolling, Jazzy, and Humble)](https://github.com/BaileyChessum/teleop_modular/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/BaileyChessum/teleop_modular/actions/workflows/ci.yml?query=branch%3Amain)
 
+# A framework for multimodal teleoperation in ROS2
 
-`teleop_modular` is a generalized framework for teleoperation input handling in ROS2.
-
-> ⚠️ `teleop_modular` is experimental, and missing build processes and documentation needed for production use. 
-> 
-> Expect major API changes until v1.0.0 -- reference stable tags rather than `main` in build processes
-
-`teleop_modular` will be ready for use shortly! Please star the repository for updates, and see [announcements](https://github.com/BaileyChessum/teleop_modular/discussions/categories/announcements) for more information.
+Please refer to the [documentation](./docs/README.md).
 
 ## Motivation
 
@@ -44,12 +41,6 @@ This is a list of plugins you can use with teleop_modular. Please post plugins t
 #### Input Sources
 
 - [teleop_modular_joy/JoyInputSource](./teleop_modular_joy) -- An input source for joystick devices.
-
-## Documentation 
-
-Detailed documentation and examples are still a work in progress. Incomplete documentation can be found under under [./teleop_modular/README.md](./teleop_modular/README.md) and [./teleop_modular/docs](./teleop_modular/docs). This will be expanded upon as the API is finalised with testing over the next week.
-
-Please see [teleop_modular_twist/TwistControlMode](./teleop_modular_twist) as an example implementation of a ControlMode and [teleop_modular_joy/JoyInputSource](./teleop_modular_joy) as an example implementation for an InputSource. Detailed guides for writing control modes and input sources are in progress.
 
 ## Contributing
 
