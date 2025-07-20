@@ -1,4 +1,4 @@
-<h1 style="display: none;">Teleop Modular</h1>
+<h1 style="display: none;" hidden>Teleop Modular</h1>
 
 <div align="center">
   <picture>
