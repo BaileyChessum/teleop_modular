@@ -1,12 +1,12 @@
+<h1 style="display: none;">Teleop Modular</h1>
+
 <div align="center">
   <picture>
-    <source media="(prefers-color-scheme: light)" srcset="docs/assets/teleop_modular_logo.svg">
-    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/teleop_modular_logo_dark.svg">
-    <img src="docs/assets/teleop_modular_logo.svg" width="200px" alt="teleop_modular logo">
+    <source media="(prefers-color-scheme: light)" srcset="docs/assets/logo_text.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo_white_text.svg">
+    <img src="docs/assets/logo_text.svg" width="768px" alt="teleop_modular logo">
   </picture>
 </div>
-
-# teleop_modular
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![CI (Rolling, Jazzy, and Humble)](https://github.com/BaileyChessum/teleop_modular/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/BaileyChessum/teleop_modular/actions/workflows/ci.yml?query=branch%3Amain)
