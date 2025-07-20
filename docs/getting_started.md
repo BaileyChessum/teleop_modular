@@ -43,4 +43,7 @@ Once added to your workspace, you should be able to run `teleop_node`:
 
 </pre>
 
-But until we configure `teleop_node`, it won't do anything. You'll need to make a package with launch files
+But until we configure `teleop_node`, it won't do anything. 
+
+Follow this guide to start making your own teleop package with the framework: 
+- [Writing a teleop package](./writing_a_teleop_package.md)
