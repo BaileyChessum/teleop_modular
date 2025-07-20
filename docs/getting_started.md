@@ -34,7 +34,7 @@ it in your overlays.
 
 Once added to your workspace, you should be able to run `teleop_node`:
 
-<pre><span style="background-color:#303030"><font color="#FFFFFF">$ </font></span>./result/bin/ros2 run teleop_node teleop_node
+<pre>$ ros2 run teleop_node teleop_node
 
 <font color="#C01C28">[ERROR] [teleop_node]: control_modes.names was not set.</font>
 [INFO] [teleop_node]: <font color="#2A7BDE"><b>Control Modes:</b></font>
@@ -45,5 +45,5 @@ Once added to your workspace, you should be able to run `teleop_node`:
 
 But until we configure `teleop_node`, it won't do anything. 
 
-Follow this guide to start making your own teleop package with the framework: 
+Follow this guide to start writing your own teleop package with the framework: 
 - [Writing a teleop package](./writing_a_teleop_package.md)

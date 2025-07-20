@@ -5,14 +5,12 @@
 
 To be able to do anything useful with `teleop_modular`, you'll need to make a package to contain:
 
-- Your launch file
+- Your launch file to run `teleop_node`
 - Your parameter files
 
-You will need to run `teleop_node` directly.
+# Tasks
 
-## Tasks
-
-### 1. Create a package
+## 1. Create a package
 
 Open a terminal and navigate into your workspace src directory. Then, create a package using `ros2 pkg create`. I will 
 be creating a C++ package in this tutorial, but a python package should also be fine.
@@ -171,7 +169,7 @@ Remember to change `teleop_example` to the name of your package.
 
 We will expand on this launch file later as we add input sources and control modes.
 
-### 4. Create the teleop.yaml parameter file
+## 4. Create the teleop.yaml parameter file
 
 Create a teleop.yaml file to configure the behavior of the core teleop_node.
 
@@ -293,7 +291,7 @@ should be listed.
 If you have any issues, please post in 
 [Discussions](https://github.com/BaileyChessum/teleop_modular/discussions/new?category=q-a), and I will try to help!
 
-### 6. Add an input source
+## 6. Add an input source
 
 Adding an input source is a very similar process to the previous step.
 
@@ -502,7 +500,7 @@ def launch_setup(context, *args, **kwargs):
 If you have any issues, please post in
 [Discussions](https://github.com/BaileyChessum/teleop_modular/discussions/new?category=q-a), and I will try to help!
 
-### 7. Mapping inputs
+## 7. Mapping inputs
 
 Congrats! You've reached the fun part.
 
@@ -532,6 +530,6 @@ to every input source implementation. We can use them to:
   - Inverting axes and buttons
   - Linearly mapping an input range of axis values to an output range
   - Clamping axes
-  - 
 
-
+We will apply these parameters to solve our problem in the following guide:
+- [Remapping and transforming inputs](./remapping_and_transforming_inputs.md)
