@@ -131,7 +131,10 @@ def launch_setup(context, *args, **kwargs):
             output='screen',
             
             # You can add multiple parameter files here:
-            parameters=[teleop_params, log_inputs],
+            parameters=[
+              teleop_params,
+              {'log_inputs': log_inputs}
+            ],
 
             additional_env={
                 # Show colors in the terminal output
@@ -237,6 +240,7 @@ teleop_node:
 >      # ...
 >      twist_control_mode:
 >        type: "teleop_modular_twist/TwistControlMode"
+>        # Add this:
 >        controllers: [
 >          "some_ros2_control_controller_name"
 >        ]
@@ -252,6 +256,7 @@ teleop_node:
   ros__parameters:
     # ...
 
+# Add this:
 twist_control_mode:
   ros__parameters:
     # TwistStamped messages will be published on this
@@ -324,6 +329,7 @@ teleop_node:
   ros__parameters:
     # ...
 
+# Add this:
 joy_input_source:
   ros__parameters:
     topic: "/joy"
@@ -480,12 +486,14 @@ You could also change your launch file to run `game_controller_node` or `joy_nod
 def launch_setup(context, *args, **kwargs):
     # ...
     return [
+        # Add this!
         # Automatically run joy alongside teleop
         Node(
             package='joy',
             executable='game_controller_node',  # or joy_node
             output="screen"
         ),
+      
         # Runs teleop_node with the given parameter files
         Node(
             package='teleop_node',
