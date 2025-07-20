@@ -4,9 +4,10 @@
   <picture>
     <source media="(prefers-color-scheme: light)" srcset="docs/assets/logo_text.svg">
     <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo_white_text.svg">
-    <img src="docs/assets/logo_text.svg" width="768px" alt="teleop_modular logo">
+    <img src="docs/assets/logo_text.svg" width="625px" alt="teleop_modular logo">
   </picture>
 </div>
+
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![CI (Rolling, Jazzy, and Humble)](https://github.com/BaileyChessum/teleop_modular/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/BaileyChessum/teleop_modular/actions/workflows/ci.yml?query=branch%3Amain)
