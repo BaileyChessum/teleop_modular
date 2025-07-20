@@ -30,7 +30,9 @@ If you're using [nix](https://nixos.org/) with
 [lopsided98/nix-ros-overlay](https://github.com/lopsided98/nix-ros-overlay), add [overlay.nix](../overlay.nix) on top of 
 it in your overlays.
 
-Once added, you should be able to run `teleop_node`:
+---
+
+Once added to your workspace, you should be able to run `teleop_node`:
 
 <pre><span style="background-color:#303030"><font color="#FFFFFF">$ </font></span>./result/bin/ros2 run teleop_node teleop_node
 
@@ -41,4 +43,4 @@ Once added, you should be able to run `teleop_node`:
 
 </pre>
 
-But until we configure `teleop_node`, it won't do anything.
+But until we configure `teleop_node`, it won't do anything. You'll need to make a package with launch files
