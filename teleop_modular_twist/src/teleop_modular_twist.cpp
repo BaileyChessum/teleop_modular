@@ -9,6 +9,12 @@
 //
 #include "teleop_modular_twist/teleop_modular_twist.hpp"
 
+namespace
+{
+// This value is used to avoid normalized limits that would cause a divide by zero
+constexpr double EPSILON = 1e-6;
+}
+
 namespace teleop_modular_twist
 {
 
@@ -19,7 +25,6 @@ TwistControlMode::~TwistControlMode() = default;
 return_type TwistControlMode::on_init()
 {
   param_listener_ = std::make_shared<teleop_modular_twist::ParamListener>(node_);
-  params_ = param_listener_->get_params();
 
   return return_type::OK;
 }
@@ -30,9 +35,22 @@ CallbackReturn TwistControlMode::on_configure(const State &)
 
   if (param_listener_->is_old(params_)) {
     params_ = param_listener_->get_params();
+
+    // Set up handles for linear and angular inputs
+    linear_.limit = {
+    };
+
+    linear_.set_limits(
+      {params_.limit.linear.x, params_.limit.linear.y, params_.limit.linear.z},
+      params_.limit.linear.all, params_.limit.linear.normalized);
+    linear_.scale_limits_with_speed = params_.limit.linear.scale_with_speed;
+    angular_.set_limits(
+      {params_.limit.angular.x, params_.limit.angular.y, params_.limit.angular.z},
+      params_.limit.angular.all, params_.limit.angular.normalized);
+    linear_.scale_limits_with_speed = params_.limit.angular.scale_with_speed;
   }
 
-  // Create publisher
+  // Create publishers
   const rclcpp::QoS qos_profile =
     rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data))
     .best_effort()
@@ -40,15 +58,23 @@ CallbackReturn TwistControlMode::on_configure(const State &)
     .keep_last(1);
 
   if (!params_.stamped_topic.empty()) {
-    stamped_publisher_ = get_node()->create_publisher<geometry_msgs::msg::TwistStamped>(
-        params_.stamped_topic,
-        qos_profile);
+    stamped_publisher_ =
+      get_node()->create_publisher<geometry_msgs::msg::TwistStamped>(
+      params_.stamped_topic,
+      qos_profile);
   }
-
   if (!params_.topic.empty()) {
     publisher_ = get_node()->create_publisher<geometry_msgs::msg::Twist>(
-        params_.topic,
-        qos_profile);
+      params_.topic,
+      qos_profile);
+  }
+
+  // You've probably made a mistake if you aren't publishing anything
+  if (!stamped_publisher_ && !publisher_) {
+    RCLCPP_ERROR(
+      get_node()->get_logger(),
+      "Both stamped_topic and topic parameters aren't set! Please set at least one.");
+    return CallbackReturn::ERROR;
   }
 
   return CallbackReturn::SUCCESS;
@@ -56,15 +82,20 @@ CallbackReturn TwistControlMode::on_configure(const State &)
 
 void TwistControlMode::capture_inputs(Inputs inputs)
 {
-  speed_coefficient_ = inputs.axes[params_.input_names.speed];
+  speed_ = inputs.axes[params_.input_names.speed];
   locked_ = inputs.buttons[params_.input_names.locked];
 
-  x_ = inputs.axes[params_.input_names.twist_x];
-  y_ = inputs.axes[params_.input_names.twist_y];
-  z_ = inputs.axes[params_.input_names.twist_z];
-  roll_ = inputs.axes[params_.input_names.twist_roll];
-  pitch_ = inputs.axes[params_.input_names.twist_pitch];
-  yaw_ = inputs.axes[params_.input_names.twist_yaw];
+  linear_.axes = {
+    inputs.axes[params_.input_names.linear.x],
+    inputs.axes[params_.input_names.linear.y],
+    inputs.axes[params_.input_names.linear.z]
+  };
+
+  angular_.axes = {
+    inputs.axes[params_.input_names.angular.x],
+    inputs.axes[params_.input_names.angular.y],
+    inputs.axes[params_.input_names.angular.z]
+  };
 }
 
 CallbackReturn TwistControlMode::on_activate(const State &)
@@ -104,31 +135,11 @@ return_type TwistControlMode::update(const rclcpp::Time & now, const rclcpp::Dur
     return return_type::OK;
   }
 
-  const float speed_coefficient = std::clamp(speed_coefficient_->value(), 0.0f, 1.0f);
+  const float speed_coefficient = std::max(speed_->value(), 0.0f);
   auto twist = geometry_msgs::msg::Twist();
 
-  twist.linear.x = *x_ * speed_coefficient * params_.max_speed.linear;
-  twist.linear.y = *y_ * speed_coefficient * params_.max_speed.linear;
-  twist.linear.z = *z_ * speed_coefficient * params_.max_speed.linear;
-  twist.angular.x = *roll_  * speed_coefficient * params_.max_speed.angular;
-  twist.angular.y = *pitch_ * speed_coefficient * params_.max_speed.angular;
-  twist.angular.z = *yaw_   * speed_coefficient * params_.max_speed.angular;
-
-  if (params_.max_speed.normalized) {
-    auto linear_input_norm = norm(x_->value(), y_->value(), z_->value());
-    if (linear_input_norm > 1.0) {
-      twist.linear.x /= linear_input_norm;
-      twist.linear.y /= linear_input_norm;
-      twist.linear.z /= linear_input_norm;
-    }
-
-    auto angular_input_norm = norm(x_->value(), y_->value(), z_->value());
-    if (angular_input_norm > 1.0) {
-      twist.angular.x /= angular_input_norm;
-      twist.angular.y /= angular_input_norm;
-      twist.angular.z /= angular_input_norm;
-    }
-  }
+  linear_.apply_to(twist.linear, speed_coefficient);
+  angular_.apply_to(twist.angular, speed_coefficient);
 
   if (stamped_publisher_) {
     auto msg = std::make_unique<geometry_msgs::msg::TwistStamped>();
@@ -161,7 +172,104 @@ CallbackReturn TwistControlMode::on_cleanup(const State &)
 
 CallbackReturn TwistControlMode::on_shutdown(const State &)
 {
+  linear_.axes = {nullptr, nullptr, nullptr};
+  angular_.axes = {nullptr, nullptr, nullptr};
+  locked_ = nullptr;
+  speed_ = nullptr;
+
   return CallbackReturn::SUCCESS;
+}
+
+void TwistControlMode::VectorHandle::set_limits(
+  const NumberVector3 values, double all,
+  bool normalized)
+{
+  normalized_limits = normalized;
+  limit = std::nullopt;   // Clear old values
+  bool any_limit_set = false;
+
+  double default_limit = infinity;  // infinity acts as no limit, so default to infinity when 'all' is not set
+  if (all >= 0.0) {
+    default_limit = all;
+    any_limit_set = true;
+  }
+
+  // Calculate the limit -- but use a separate array for now in case they are all infinity
+  NumberVector3 potential_limit;
+  for (size_t i = 0; i < 3; ++i) {
+    // This condition is true when the limit for this x,y,z is not set
+    if (values[i] < 0.0) {
+      potential_limit[i] = default_limit;
+      continue;
+    }
+
+    // Edge case to avoid divisions by zero (or near zero) when normalized
+    // But also applied to non-normalized limits because it is effectively a potential optimization
+    if (values[i] < EPSILON) {
+      // A scale of 0 is equivalent to a limit of 0.
+      // We don't set any_limit_set = true because we don't need to run limit code for this to work
+      scale[i] = 0.0;
+      potential_limit[i] = infinity;
+      continue;
+    }
+
+    // Actually apply a limit in this case
+    potential_limit[i] = values[i];
+    any_limit_set = true;
+  }
+
+  // Only set the limit if there is a non-infinity limit
+  if (any_limit_set) {
+    limit = potential_limit;
+  }
+}
+
+void TwistControlMode::VectorHandle::apply_to(
+  geometry_msgs::msg::Vector3 & msg,
+  double speed_coefficient)
+{
+  NumberVector3 result;
+
+  if (!limit.has_value()) {
+    // Calculate the values without applying the limit, with speed_coefficient included.
+    for (size_t i = 0; i < 3; ++i) {
+      result[i] = *axes[i] * speed_coefficient * scale[i];
+    }
+
+    // Apply to the message and exit early.
+    msg.x = result[0];
+    msg.y = result[1];
+    msg.z = result[2];
+    return;
+  }
+
+
+  // Apply limits
+  if (normalized_limits) {
+    // Apply by scaling the vector down depending on its magnitude relative to the limit
+    NumberVector3 vector_to_norm;
+    // Note: This could cause a division by zero if not careful! Make sure it can never be zero when setting params.
+    for (size_t i = 0; i < 3; ++i) {
+      vector_to_norm[i] = result[i] / (*limit)[i];
+    }
+
+    auto magnitude_relative_to_limit = std::apply(norm, vector_to_norm);
+    if (magnitude_relative_to_limit > 1.0) {
+      for (size_t i = 0; i < 3; ++i) {
+        result[i] /= magnitude_relative_to_limit;
+      }
+    }
+  } else {
+    // Apply per component independently
+    for (size_t i = 0; i < 3; ++i) {
+      result[i] = std::clamp(result[i], -(*limit)[i], (*limit)[i]);
+    }
+  }
+
+  // Apply to the message
+  msg.x = result[0];
+  msg.y = result[1];
+  msg.z = result[2];
 }
 
 }  // namespace teleop_modular_twist
