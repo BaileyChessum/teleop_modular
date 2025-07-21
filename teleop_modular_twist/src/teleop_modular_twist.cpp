@@ -38,9 +38,18 @@ CallbackReturn TwistControlMode::on_configure(const State &)
     .best_effort()
     .transient_local()
     .keep_last(1);
-  publisher_ = get_node()->create_publisher<geometry_msgs::msg::TwistStamped>(
-    params_.topic,
-    qos_profile);
+
+  if (!params_.stamped_topic.empty()) {
+    stamped_publisher_ = get_node()->create_publisher<geometry_msgs::msg::TwistStamped>(
+        params_.stamped_topic,
+        qos_profile);
+  }
+
+  if (!params_.topic.empty()) {
+    publisher_ = get_node()->create_publisher<geometry_msgs::msg::Twist>(
+        params_.topic,
+        qos_profile);
+  }
 
   return CallbackReturn::SUCCESS;
 }
@@ -72,9 +81,17 @@ CallbackReturn TwistControlMode::on_deactivate(const State &)
 
 void TwistControlMode::publish_halt_message(const rclcpp::Time & now) const
 {
-  auto msg = std::make_unique<geometry_msgs::msg::TwistStamped>();
-  msg->header.stamp = now;
-  publisher_->publish(std::move(msg));
+  if (stamped_publisher_) {
+    auto msg = std::make_unique<geometry_msgs::msg::TwistStamped>();
+    msg->header.stamp = now;
+    msg->header.frame_id = params_.frame;
+    stamped_publisher_->publish(std::move(msg));
+  }
+
+  if (publisher_) {
+    auto msg = std::make_unique<geometry_msgs::msg::Twist>();
+    publisher_->publish(std::move(msg));
+  }
 }
 
 return_type TwistControlMode::update(const rclcpp::Time & now, const rclcpp::Duration &)
@@ -88,35 +105,41 @@ return_type TwistControlMode::update(const rclcpp::Time & now, const rclcpp::Dur
   }
 
   const float speed_coefficient = std::clamp(speed_coefficient_->value(), 0.0f, 1.0f);
-  auto msg = std::make_unique<geometry_msgs::msg::TwistStamped>();
-  msg->header.stamp = now;
+  auto twist = geometry_msgs::msg::Twist();
 
-  msg->twist.linear.x = *x_ * speed_coefficient * params_.max_speed.linear;
-  msg->twist.linear.y = y_->value() * speed_coefficient * params_.max_speed.linear;
-  msg->twist.linear.z = z_->value() * speed_coefficient * params_.max_speed.linear;
-  msg->twist.angular.x = roll_->value() * speed_coefficient * params_.max_speed.angular;
-  msg->twist.angular.y = pitch_->value() * speed_coefficient * params_.max_speed.angular;
-  msg->twist.angular.z = yaw_->value() * speed_coefficient * params_.max_speed.angular;
+  twist.linear.x = *x_ * speed_coefficient * params_.max_speed.linear;
+  twist.linear.y = *y_ * speed_coefficient * params_.max_speed.linear;
+  twist.linear.z = *z_ * speed_coefficient * params_.max_speed.linear;
+  twist.angular.x = *roll_  * speed_coefficient * params_.max_speed.angular;
+  twist.angular.y = *pitch_ * speed_coefficient * params_.max_speed.angular;
+  twist.angular.z = *yaw_   * speed_coefficient * params_.max_speed.angular;
 
   if (params_.max_speed.normalized) {
     auto linear_input_norm = norm(x_->value(), y_->value(), z_->value());
     if (linear_input_norm > 1.0) {
-      msg->twist.linear.x /= linear_input_norm;
-      msg->twist.linear.y /= linear_input_norm;
-      msg->twist.linear.z /= linear_input_norm;
+      twist.linear.x /= linear_input_norm;
+      twist.linear.y /= linear_input_norm;
+      twist.linear.z /= linear_input_norm;
     }
 
     auto angular_input_norm = norm(x_->value(), y_->value(), z_->value());
     if (angular_input_norm > 1.0) {
-      msg->twist.angular.x /= angular_input_norm;
-      msg->twist.angular.y /= angular_input_norm;
-      msg->twist.angular.z /= angular_input_norm;
+      twist.angular.x /= angular_input_norm;
+      twist.angular.y /= angular_input_norm;
+      twist.angular.z /= angular_input_norm;
     }
   }
 
-  msg->header.frame_id = params_.frame_id;
+  if (stamped_publisher_) {
+    auto msg = std::make_unique<geometry_msgs::msg::TwistStamped>();
+    msg->header.stamp = now;
+    msg->header.frame_id = params_.frame;
+    stamped_publisher_->publish(std::move(msg));
+  }
 
-  publisher_->publish(std::move(msg));
+  if (publisher_) {
+    publisher_->publish(twist);
+  }
 
   return return_type::OK;
 }

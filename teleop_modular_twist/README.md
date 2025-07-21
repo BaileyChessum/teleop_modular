@@ -35,12 +35,15 @@ teleop_node:
 twist_control_mode:
   ros__parameters:
 
-    # Topic to send Twist messages to. (Required)
+    # Topic to send Twist messages to. (Optional if stamped_topic is set)
     topic: "/turtle1/cmd_vel"
+
+    # Topic to send TwistStamped messages to. (Optional if stamped_topic is set) 
+    stamped_topic: "/cmd_vel_stamped"
 
     # Used as the header.frame_id of all sent TwistStamped messages. 
     # The name of the reference frame twist messages are relative to. (Optional)
-    frame_id: "endeffector"
+    frame: "endeffector"
 
     max_speed:
       # The maximum value for the linear component of the twist messages, in metres per second. 

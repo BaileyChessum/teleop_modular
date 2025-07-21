@@ -4,11 +4,56 @@ teleop_modular_twist:
   topic:
     type: string
     default_value: ""
-    description: "The topic to publish TwistStamped messages to."
-  frame_id:
+    description: "The topic to publish Twist messages to."
+  stamped_topic:
     type: string
     default_value: ""
-    description: "The name of the reference frame twist messages are relative to. Included as the header.frame_id of all sent TwistStamped messages."
+    description: "The topic to publish TwistStamped messages to."
+  frame:
+    type: string
+    default_value: ""
+    description: "The name of the reference frame twist messages are relative to. Included as the header.frame_id of all 
+    sent TwistStamped messages."
+
+  scale:
+    linear:
+      x:
+        type: double
+        default_value: 1.0
+        description: "The speed (in metres per second) to multiply the linear y axis input by."
+      y:
+        type: double
+        default_value: 1.0
+        description: "The speed (in metres per second) to multiply the linear y axis input by."
+      z:
+        type: double
+        default_value: 1.0
+        description: "The speed (in metres per second) to multiply the linear y axis input by."
+      all:
+        type: double
+        default_value: 1.0
+        description: "The speed (in metres per second) to multiply ALL linear axis inputs by. This is applied ontop of 
+        scale.linear.* for individual axes."
+    angular:
+      x:
+        type: double
+        default_value: 1.0
+        description: "The speed (in metres per second) to multiply the angular x axis input by."
+      y:
+        type: double
+        default_value: 1.0
+        description: "The speed (in metres per second) to multiply the angular y axis input by."
+      z:
+        type: double
+        default_value: 1.0
+        description: "The speed (in metres per second) to multiply the angular z axis input by."
+      all:
+        type: double
+        default_value: 1.0
+        description: "The speed (in metres per second) to multiply ALL linear axis inputs by. This is applied ontop of 
+        scale.linear.* for individual axes."
+
+
 
   max_speed:
     linear:

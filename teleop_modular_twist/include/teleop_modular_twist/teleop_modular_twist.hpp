@@ -13,6 +13,7 @@
 #include <rclcpp/time.hpp>
 #include "teleop_modular_twist/visibility_control.h"
 #include "control_mode/control_mode.hpp"
+#include "geometry_msgs/msg/twist.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
 #include "twist_control_mode_parameters.hpp"
 
@@ -62,7 +63,8 @@ private:
   Axis::SharedPtr pitch_;
   Axis::SharedPtr roll_;
 
-  rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr publisher_;
+  rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr stamped_publisher_;
+  rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr publisher_;
 };
 
 }  // namespace teleop_modular_twist
