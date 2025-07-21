@@ -9,6 +9,10 @@ teleop_modular_twist:
     type: string
     default_value: ""
     description: "The topic to publish TwistStamped messages to."
+  qos:
+    type: int
+    default_value: 10
+    description: "The QoS value to use when creating publishers."
   frame:
     type: string
     default_value: ""

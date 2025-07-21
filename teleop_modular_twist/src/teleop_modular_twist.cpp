@@ -48,23 +48,14 @@ CallbackReturn TwistControlMode::on_configure(const State &)
     linear_.scale_limits_with_speed = params_.limit.angular.scale_with_speed;
   }
 
-  // Create publishers
-  const rclcpp::QoS qos_profile =
-    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_sensor_data))
-    .best_effort()
-    .transient_local()
-    .keep_last(1);
-
   if (!params_.stamped_topic.empty()) {
     stamped_publisher_ =
       get_node()->create_publisher<geometry_msgs::msg::TwistStamped>(
-      params_.stamped_topic,
-      qos_profile);
+      params_.stamped_topic, params_.qos);
   }
   if (!params_.topic.empty()) {
     publisher_ = get_node()->create_publisher<geometry_msgs::msg::Twist>(
-      params_.topic,
-      qos_profile);
+      params_.topic, params_.qos);
   }
 
   // You've probably made a mistake if you aren't publishing anything
