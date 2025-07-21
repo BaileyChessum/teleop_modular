@@ -1,19 +1,31 @@
 # teleop_modular_twist/TwistControlMode
 
-This is a ControlMode that sends [Twist](https://docs.ros2.org/latest/api/geometry_msgs/msg/Twist.html) and [TwistStamped](https://docs.ros2.org/latest/api/geometry_msgs/msg/TwistStamped.html) messages.
+This is a feature-rich ControlMode that sends [Twist](https://docs.ros2.org/latest/api/geometry_msgs/msg/Twist.html) and [TwistStamped](https://docs.ros2.org/latest/api/geometry_msgs/msg/TwistStamped.html) messages.
 
 ### Inputs
 
 #### Axes
-- `speed`: The input axis that scales the output speed from 0 to 1.
-- `twist_x`: The x component of the linear velocity from -1 to 1.
-- `twist_y`: The y component of the linear velocity from -1 to 1.
-- `twist_z`: The z component of the linear velocity from -1 to 1.
-- `twist_roll `: The x component of the angular velocity from -1 to 1.
-- `twist_pitch`: The y component of the angular velocity from -1 to 1.
-- `twist_yaw  `: The z component of the angular velocity from -1 to 1.
+- `linear.x`: The x component of the linear velocity
+- `linear.y`: The y component of the linear velocity
+- `linear.z`: The z component of the linear velocity
+- `angular.x`: The x component of the angular velocity
+- `angular.y`: The y component of the angular velocity
+- `angular.z`: The z component of the angular velocity
 
-> **Note**: `twist_*` inputs are multiplied by `speed` and the `max_speed.linear`/`max_speed.angular` parameter in the output twist message
+
+- `speed`: The input axis that scales the output speed from 0 to 1. *(Required unless the `use_speed_input` param is set to false)*
+
+> **Note**: `linear.*` and `angular.*` inputs are multiplied by the `speed` input and the `scale.linear.*` / 
+> `scale.angular.*` parameters in the output twist message. 
+> 
+> If you don't want to use an additional `speed` input, you can disable it by setting `use_speed_input` to false in 
+> your parameter file. It is enabled by default.
+ 
+> **Note**: `linear.*` and `angular.*` are usually values between -1 and 1 that you then turn into a velocity unit by 
+> setting `scale.linear.*` and `scale.angular.*` parameters to be your largest desired speed. 
+> 
+> However, if you have some novel input device that provides inputs in metres per second, you can keep the scale at 1 
+> and it should still work!
 
 #### Buttons
 
@@ -21,7 +33,7 @@ This is a ControlMode that sends [Twist](https://docs.ros2.org/latest/api/geomet
 
 ### Parameters
 
-Parameters are defined in [twist_control_mode_parameters.yaml](./src/twist_control_mode_parameters.yaml). Please refer to the file for a full list of parameters.
+Parameters are defined in [twist_control_mode_parameters.yaml](./src/twist_control_mode_parameters.yaml). 
 
 ```yaml
 # Example parameter file
@@ -38,21 +50,63 @@ twist_control_mode:
     # Topic to send Twist messages to. (Optional if stamped_topic is set)
     topic: "/turtle1/cmd_vel"
 
-    # Topic to send TwistStamped messages to. (Optional if stamped_topic is set) 
+    # Topic to send TwistStamped messages to. (Optional if topic is set) 
     stamped_topic: "/cmd_vel_stamped"
+
+    # Use the input named "speed" to scale everything
+    use_speed_input: true
 
     # Used as the header.frame_id of all sent TwistStamped messages. 
     # The name of the reference frame twist messages are relative to. (Optional)
     frame: "endeffector"
+    
+    # Values to multiply inputs with. All values are 1.0 by default. (Recommended)
+    scale:
+      linear:
+        x: 0.5
+        y: 0.5
+        z: 0.35
+        # Or if you dont want to specify per-component, you can just set all
+        all: 1.0
+      angular:
+        x: 0.5
+        y: 0.5
+        z: 0.35
+        # Or if you dont want to specify per-component, you can just set all
+        all: 1.0
 
-    max_speed:
-      # The maximum value for the linear component of the twist messages, in metres per second. 
-      # A 'twist_*' of 1 and 'speed' of 1 will correspond to this value being sent. (Required)
-      linear: 0.25
-      # The maximum value for the angular component of the twist messages, in radians per second.
-      # A 'twist_*' of 1 and 'speed' of 1 will correspond to this value being sent. (Required)
-      angular: 0.25
-      # When true, the magnitude of the velocity will be limited to be less than or equal to the max speed, 
-      # rather than individual axes. (Optional, defaults to true)
-      normalized: true
+    # Prevent velocities larger than the specified values from being emitted
+    # If you leave a parameter unspecified, no limit will be applied. (Optional)
+    limit: 
+      linear:
+        x: 1.0
+        y: 1.0
+        z: 0.5
+        # Or you can provide a default by setting 'all'. This has no effect if you 
+        # set values for each component. If not set, any unspecified x,y,z will not 
+        # be limited.
+        all: 1.0
+        # True by default. When true, the magnitude of the velocity will be 
+        # limited rather than individual axes. Limiting will still be done  
+        # proportionally to the provided x,y,z limits, which don't have to be
+        # uniform.
+        normalized: true
+        # True by default. When true, limits are scaled with the 'speed' input.
+        scale_with_speed: true
+      angular:
+        x: 1.0
+        y: 1.0
+        z: 0.5
+        # Or you can provide a default by setting 'all'. This has no effect if you 
+        # set values for each component. If not set, any unspecified x,y,z will not 
+        # be limited.
+        all: 1.0
+        # True by default. When true, the magnitude of the velocity will be 
+        # limited rather than individual axes. Limiting will still be done  
+        # proportionally to the provided x,y,z limits, which don't have to be
+        # uniform.
+        normalized: true
+        # True by default. When true, limits are scaled with the 'speed' input.
+        scale_with_speed: true
+      
 ```
