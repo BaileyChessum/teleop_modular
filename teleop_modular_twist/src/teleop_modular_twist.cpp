@@ -134,7 +134,7 @@ return_type TwistControlMode::update(const rclcpp::Time & now, const rclcpp::Dur
     return return_type::OK;
   }
 
-  const float speed_coefficient = std::max(speed_->value(), 0.0f);
+  const float speed_coefficient = params_.use_speed_input ? std::max(speed_->value(), 0.0f) : 1.0;
   auto twist = geometry_msgs::msg::Twist();
 
   linear_.apply_to(twist.linear, speed_coefficient);

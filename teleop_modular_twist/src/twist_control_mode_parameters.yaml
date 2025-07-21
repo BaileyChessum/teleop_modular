@@ -17,7 +17,7 @@ teleop_modular_twist:
   use_speed_input:
     type: bool
     default_value: false
-    description: "When true, all speeds will be multiplied by the axis named 'speed'."
+    description: "When true, all speeds will be multiplied by the axis named 'speed'. Otherwise, they will not."
 
   scale:
     linear:
