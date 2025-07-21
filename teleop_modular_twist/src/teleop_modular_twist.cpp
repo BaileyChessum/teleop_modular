@@ -46,6 +46,18 @@ CallbackReturn TwistControlMode::on_configure(const State &)
       {params_.limit.angular.x, params_.limit.angular.y, params_.limit.angular.z},
       params_.limit.angular.all, params_.limit.angular.normalized);
     linear_.scale_limits_with_speed = params_.limit.angular.scale_with_speed;
+
+    linear_.scale = {
+      params_.scale.linear.x * params_.scale.linear.all,
+      params_.scale.linear.y * params_.scale.linear.all,
+      params_.scale.linear.z * params_.scale.linear.all,
+    };
+
+    angular_.scale = {
+      params_.scale.angular.x * params_.scale.angular.all,
+      params_.scale.angular.y * params_.scale.angular.all,
+      params_.scale.angular.z * params_.scale.angular.all,
+    };
   }
 
   if (!params_.stamped_topic.empty()) {
