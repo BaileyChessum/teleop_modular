@@ -16,6 +16,7 @@
 #include <set>
 #include "teleop_core/utilities/get_parameter.hpp"
 #include "teleop_core/colors.hpp"
+#include "teleop_core/input_sources/Remapper.hpp"
 
 namespace teleop::internal
 {
@@ -173,6 +174,25 @@ void InputSourceHandle::declare_and_link_inputs()
 
   auto declarations = source_->export_inputs();
   const auto remap_params = get_remap_params();
+
+  std::set<std::string> button_names;
+  for (const auto & button : inputs_.get().get_buttons()) {
+    button_names.insert(button->get_name());
+  }
+
+  std::set<std::string> axis_names;
+  for (const auto & axis : inputs_.get().get_axes()) {
+    axis_names.insert(axis->get_name());
+  }
+
+  Remapper<uint8_t, float> remapper(
+    OriginalDefinitions<uint8_t>{declarations.button_names, declarations.buttons},
+    OriginalDefinitions<float>{declarations.axis_names, declarations.axes},
+    {button_names, axis_names},
+    logger
+  );
+  remapper.process_all_types();
+
   remap(declarations, remap_params);
 
   add_definitions_to_inputs();
