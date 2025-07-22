@@ -18,11 +18,16 @@
 #include <utility>
 #include <vector>
 #include <memory>
+#include <rclcpp/node_interfaces/node_interfaces.hpp>
+#include <rclcpp/node_interfaces/node_parameters.hpp>
+#include "teleop_core/utilities/get_parameter.hpp"
 
 namespace teleop
 {
-namespace internal
+namespace internal::remapping
 {
+
+using ParametersInterface = rclcpp::node_interfaces::NodeParametersInterface;
 
 // To get span<T> without the prefix
 using namespace input_source;
@@ -78,7 +83,7 @@ struct DirectReducer final : public Reducer<T, T>
   }
 
   /// Special case for DirectReducers to allow direct mapping
-  [[nodiscard]] T* first() const noexcept
+  [[nodiscard]] T * first() const noexcept
   {
     assert(this->size() == 1);
     return values[0];
@@ -155,8 +160,9 @@ struct ButtonFromAxisParams final : public Reducer<uint8_t, float>
 
   void push_back(float * value, float threshold)
   {
-    if (!value)
+    if (!value) {
       return;
+    }
 
     values.emplace_back(value);
     thresholds.emplace_back(threshold);
@@ -195,6 +201,13 @@ struct Assoc<float>
   using transforms = AxisTransformParams;
 };
 
+template<typename ParamT>
+struct ParamDefinitions
+{
+  std::vector<std::string> names;
+  std::vector<ParamT> params;
+};
+
 /**
  * \breif helper to associate how one type relates to another
  * We use this to define from params in remapping, such as making a button from an axis
@@ -206,31 +219,77 @@ template<>
 struct PairAssoc<uint8_t, uint8_t>
 {
   using from = DirectReducer<uint8_t>;
+
+  static std::vector<std::string> get_params(
+    const ParametersInterface::SharedPtr & interface,
+    const std::string & used_name)
+  {
+    auto from_any = utils::get_parameter_or_default<std::vector<std::string>>(
+      interface,
+      "remap.buttons." + used_name + ".from_any",
+      "The original button names to derive values for this name from.", {});
+    const auto from = utils::get_parameter<std::string>(
+      interface,
+      "remap.buttons." + used_name + ".from",
+      "The original button name to derive values for this name from.");
+
+    if (from.has_value())
+      from_any.emplace_back(from.value());
+
+    return from_any;
+  }
 };
 
 template<>
 struct PairAssoc<uint8_t, float>
 {
   using from = ButtonFromAxisParams;
+  using params = float;
+
+  static ParamDefinitions<params> get_params(
+    const ParametersInterface::SharedPtr & interface,
+    const std::string & used_name)
+  {
+    ParamDefinitions<params> result;
+
+
+
+
+    return result;
+  }
 };
 
 template<>
 struct PairAssoc<float, float>
 {
   using from = DirectReducer<float>;
+
+  static std::vector<std::string> get_params(
+    const ParametersInterface::SharedPtr & interface,
+    const std::string & used_name)
+  {
+    auto from_any = utils::get_parameter_or_default<std::vector<std::string>>(
+      interface,
+      "remap.axes." + used_name + ".from_any",
+      "The original axis names to derive values for this name from.", {});
+    const auto from = utils::get_parameter<std::string>(
+      interface,
+      "remap.axes." + used_name + ".from",
+      "The original axis name to derive values for this name from.");
+
+    if (from.has_value())
+      from_any.emplace_back(from.value());
+
+    return from_any;
+  }
 };
 
 template<>
 struct PairAssoc<float, uint8_t>
 {
   using from = AxisFromButtonParams;
+  using params = float;
 };
-
-template<typename Type, typename From>
-std::string pair_name()
-{
-  return std::string(Assoc<Type>::name) + " from " + std::string(Assoc<From>::name);
-}
 
 /**
  * \brief A templated class to reduce duplicated logic for input source remapping
@@ -245,12 +304,12 @@ public:
     (std::is_class_v<typename Assoc<T>::transforms>&& ...),
     "All types must be mappable via Assoc");
 
-
   Remapper(
     OriginalDefinitions<T>... originals_,
     std::array<std::set<std::string>, sizeof...(T)> used_name_sets,
-    rclcpp::Logger logger)
-  : originals(originals_ ...), used_name_sets(used_name_sets), logger(std::move(logger))
+    rclcpp::Logger logger, ParametersInterface::SharedPtr interface)
+  : originals(originals_ ...), used_name_sets(used_name_sets), logger(std::move(logger)),
+    interface(std::move(interface))
   {
   }
 
@@ -287,12 +346,17 @@ public:
   {
     RCLCPP_INFO(logger, C_INPUT "  %s remap" C_RESET, Assoc<Type>::name.data());
 
+    auto reducer = std::make_shared<DirectReducer<Type>>();
+
     // Check if it is defined in originals
     OriginalDefinitions<Type> original = original_at<I>();
-    std::set<std::string> original_names = original.names;
+    span<std::string> original_names = original.names;
+    const auto it = std::find(original_names.begin(), original_names.end(), used_name);
 
-    auto it = original.names.find(used_name);
-    if (it != original.names.end()) {}
+    if (it != original.names.end()) {
+      const size_t original_index = std::distance(original_names.begin(), it);
+      reducer->values.emplace_back(original.values[original_index]);
+    }
   }
 
   /**
@@ -302,24 +366,23 @@ public:
   inline auto process_intertype_mapping(const std::string & used_name)
   {
     if constexpr (I == J) {
-
-
-    } else {
-      using From = std::tuple_element_t<J, std::tuple<T...>>;
-      static_assert(
-        std::is_class_v<typename PairAssoc<Type, From>::from>,
-        "Pair is not mappable! Define values for PairAssoc for these types.");
-      using Pair = PairAssoc<Type, From>;
-
-      // Get params for this pair
-      typename Pair::from result;
-      return result;
-
-      RCLCPP_INFO(
-        logger, C_INPUT "  %s from %s" C_RESET, Assoc<Type>::name.data(),
-        Assoc<From>::name.data());
+      // Direct reduction
+      return process_same_type_mapping<I, Type>();
     }
 
+    using From = std::tuple_element_t<J, std::tuple<T...>>;
+    static_assert(
+      std::is_class_v<typename PairAssoc<Type, From>::from>,
+      "Pair is not mappable! Define values for PairAssoc for these types.");
+    using Pair = PairAssoc<Type, From>;
+
+    // Get params for this pair
+    typename Pair::from result;
+    return result;
+
+    RCLCPP_INFO(
+      logger, C_INPUT "  %s from %s" C_RESET, Assoc<Type>::name.data(),
+      Assoc<From>::name.data());
   }
 
   /// Applies process_pair<U, J>() for every J
@@ -381,7 +444,8 @@ public:
   /// For each type T, the set of names actually used by the system consuming inputs.
   std::array<std::set<std::string>, sizeof...(T)> used_name_sets;
   /// For each type T, additional transformed values from complex remappings
-  std::tuple<std::vector<TransformedValue<T>>...> transformed_values;
+  std::tuple<std::vector<std::shared_ptr<TransformedValue<T>>>...> transformed_values;
+  ParametersInterface::SharedPtr interface;
 };
 
 }  // namespace internal
