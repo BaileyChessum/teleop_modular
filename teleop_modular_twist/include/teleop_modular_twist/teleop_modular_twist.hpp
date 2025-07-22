@@ -66,7 +66,7 @@ private:
     /// When true, limits will be applied to the axis inputs relative to the 'speed' input.
     bool scale_limits_with_speed = true;
 
-    void set_limits(const NumberVector3 values, double all, bool normalized);
+    void set_limits(NumberVector3 values, double all, bool normalized);
     /**
      * \brief Calculates the value for a Vector3 message based on the input axis values, and given speed_coefficient.
      *

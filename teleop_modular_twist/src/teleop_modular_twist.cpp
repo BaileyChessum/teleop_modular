@@ -38,14 +38,14 @@ CallbackReturn TwistControlMode::on_configure(const State &)
 
     // Set up handle configurations for linear and angular inputs
     linear_.set_limits(
-      {params_.limit.linear.x, params_.limit.linear.y, params_.limit.linear.z},
-      params_.limit.linear.all, params_.limit.linear.normalized);
-    linear_.scale_limits_with_speed = params_.limit.linear.scale_with_speed;
+      {params_.limits.linear.x, params_.limits.linear.y, params_.limits.linear.z},
+      params_.limits.linear.all, params_.limits.linear.normalized);
+    linear_.scale_limits_with_speed = params_.limits.linear.scale_with_speed;
 
     angular_.set_limits(
-      {params_.limit.angular.x, params_.limit.angular.y, params_.limit.angular.z},
-      params_.limit.angular.all, params_.limit.angular.normalized);
-    linear_.scale_limits_with_speed = params_.limit.angular.scale_with_speed;
+      {params_.limits.angular.x, params_.limits.angular.y, params_.limits.angular.z},
+      params_.limits.angular.all, params_.limits.angular.normalized);
+    linear_.scale_limits_with_speed = params_.limits.angular.scale_with_speed;
 
     linear_.scale = {
       params_.scale.linear.x * params_.scale.linear.all,
@@ -137,7 +137,7 @@ return_type TwistControlMode::update(const rclcpp::Time & now, const rclcpp::Dur
     return return_type::OK;
   }
 
-  const float speed_coefficient = params_.use_speed_input ? std::max(speed_->value(), 0.0f) : 1.0;
+  const float speed_coefficient = params_.use_speed_input ? std::max(speed_->value(), 0.0f) : 1.0f;
   auto twist = geometry_msgs::msg::Twist();
 
   linear_.apply_to(twist.linear, speed_coefficient);

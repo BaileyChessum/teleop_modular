@@ -13,13 +13,13 @@ This is a feature-rich ControlMode that sends [Twist](https://docs.ros2.org/late
 - `angular.z`: The z component of the angular velocity
 
 
-- `speed`: The input axis that scales the output speed from 0 to 1. *(Required unless the `use_speed_input` param is set to false)*
+- `speed`: The input axis that scales the output speed from 0 to 1. *(Required if `use_speed_input` is set to true)*
 
-> **Note**: `linear.*` and `angular.*` inputs are multiplied by the `speed` input and the `scale.linear.*` / 
-> `scale.angular.*` parameters in the output twist message. 
+> **Note**: `linear.*` and `angular.*` inputs are multiplied by the `speed` input (when `use_speed_input` is set to 
+> true) and the `scale.linear.*` / `scale.angular.*` parameters in the output twist message. 
 > 
 > If you don't want to use an additional `speed` input, you can disable it by setting `use_speed_input` to false in 
-> your parameter file. It is enabled by default.
+> your parameter file. It is disabled by default.
  
 > **Note**: `linear.*` and `angular.*` are usually values between -1 and 1 that you then turn into a velocity unit by 
 > setting `scale.linear.*` and `scale.angular.*` parameters to be your largest desired speed. 
@@ -77,7 +77,7 @@ twist_control_mode:
 
     # Prevent velocities larger than the specified values from being emitted
     # If you leave a parameter unspecified, no limit will be applied. (Optional)
-    limit: 
+    limits: 
       linear:
         x: 1.0
         y: 1.0
@@ -86,12 +86,12 @@ twist_control_mode:
         # set values for each component. If not set, any unspecified x,y,z will not 
         # be limited.
         all: 1.0
-        # True by default. When true, the magnitude of the velocity will be 
+        # False by default. When true, the magnitude of the velocity will be 
         # limited rather than individual axes. Limiting will still be done  
         # proportionally to the provided x,y,z limits, which don't have to be
         # uniform.
         normalized: true
-        # True by default. When true, limits are scaled with the 'speed' input.
+        # False by default. When true, limits are scaled with the 'speed' input.
         scale_with_speed: true
       angular:
         x: 1.0
@@ -101,12 +101,12 @@ twist_control_mode:
         # set values for each component. If not set, any unspecified x,y,z will not 
         # be limited.
         all: 1.0
-        # True by default. When true, the magnitude of the velocity will be 
+        # False by default. When true, the magnitude of the velocity will be 
         # limited rather than individual axes. Limiting will still be done  
         # proportionally to the provided x,y,z limits, which don't have to be
         # uniform.
         normalized: true
-        # True by default. When true, limits are scaled with the 'speed' input.
+        # False by default. When true, limits are scaled with the 'speed' input.
         scale_with_speed: true
       
 ```
