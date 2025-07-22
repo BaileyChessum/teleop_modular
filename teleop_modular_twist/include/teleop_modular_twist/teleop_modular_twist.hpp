@@ -22,7 +22,7 @@ namespace teleop_modular_twist
 {
 using namespace control_mode;
 
-class TwistControlMode : public ControlMode
+class TELEOP_MODULAR_TWIST_PUBLIC TwistControlMode : public ControlMode
 {
 public:
   TwistControlMode();
