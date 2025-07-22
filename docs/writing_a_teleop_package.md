@@ -1,6 +1,5 @@
 # Writing a teleop package
 
-
 ## Background
 
 To be able to do anything useful with `teleop_modular`, you'll need to make a package to contain:
@@ -12,14 +11,14 @@ To be able to do anything useful with `teleop_modular`, you'll need to make a pa
 
 ## 1. Create a package
 
-Open a terminal and navigate into your workspace src directory. Then, create a package using `ros2 pkg create`. I will 
+Open a terminal and navigate into your workspace src directory. Then, create a package using `ros2 pkg create`. I will
 be creating a C++ package in this tutorial, but a python package should also be fine.
 
 ```sh
 ros2 pkg create --build-type ament_cmake --license Apache-2.0 teleop_example
 ```
 
-Replace `teleop_example` with an appropriate name. If I were making a teleop package for a robotic arm, I would name 
+Replace `teleop_example` with an appropriate name. If I were making a teleop package for a robotic arm, I would name
 this `teleop_arm`.
 
 Now you should have a package to add your launch file to. Your directory structure might look something like this:
@@ -38,7 +37,7 @@ You can delete `include/` and `src/` if you wish.
 
 ### 2. Add directories for launch and parameter files to CMakeLists.txt
 
-By convention, all launch files for a package are stored in the `launch` directory inside of the package. Make sure to 
+By convention, all launch files for a package are stored in the `launch` directory inside of the package. Make sure to
 create a launch directory at the top-level of the package you created above.
 
 ```sh
@@ -100,10 +99,12 @@ Next, we need to add a launch file that
 - Runs `teleop_node`
 - Passes `teleop_node` the appropriate parameter files
 
-> **Sidenote:** In this tutorial, I will be using python launch files, as you can use python to have the launch file accept some 
-interesting arguments that could change what parameter files you want to load. For example, you could load up different configurations for you input sources depending on what controller you wanted to use, such that adding `device:=xbox` or `device:=ps5` would load up the configs for those specific devices. 
-> 
-> You can also just run `teleop_node` and pass it your parameter files! I do this to quickly test out different 
+> **Sidenote:** In this tutorial, I will be using python launch files, as you can use python to have the launch file
+> accept some interesting arguments that could change what parameter files you want to load. For example, you could load
+> up different configurations for you input sources depending on what controller you wanted to use, such that adding
+> `device:=xbox` or `device:=ps5` would load up the configs for those specific devices.
+>
+> You can also just run `teleop_node` and pass it your parameter files! I do this to quickly test out different
 > parameter file changes without rebuilding the workspace.
 
 Load up your favorite IDE, and create `teleop.launch.py` under `teleop_example/launch/`:
@@ -111,17 +112,18 @@ Load up your favorite IDE, and create `teleop.launch.py` under `teleop_example/l
 ```python
 # teleop.launch.py
 from launch import LaunchDescription
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution 
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
+from launch_ros.parameter_descriptions import ParameterValue
 
 
 def launch_setup(context, *args, **kwargs):
     teleop_example_dir = FindPackageShare('teleop_example')
 
     teleop_params = LaunchConfiguration('teleop_params')
-    log_inputs = LaunchConfiguration('teleop_params')
+    log_inputs = LaunchConfiguration('log_inputs')
 
     return [
         # Runs teleop_node with the given parameter files
@@ -129,16 +131,16 @@ def launch_setup(context, *args, **kwargs):
             package='teleop_node',
             executable='teleop_node',
             output='screen',
-            
+
             # You can add multiple parameter files here:
             parameters=[
-              teleop_params,
-              {'log_inputs': log_inputs}
+                teleop_params,
+                {'log_inputs': ParameterValue(log_inputs, value_type=bool)}
             ],
 
             additional_env={
                 # Show colors in the terminal output
-                'RCUTILS_COLORIZED_OUTPUT': '1', 
+                'RCUTILS_COLORIZED_OUTPUT': '1',
                 # (Optional!) omit time from the logs
                 'RCUTILS_CONSOLE_OUTPUT_FORMAT': '[{severity}] [{name}] {message}',
             }
@@ -182,16 +184,19 @@ teleop_node:
   ros__parameters:
     # The maximum rate at which updates should occur, and hence the max rate at which commands are sent. 
     # Leaving this unset makes the max update rate unlimited. 
-    update_rate: 50.0
-    
+    # update_rate: 50.0
+
     # The minimum rate at which updates occur. 
     # Leaving this unset will allow for indefinite lapses between updates.
-    min_update_rate: 1.0
+    min_update_rate: 2.0
+
+    # Note: all update rates are in hz
 ```
 
 We'll add control modes and input sources later.
 
-For now, you should have everything you need to run your teleop package. Try to build and source your workspace, then run 
+For now, you should have everything you need to run your teleop package. Try to build and source your workspace, then
+run
 the launch file:
 
 ```sh
@@ -223,18 +228,19 @@ teleop_node:
 
     # Add this:
     control_modes:
-      names: [ 
-        # Give your control mode a name!
+      names: [
+        # Give your control mode a name! Use snake_case
         "twist_control_mode"
       ]
-      
+
       # Then declare its type!
       twist_control_mode:
         type: "teleop_modular_twist/TwistControlMode"
 ```
 
-> **Note**: For `ros2_control` users: if you also want Teleop Modular to activate and deactivate controllers in `ros2_control` alongside your control modes,
-> you can add the names of the controllers you want to be activated with the control mode under the `controllers` 
+> **Note**: For `ros2_control` users: if you also want Teleop Modular to activate and deactivate controllers in
+`ros2_control` alongside your control modes,
+> you can add the names of the controllers you want to be activated with the control mode under the `controllers`
 > parameter:
 > ```yaml
 >      # ...
@@ -245,25 +251,34 @@ teleop_node:
 >          "some_ros2_control_controller_name"
 >        ]
 > ```
-> 
+>
 
-Then, we need to define parameters for the node created for `twist_control_mode`. You can either add this at the bottom 
+Then, we need to define parameters for the node created for `twist_control_mode`. You can either add this at the bottom
 of `teleop.yaml`, or make a new parameter file. I will just be adding them to the end of `teleop.yaml` in this tutorial.
 
 ```yaml
 # teleop.yaml
 teleop_node:
   ros__parameters:
-    # ...
+  # ...
 
 # Add this:
 twist_control_mode:
   ros__parameters:
-    # TwistStamped messages will be published on this
+    # Twist messages will be published on this
     topic: "/twist"
-    max_speed:
-      linear: 0.25
-      angular: 0.25
+    # This will disable the input called 'speed', which multiplies every other input when enabled
+    use_speed_input: false
+    
+    scale:
+      linear:
+        all: 2.0  # max speed of 2 meters per second
+      angular:
+        all: 2.0  # max angular speed of 2 radians per second
+
+    # Check the README.md for teleop_modular_twist/TwistControlMode for more parameters!
+    # It is very extensive.
+    # https://github.com/BaileyChessum/teleop_modular/tree/main/teleop_modular_twist
 ```
 
 Check the docs for the control mode you use to find out what parameters exist for it.
@@ -274,11 +289,12 @@ Then, try running it!
 ros2 launch teleop_example teleop.launch.py teleop_params:=/path/to/ws/src/teleop_example/params/teleop.yaml
 ```
 
-> **Note:** we don't need to rebuild the workspace to try out changes to the config, as long as we specify the absolute 
-> path to the config file. Specify the absolute path to the config file whenever you want to actively edit your parameter 
+> **Note:** we don't need to rebuild the workspace to try out changes to the config, as long as we specify the absolute
+> path to the config file. Specify the absolute path to the config file whenever you want to actively edit your
+> parameter
 > files.
 
-Your output should no longer have the error for missing the `control_modes.names` parameter, and your control mode 
+Your output should no longer have the error for missing the `control_modes.names` parameter, and your control mode
 should be listed.
 
 <pre>$ ros2 launch teleop_arm teleop.launch.py teleop_params:=/home/.../teleop_example/params/teleop.yaml
@@ -293,7 +309,7 @@ should be listed.
 [teleop_node-1] [INFO] [teleop_node] <font color="#A347BA">Twist Control Mode activated</font>
 </pre>
 
-If you have any issues, please post in 
+If you have any issues, please post in
 [Discussions](https://github.com/BaileyChessum/teleop_modular/discussions/new?category=q-a), and I will try to help!
 
 ## 6. Add an input source
@@ -311,7 +327,7 @@ teleop_node:
     # Add this:
     input_sources:
       names: [
-        # Give your input source a name!
+        # Give your input source a name! Use snake_case
         "joy_input_source"
       ]
 
@@ -327,7 +343,7 @@ of `teleop.yaml`, or make a new parameter file. I will just be adding them to th
 # teleop.yaml
 teleop_node:
   ros__parameters:
-    # ...
+  # ...
 
 # Add this:
 joy_input_source:
@@ -372,7 +388,7 @@ joy_input_source:
 
 Check the docs for the input source you use to find out what parameters exist for it.
 
-In the example above, the joy_input_source will export all the axis and button names listed, associated with the 
+In the example above, the joy_input_source will export all the axis and button names listed, associated with the
 values from Joy messages, maintaining the same order as the list of names.
 
 Now, try running it!
@@ -410,7 +426,7 @@ ros2 run joy game_controller_node
 
 Mess around with controller inputs, and you should see them appear in your original terminal:
 
-<pre>$ ros2 launch teleop_example teleop.launch.py teleop_params:=/home/.../teleop_example/params/teleop.yaml log_inputs:=true
+<pre>$ ros2 launch teleop_example teleop.launch.py teleop_params:=/home/.../teleop_example/params/teleop.yaml log_inputs:=True
 [INFO] [launch]: All log files can be found below /home/nova/.ros/log/2025-07-21-02-16-07-117871-nixos-2232880
 [INFO] [launch]: Default logging verbosity is set to INFO
 [INFO] [teleop_node-1]: process started with pid [2232890]
@@ -493,7 +509,7 @@ def launch_setup(context, *args, **kwargs):
             executable='game_controller_node',  # or joy_node
             output="screen"
         ),
-      
+
         # Runs teleop_node with the given parameter files
         Node(
             package='teleop_node',
@@ -512,32 +528,35 @@ If you have any issues, please post in
 
 Congrats! You've reached the fun part.
 
-Currently, your control mode isn't getting any inputs from the input source. If we check the documentation for [teleop_modular_twist/TwistControlMode](../teleop_modular_twist), we'll find that it 
+Currently, your control mode isn't getting any inputs from the input source. If we check the documentation
+for [teleop_modular_twist/TwistControlMode](../teleop_modular_twist), we'll find that it
 expects to get these axis inputs:
 
-- `speed`: The input axis that scales the output speed from 0 to 1.
-- `twist_x`: The input axis providing the x component of the twist linear velocity from -1 to 1.
-- `twist_y`: The input axis providing the y component of the twist linear velocity from -1 to 1.
-- `twist_z`: The input axis providing the z component of the twist linear velocity from -1 to 1.
-- `twist_roll`: The input axis providing the x component of the twist angular velocity from -1 to 1.
-- `twist_pitch`: The input axis providing the y component of the twist angular velocity from -1 to 1.
-- `twist_yaw`: The input axis providing the z component of the twist angular velocity from -1 to 1.
+- `linear.x`: The input axis providing the x component of the twist linear velocity from -1 to 1.
+- `linear.y`: The input axis providing the y component of the twist linear velocity from -1 to 1.
+- `linear.z`: The input axis providing the z component of the twist linear velocity from -1 to 1.
+- `angular.x`: The input axis providing the x component of the twist angular velocity from -1 to 1.
+- `angular.y`: The input axis providing the y component of the twist angular velocity from -1 to 1.
+- `angular.z`: The input axis providing the z component of the twist angular velocity from -1 to 1.
 
-And note, if you don't set `speed`, it will default to 0, so nothing will happen.
 
-You could change the names of the inputs in `joy_input_source`'s `axis_definitions` parameter to match those needed by 
-the control mode. But, chances are, the inputs aren't behaving exactly as you'd like. Some input axes might be inverted, 
-for example. 
+- `speed`: The input axis that scales the output speed from 0 to 1. But, since we set `use_speed_input: false` in the parameter file, we shouldn't need to set this.
 
-Teleop Modular solves this problem with the set of [remap parameters](./input_source_remapping.md) automatically added 
+You could change the names of the inputs in `joy_input_source`'s `axis_definitions` parameter to match those needed by
+the control mode. But, chances are, the inputs aren't behaving exactly as you'd like. Some input axes might be inverted,
+for example.
+
+Teleop Modular solves this problem with the set of [remap parameters](./input_source_remapping.md) automatically added
 to every input source implementation. We can use them to:
+
 - Rename inputs
 - Create axes from buttons
 - Create buttons from axes
 - Transform input values in various ways, such as:
-  - Inverting axes and buttons
-  - Linearly mapping an input range of axis values to an output range
-  - Clamping axes
+    - Inverting axes and buttons
+    - Linearly mapping an input range of axis values to an output range
+    - Clamping axes
 
 We will apply these parameters to solve our problem in the following guide:
+
 - [Remapping and transforming inputs](./remapping_and_transforming_inputs.md)

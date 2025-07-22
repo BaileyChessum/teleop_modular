@@ -13,6 +13,8 @@
 #include <rclcpp/time.hpp>
 #include "teleop_modular_twist/visibility_control.h"
 #include "control_mode/control_mode.hpp"
+#include "geometry_msgs/msg/vector3.hpp"
+#include "geometry_msgs/msg/twist.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
 #include "twist_control_mode_parameters.hpp"
 
@@ -20,7 +22,7 @@ namespace teleop_modular_twist
 {
 using namespace control_mode;
 
-class TwistControlMode : public ControlMode
+class TELEOP_MODULAR_TWIST_PUBLIC TwistControlMode : public ControlMode
 {
 public:
   TwistControlMode();
@@ -42,6 +44,50 @@ protected:
   ~TwistControlMode() override;
 
 private:
+  /// We use infinity as the default limit, as it will effectively not impose a limit while avoiding branching
+  static constexpr double infinity = std::numeric_limits<double>::infinity();
+  /// Helper type to hold 3 Axis::SharedPtrs to make a up a vector
+  using AxisVector3 = std::array<Axis::SharedPtr, 3>;
+  /// Helper type to hold 3 Axis::SharedPtrs to make a up a vector. You could also use Eigen for more complex use cases.
+  using NumberVector3 = std::array<double, 3>;
+
+  /// Helper struct to avoid duplicating code for the nearly identical logic for linear and angular components of twist.
+  struct VectorHandle
+  {
+    /// Our actual inputs for the vector3
+    AxisVector3 axes;
+    /// A scale to multiply axis values by when populating vector3 messages
+    NumberVector3 scale = {1.0, 1.0, 1.0};
+    /// limits to apply to the vector3 message
+    std::optional<NumberVector3> limits = std::nullopt;
+
+    /// Switches limiting logic from simple component-wise limiting to more complex normalization based limits.
+    bool normalized_limits = true;
+    /// When true, limits will be applied to the axis inputs relative to the 'speed' input.
+    bool scale_limits_with_speed = true;
+
+    /**
+     * \brief Given the parameter values, converts them to usable limits for apply_to().
+     *
+     * Any negative parameter values will translate to an infinity -- which is effectively no limit.
+     * If all limits end up being infinity, limits will become std::nullopt.
+     *
+     * \param values[in]    The x,y,z limit parameters all put into an array<double, 3>
+     * \param all[in]       The 'all' default limit parameter to use for any unspecified x,y,z in values
+     */
+    void set_limits(NumberVector3 values, double all);
+
+    /**
+     * \brief Calculates the value for a Vector3 message based on the input axis values, and given speed_coefficient.
+     *
+     * This method applies limits when limit.has_value().
+     *
+     * \param msg[out]  The message to put calculated values in
+     * \param speed_coefficient[in]     The value to multiply all speeds by
+     */
+    void apply_to(geometry_msgs::msg::Vector3 & msg, double speed_coefficient);
+  };
+
   /// Helper function to get the euclidean length of a vector, used for normalized limits.
   static double norm(double x, double y, double z);
 
@@ -49,20 +95,18 @@ private:
   std::shared_ptr<teleop_modular_twist::ParamListener> param_listener_{};
   teleop_modular_twist::Params params_;
 
+  rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr stamped_publisher_;
+  rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr publisher_;
+
+  /// Inputs for all the linear twist components
+  VectorHandle linear_;
+  /// Inputs for all the angular twist components
+  VectorHandle angular_;
+
   /// Input from 0 to 1 that directly scales the output speed.
-  Axis::SharedPtr speed_coefficient_;
+  Axis::SharedPtr speed_;
   /// Do nothing when this is true
   Button::SharedPtr locked_;
-
-  // Inputs for all the twist components
-  Axis::SharedPtr x_;
-  Axis::SharedPtr y_;
-  Axis::SharedPtr z_;
-  Axis::SharedPtr yaw_;
-  Axis::SharedPtr pitch_;
-  Axis::SharedPtr roll_;
-
-  rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr publisher_;
 };
 
 }  // namespace teleop_modular_twist
