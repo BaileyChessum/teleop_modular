@@ -33,19 +33,22 @@ CallbackReturn TwistControlMode::on_configure(const State &)
 {
   const auto logger = get_node()->get_logger();
 
+  // Get the parameters (if they changed)
   if (param_listener_->is_old(params_)) {
     params_ = param_listener_->get_params();
 
     // Set up handle configurations for linear and angular inputs
     linear_.set_limits(
       {params_.limits.linear.x, params_.limits.linear.y, params_.limits.linear.z},
-      params_.limits.linear.all, params_.limits.linear.normalized);
+      params_.limits.linear.all);
+    linear_.normalized_limits = params_.limits.linear.normalized;
     linear_.scale_limits_with_speed = params_.limits.linear.scale_with_speed;
 
     angular_.set_limits(
       {params_.limits.angular.x, params_.limits.angular.y, params_.limits.angular.z},
-      params_.limits.angular.all, params_.limits.angular.normalized);
-    linear_.scale_limits_with_speed = params_.limits.angular.scale_with_speed;
+      params_.limits.angular.all);
+    angular_.normalized_limits = params_.limits.angular.normalized;
+    angular_.scale_limits_with_speed = params_.limits.angular.scale_with_speed;
 
     linear_.scale = {
       params_.scale.linear.x * params_.scale.linear.all,
@@ -60,6 +63,8 @@ CallbackReturn TwistControlMode::on_configure(const State &)
     };
   }
 
+  // Create the publishers based on the params we just got
+
   if (!params_.stamped_topic.empty()) {
     stamped_publisher_ =
       get_node()->create_publisher<geometry_msgs::msg::TwistStamped>(
@@ -70,7 +75,7 @@ CallbackReturn TwistControlMode::on_configure(const State &)
       params_.topic, params_.qos);
   }
 
-  // You've probably made a mistake if you aren't publishing anything
+  // You've probably made a mistake if you aren't publishing anything!
   if (!stamped_publisher_ && !publisher_) {
     RCLCPP_ERROR(
       get_node()->get_logger(),
@@ -187,11 +192,9 @@ CallbackReturn TwistControlMode::on_shutdown(const State &)
 }
 
 void TwistControlMode::VectorHandle::set_limits(
-  const NumberVector3 values, double all,
-  bool normalized)
+  const NumberVector3 values, double all)
 {
-  normalized_limits = normalized;
-  limit = std::nullopt;   // Clear old values
+  limits = std::nullopt;   // Clear old values
   bool any_limit_set = false;
 
   double default_limit = infinity;  // infinity acts as no limit, so default to infinity when 'all' is not set
@@ -226,7 +229,7 @@ void TwistControlMode::VectorHandle::set_limits(
 
   // Only set the limit if there is a non-infinity limit
   if (any_limit_set) {
-    limit = potential_limit;
+    limits = potential_limit;
   }
 }
 
@@ -236,10 +239,11 @@ void TwistControlMode::VectorHandle::apply_to(
 {
   NumberVector3 result;
 
-  if (!limit.has_value()) {
+  if (!limits.has_value()) {
     // Calculate the values without applying the limit.
-    for (size_t i = 0; i < 3; ++i)
+    for (size_t i = 0; i < 3; ++i) {
       result[i] = *axes[i] * scale[i] * speed_coefficient;
+    }
 
     // Apply to the message and exit early.
     msg.x = result[0];
@@ -250,12 +254,13 @@ void TwistControlMode::VectorHandle::apply_to(
 
   // Calculate the values, excluding the speed_coefficient if we should scale_limits_with_speed
   if (scale_limits_with_speed) {
-    for (size_t i = 0; i < 3; ++i)
+    for (size_t i = 0; i < 3; ++i) {
       result[i] = *axes[i] * scale[i];
-  }
-  else {
-    for (size_t i = 0; i < 3; ++i)
+    }
+  } else {
+    for (size_t i = 0; i < 3; ++i) {
       result[i] = *axes[i] * scale[i] * speed_coefficient;
+    }
   }
 
   // Apply limits
@@ -264,7 +269,7 @@ void TwistControlMode::VectorHandle::apply_to(
     NumberVector3 vector_to_norm;
     // Note: This could cause a division by zero if not careful! Make sure it can never be zero when setting params.
     for (size_t i = 0; i < 3; ++i) {
-      vector_to_norm[i] = result[i] / (*limit)[i];
+      vector_to_norm[i] = result[i] / (*limits)[i];
     }
 
     auto magnitude_relative_to_limit = std::apply(norm, vector_to_norm);
@@ -276,14 +281,15 @@ void TwistControlMode::VectorHandle::apply_to(
   } else {
     // Apply per component independently
     for (size_t i = 0; i < 3; ++i) {
-      result[i] = std::clamp(result[i], -(*limit)[i], (*limit)[i]);
+      result[i] = std::clamp(result[i], -(*limits)[i], (*limits)[i]);
     }
   }
 
   // If speed_coefficient didn't scale limits before, scale them now
   if (scale_limits_with_speed) {
-    for (size_t i = 0; i < 3; ++i)
+    for (size_t i = 0; i < 3; ++i) {
       result[i] *= speed_coefficient;
+    }
   }
 
   // Apply to the message

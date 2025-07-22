@@ -76,7 +76,7 @@ joy_input_source:
           # Clamp input value to a range
           range:                
             in: [-1, 1]
-            limit: true  
+            limits: true  
         speed:
           from: "right_trigger"
           # Remap the range of the input from [-1, 1] to [0, 1].

@@ -76,7 +76,7 @@ twist_control_mode:
         all: 1.0
 
     # Prevent velocities larger than the specified values from being emitted
-    # If you leave a parameter unspecified, no limit will be applied. (Optional)
+    # If you leave a parameter unspecified, no limits will be applied. (Optional)
     limits: 
       linear:
         x: 1.0

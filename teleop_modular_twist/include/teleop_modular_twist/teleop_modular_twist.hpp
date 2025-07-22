@@ -59,20 +59,31 @@ private:
     /// A scale to multiply axis values by when populating vector3 messages
     NumberVector3 scale = {1.0, 1.0, 1.0};
     /// limits to apply to the vector3 message
-    std::optional<NumberVector3> limit = std::nullopt;
+    std::optional<NumberVector3> limits = std::nullopt;
 
     /// Switches limiting logic from simple component-wise limiting to more complex normalization based limits.
     bool normalized_limits = true;
     /// When true, limits will be applied to the axis inputs relative to the 'speed' input.
     bool scale_limits_with_speed = true;
 
-    void set_limits(NumberVector3 values, double all, bool normalized);
+    /**
+     * \brief Given the parameter values, converts them to usable limits for apply_to().
+     *
+     * Any negative parameter values will translate to an infinity -- which is effectively no limit.
+     * If all limits end up being infinity, limits will become std::nullopt.
+     *
+     * \param values[in]    The x,y,z limit parameters all put into an array<double, 3>
+     * \param all[in]       The 'all' default limit parameter to use for any unspecified x,y,z in values
+     */
+    void set_limits(NumberVector3 values, double all);
+
     /**
      * \brief Calculates the value for a Vector3 message based on the input axis values, and given speed_coefficient.
      *
      * This method applies limits when limit.has_value().
+     *
      * \param msg[out]  The message to put calculated values in
-     * \param speed_coefficient[out]    The value to multiply all speeds by
+     * \param speed_coefficient[in]     The value to multiply all speeds by
      */
     void apply_to(geometry_msgs::msg::Vector3 & msg, double speed_coefficient);
   };
