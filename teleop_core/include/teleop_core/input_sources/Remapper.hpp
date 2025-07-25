@@ -7,6 +7,7 @@
 #define CONTROL_MODE_REMAPPER_HPP
 
 #include "input_source/utilities/span.hpp"
+#include "input_source/utilities/vector_ref.hpp"
 #include "teleop_core/colors.hpp"
 #include <string>
 #include <array>
@@ -178,6 +179,17 @@ struct ButtonFromAxisParams final : public Reducer<uint8_t, float>
   }
 };
 
+/**
+ * The result of some part of the parameterization stage
+ */
+template<typename ParamT>
+struct ParamDefinitions
+{
+  std::vector<std::string> names;
+  std::vector<ParamT> params;
+};
+
+//region Assoc
 
 /**
  * \breif helper to associate various extra types with T
@@ -201,12 +213,6 @@ struct Assoc<float>
   using transforms = AxisTransformParams;
 };
 
-template<typename ParamT>
-struct ParamDefinitions
-{
-  std::vector<std::string> names;
-  std::vector<ParamT> params;
-};
 
 /**
  * \breif helper to associate how one type relates to another
@@ -291,6 +297,61 @@ struct PairAssoc<float, uint8_t>
   using params = float;
 };
 
+//endregion
+
+/**
+ * The inputs given by the external system to run the algorithm on
+ */
+template<typename ... T>
+struct AlgorithmInputs{
+
+  std::tuple<OriginalDefinitions<T>...> originals;
+
+};
+
+
+
+template<typename ... T>
+struct ParamPhaseData
+{
+  struct LookupEntry {
+    size_t index{};
+    bool original = false;
+  };
+
+  /// The original inputs to the algorithm
+  AlgorithmInputs<T...> inputs;
+
+  /// Maps name to index and info to identify the appropriate container
+
+  std::array<std::map<std::string, LookupEntry>, sizeof...(T)> lookup{};
+  size_t new_entries = 0;
+
+  template<std::size_t I>
+  inline void constructor_foreach_type() {
+    auto og_names = std::get<I>(inputs.originals).names;
+    for (size_t j = 0; j < og_names.size(); ++j)
+      lookup[I][og_names[j]] = LookupEntry{j, true};
+  }
+
+  template<std::size_t... I>
+  inline void constructor_foreach_type_aux(std::index_sequence<I...>)
+  {
+    (constructor_foreach_type<I>(), ...);
+  }
+
+  explicit ParamPhaseData(AlgorithmInputs<T...> inputs) : inputs(inputs)
+  {
+    constructor_foreach_type_aux(std::make_index_sequence<sizeof...(T)>{});
+  }
+
+//  size_t make_entry_for(const std::string& new_name) {
+//    value_lookup[new_name] = LookupEntry{new_entries, true};
+//    return new_entries++;
+//  }
+};
+
+
 /**
  * \brief A templated class to reduce duplicated logic for input source remapping
  *
@@ -305,33 +366,10 @@ public:
     "All types must be mappable via Assoc");
 
   Remapper(
-    OriginalDefinitions<T>... originals_,
-    std::array<std::set<std::string>, sizeof...(T)> used_name_sets,
     rclcpp::Logger logger, ParametersInterface::SharedPtr interface)
-  : originals(originals_ ...), used_name_sets(used_name_sets), logger(std::move(logger)),
+  : logger(std::move(logger)),
     interface(std::move(interface))
   {
-  }
-
-  /// Helper to get the original for some type T
-  template<typename U>
-  OriginalDefinitions<U> & get_original()
-  {
-    return std::get<OriginalDefinitions<U>>(originals);
-  }
-  /// Helper to statically index into originals
-  template<size_t I>
-  auto & original_at()
-  {
-    return std::get<I>(originals);
-  }
-
-
-  /// Helper to statically index into used_name_sets
-  template<std::size_t I>
-  std::set<std::string> & used_name_set_at()
-  {
-    return std::get<I>(used_name_sets);
   }
 
   /// Helper to statically index into originals
@@ -342,32 +380,32 @@ public:
   }
 
   template<size_t I, typename Type>
-  inline void process_same_type_mapping(const std::string & used_name)
+  inline void param_phase_same_type_mapping(const std::string & used_name)
   {
     RCLCPP_INFO(logger, C_INPUT "  %s remap" C_RESET, Assoc<Type>::name.data());
 
     auto reducer = std::make_shared<DirectReducer<Type>>();
 
     // Check if it is defined in originals
-    OriginalDefinitions<Type> original = original_at<I>();
-    span<std::string> original_names = original.names;
-    const auto it = std::find(original_names.begin(), original_names.end(), used_name);
-
-    if (it != original.names.end()) {
-      const size_t original_index = std::distance(original_names.begin(), it);
-      reducer->values.emplace_back(original.values[original_index]);
-    }
+//    OriginalDefinitions<Type> original = original_at<I>();
+//    span<std::string> original_names = original.names;
+//    const auto it = std::find(original_names.begin(), original_names.end(), used_name);
+//
+//    if (it != original.names.end()) {
+//      const size_t original_index = std::distance(original_names.begin(), it);
+//      reducer->values.emplace_back(original.values[original_index]);
+//    }
   }
 
   /**
    * Gets the reference_wrapper<From>
    */
   template<size_t I, typename Type, std::size_t J>
-  inline auto process_intertype_mapping(const std::string & used_name)
+  inline auto param_phase_intertype_mapping(const std::string & used_name)
   {
     if constexpr (I == J) {
       // Direct reduction
-      return process_same_type_mapping<I, Type>();
+      return param_phase_same_type_mapping<I, Type>();
     }
 
     using From = std::tuple_element_t<J, std::tuple<T...>>;
@@ -387,18 +425,18 @@ public:
 
   /// Applies process_pair<U, J>() for every J
   template<size_t I, typename Type, std::size_t... J>
-  inline auto process_intertype_mappings_aux(
+  inline auto param_phase_intertype_mappings_aux(
     const std::string & used_name,
     std::index_sequence<J...>)
   {
     // Run the above method for every J and put the result in a tuple
-    return std::make_tuple(process_intertype_mapping<I, Type, J>(used_name)...);
+    return std::make_tuple(param_phase_intertype_mapping<I, Type, J>(used_name)...);
   }
 
   template<std::size_t I, typename Type>
-  inline Type * get_definition_for(const std::string & used_name)
+  inline Type * param_phase_get_definition_for(const std::string & used_name)
   {
-    process_intertype_mappings_aux<I, Type>(std::make_index_sequence<sizeof...(T)>{});
+    param_phase_intertype_mappings_aux<I, Type>(std::make_index_sequence<sizeof...(T)>{});
 
 
     return nullptr;
@@ -410,42 +448,43 @@ public:
    * \tparam I  The index of the type we are mapping values to in typename ... T
    */
   template<std::size_t I>
-  inline void remap_inputs_of_type()
+  inline void param_phase_remap_inputs_of_type(ParamPhaseData<T...>& data)
   {
     using Type = std::tuple_element_t<I, std::tuple<T...>>;
 
     // Get names that control modes actually use
-    const auto used_names = used_name_set_at<I>();
 
-    for (auto & name : used_names) {
-      RCLCPP_INFO(
-        logger, "Checking remap for %s " C_INPUT "%s" C_RESET, Assoc<Type>::name.data(),
-        name.c_str());
-
-      // Get mapping for every other type
-    }
+//    for (auto & name : used_names) {
+//      RCLCPP_INFO(
+//        logger, "Checking remap for %s " C_INPUT "%s" C_RESET, Assoc<Type>::name.data(),
+//        name.c_str());
+//
+//      // Get mapping for every other type
+//    }
   }
 
   // Outer loop over all I
   template<std::size_t... I>
-  inline void process_all_types_aux(std::index_sequence<I...>)
+  inline void param_phase_all_types_aux(ParamPhaseData<T...>& data, std::index_sequence<I...>)
   {
-    (remap_inputs_of_type<I>(), ...);
+    (param_phase_remap_inputs_of_type<I>(data), ...);
   }
 
-  inline void process_all_types()
+  inline ParamPhaseData<T...> param_phase_all_types(AlgorithmInputs<T...> inputs)
   {
-    process_all_types_aux(std::make_index_sequence<sizeof...(T)>{});
+    ParamPhaseData<T...> data = ParamPhaseData<T...>(inputs);
+
+    param_phase_all_types_aux(data, std::make_index_sequence<sizeof...(T)>{});
   }
 
   rclcpp::Logger logger;
+  ParametersInterface::SharedPtr interface;
   /// All the original definitions exported by the input source
-  std::tuple<OriginalDefinitions<T>...> originals;
+//  std::tuple<OriginalDefinitions<T>...> originals;
   /// For each type T, the set of names actually used by the system consuming inputs.
-  std::array<std::set<std::string>, sizeof...(T)> used_name_sets;
+//  std::array<std::set<std::string>, sizeof...(T)> used_name_sets;
   /// For each type T, additional transformed values from complex remappings
   std::tuple<std::vector<std::shared_ptr<TransformedValue<T>>>...> transformed_values;
-  ParametersInterface::SharedPtr interface;
 };
 
 }  // namespace internal

@@ -185,13 +185,13 @@ void InputSourceHandle::declare_and_link_inputs()
     axis_names.insert(axis->get_name());
   }
 
-  Remapper<uint8_t, float> remapper(
+  /*Remapper<uint8_t, float> remapper(
     OriginalDefinitions<uint8_t>{declarations.button_names, declarations.buttons},
     OriginalDefinitions<float>{declarations.axis_names, declarations.axes},
     {button_names, axis_names},
     logger
   );
-  remapper.process_all_types();
+  remapper.param_phase_all_types();*/
 
   remap(declarations, remap_params);
 
