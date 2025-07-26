@@ -172,8 +172,8 @@ void InputSourceHandle::declare_and_link_inputs()
   const auto logger = source_->get_node()->get_logger();
   // TODO(BaileyChessum): Check if inputs are already linked, and unlink them
 
+
   auto declarations = source_->export_inputs();
-  const auto remap_params = get_remap_params();
 
   std::vector<std::string> button_names;
   for (const auto & button : inputs_.get().get_buttons()) {
@@ -188,6 +188,8 @@ void InputSourceHandle::declare_and_link_inputs()
   remapping::Remapper<uint8_t, float> remapper(logger,
     source_->get_node()->get_node_parameters_interface());
 
+  auto start = std::chrono::high_resolution_clock::now();
+
   remapper.remap(
     {
       {{declarations.button_names, declarations.buttons},
@@ -195,17 +197,15 @@ void InputSourceHandle::declare_and_link_inputs()
       {button_names, axis_names}
     });
 
-  /*Remapper<uint8_t, float> remapper(
-    OriginalDefinitions<uint8_t>{declarations.button_names, declarations.buttons},
-    OriginalDefinitions<float>{declarations.axis_names, declarations.axes},
-    {button_names, axis_names},
-    logger
-  );
-  remapper.param_phase_all_types();*/
+  // Old implementation:
+//  const auto remap_params = get_remap_params();
+//  remap(declarations, remap_params);
+//  add_definitions_to_inputs();
 
-  remap(declarations, remap_params);
+  auto end = std::chrono::high_resolution_clock::now();
+  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
-  add_definitions_to_inputs();
+  RCLCPP_INFO(logger, "Remapped parameters in %ld microseconds", duration);
 }
 
 InputSourceHandle::RemapParams InputSourceHandle::get_remap_params()

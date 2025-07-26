@@ -10,6 +10,7 @@
 #include <string_view>
 #include "teleop_core/utilities/get_parameter.hpp"
 #include <string>
+#include <teleop_core/utilities/get_parameter.hpp>
 
 namespace teleop::internal::remapping
 {
@@ -176,6 +177,45 @@ struct PairAssoc<uint8_t, float>
     const std::string & used_name)
   {
     ParamDefinitions<params> result;
+
+    const auto prefix = "remap.axes." + used_name + ".from_buttons.";
+
+    // Get all negative froms
+    std::vector<std::string> negatives = utils::get_parameter_or_default(
+        interface, prefix + "negative",
+        "A button that when pressed will cause the axis to be negative.", std::vector<std::string>());
+    const auto from_button_negative = utils::get_parameter<std::string>(
+        interface, prefix + "negatives",
+        "Buttons that when pressed will cause the axis to be negative.");
+    if (from_button_negative.has_value())
+      negatives.push_back(from_button_negative.value());
+
+    // Get all positive froms
+    const auto from_button_positive = utils::get_parameter<std::string>(
+        interface, prefix + "positive",
+        "A button that when pressed will cause the axis to be positive.");
+    std::vector<std::string> positives = utils::get_parameter_or_default(
+        interface, prefix + "positives",
+        "Buttons that when pressed will cause the axis to be positive.", std::vector<std::string>());
+    if (from_button_positive.has_value())
+      positives.push_back(from_button_positive.value());
+
+    // Collate into the two arrays
+    size_t count = negatives.size() + positives.size();
+    if (count == 0)
+      return result;  //< Most mappings will be empty
+
+    result.names = positives;
+    result.names.reserve(count);
+    result.params.reserve(count);
+    for (size_t i = 0; i < positives.size(); i++) {
+      result.params.emplace_back(1.0f);
+    }
+
+    for (size_t i = 0; i < negatives.size(); i++) {
+      result.names.push_back(negatives[i]);
+      result.params.emplace_back(-1.0f);
+    }
 
     return result;
   }

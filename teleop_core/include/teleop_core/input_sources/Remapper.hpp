@@ -39,6 +39,7 @@
 #include "teleop_core/utilities/get_parameter.hpp"
 #include "teleop_core/input_sources/remapper_reducer.hpp"
 #include "teleop_core/input_sources/remapper_assoc.hpp"
+#include "teleop_core/utilities/make_array.hpp"
 
 namespace teleop::internal::remapping
 {
@@ -119,12 +120,6 @@ struct ParamPhaseData
 //    return new_entries++;
 //  }
 };
-
-/// Added to be compatible with C++ 17
-//template <typename... T>
-//constexpr auto make_array(T&&... t) -> std::array<std::common_type_t<T...>, sizeof...(T)> {
-//  return {std::forward<T>(t)...};
-//}
 
 /**
  * \brief A templated class to reduce duplicated logic for input source remapping
@@ -313,9 +308,8 @@ public:
     ParamPhaseData<T...> & data,
     const std::string & used_name, std::index_sequence<J...>)
   {
-    // TODO: Turn back to normal
-    return std::array<size_t, 2>{0, 0};
-    // return make_array(get_params_for_pair_to_used_name<I, Type, J>(data, used_name)...);
+     // TODO: Turn back to normal
+     return utils::make_array(get_params_for_pair_to_used_name<I, Type, J>(data, used_name)...);
   }
 
   template<std::size_t I, typename Type>
@@ -351,7 +345,6 @@ public:
     // TODO(BaileyChessum): Deal with overwritten original names
     return true;
   }
-
 
   /**
    * \brief Remap values for the Ith type in typename ... T.
