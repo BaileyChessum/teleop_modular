@@ -11,12 +11,13 @@
 #include "teleop_core/utilities/get_parameter.hpp"
 #include <string>
 
-namespace teleop::internal::remapping {
+namespace teleop::internal::remapping
+{
 
 using ParametersInterface = rclcpp::node_interfaces::NodeParametersInterface;
 
-
-struct LookupEntry {
+struct LookupEntry
+{
   size_t index{};
   bool original = false;
 };
@@ -136,20 +137,21 @@ struct PairAssoc<uint8_t, uint8_t>
   using pre_param = std::pair<std::vector<LookupEntry>, std::vector<params>>;
 
   static DirectParamDefinitions get_params(
-      const ParametersInterface::SharedPtr & interface,
-      const std::string & used_name)
+    const ParametersInterface::SharedPtr & interface,
+    const std::string & used_name)
   {
     auto from_any = utils::get_parameter_or_default<std::vector<std::string>>(
-        interface,
-            "remap.buttons." + used_name + ".from_any",
-            "The original button names to derive values for this name from.", {});
+      interface,
+      "remap.buttons." + used_name + ".from_any",
+      "The original button names to derive values for this name from.", {});
     const auto from = utils::get_parameter<std::string>(
-        interface,
-        "remap.buttons." + used_name + ".from",
-        "The original button name to derive values for this name from.");
+      interface,
+      "remap.buttons." + used_name + ".from",
+      "The original button name to derive values for this name from.");
 
-    if (from.has_value())
+    if (from.has_value()) {
       from_any.emplace_back(from.value());
+    }
 
     return from_any;
   }
@@ -163,8 +165,8 @@ struct PairAssoc<uint8_t, float>
   using pre_param = std::pair<std::vector<LookupEntry>, std::vector<params>>;
 
   static ParamDefinitions<params> get_params(
-      const ParametersInterface::SharedPtr & interface,
-      const std::string & used_name)
+    const ParametersInterface::SharedPtr & interface,
+    const std::string & used_name)
   {
     ParamDefinitions<params> result;
 
@@ -181,20 +183,21 @@ struct PairAssoc<float, float>
   using pre_param = std::pair<std::vector<LookupEntry>, std::vector<params>>;
 
   static DirectParamDefinitions get_params(
-      const ParametersInterface::SharedPtr & interface,
-      const std::string & used_name)
+    const ParametersInterface::SharedPtr & interface,
+    const std::string & used_name)
   {
     auto from_any = utils::get_parameter_or_default<std::vector<std::string>>(
-        interface,
-            "remap.axes." + used_name + ".from_any",
-            "The original axis names to derive values for this name from.", {});
+      interface,
+      "remap.axes." + used_name + ".from_any",
+      "The original axis names to derive values for this name from.", {});
     const auto from = utils::get_parameter<std::string>(
-        interface,
-        "remap.axes." + used_name + ".from",
-        "The original axis name to derive values for this name from.");
+      interface,
+      "remap.axes." + used_name + ".from",
+      "The original axis name to derive values for this name from.");
 
-    if (from.has_value())
+    if (from.has_value()) {
       from_any.emplace_back(from.value());
+    }
 
     return from_any;
   }
@@ -208,8 +211,8 @@ struct PairAssoc<float, uint8_t>
   using pre_param = std::pair<std::vector<LookupEntry>, std::vector<params>>;
 
   static ParamDefinitions<params> get_params(
-      const ParametersInterface::SharedPtr & interface,
-      const std::string & used_name)
+    const ParametersInterface::SharedPtr & interface,
+    const std::string & used_name)
   {
     ParamDefinitions<params> result;
 
@@ -218,7 +221,6 @@ struct PairAssoc<float, uint8_t>
 };
 
 }  // namespace teleop::internal::remapping
-
 
 
 #endif  // CONTROL_MODE_REMAPPER_ASSOC_HPP

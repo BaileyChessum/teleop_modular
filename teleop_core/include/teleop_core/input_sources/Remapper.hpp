@@ -1,7 +1,22 @@
 //
-// Created by Bailey Chessum on 7/22/25.
+// Created by Bailey Chessum on 22/7/25.
 //
 // Look, I know. This whole file wishes it were written in Haskell.
+//
+// I tried to do some metaprogramming to make the remapping less terse and more extensible, while keeping good cache
+// locality, avoiding excessive indirection, and reducing duplicate code. Since the previous simpler implementation was
+// already very error-prone due to its size and duplicated code, I went about this implementation to avoid those issues.
+//
+// Unfortunately, most of this has to be achieved through complex templates in C++, hence why everything is near
+// incomprehensible.
+//
+// The algorithm is split up into two phases -- the parameterization phase, and crystallization phase
+//
+// The parameterization phase does the brunt of the work, figuring out for each input type pairing, what inputs relate
+// to each other, associated parameters with each pairing, and a LookupEntry object to be used to link things in the
+// next phase.
+//
+// The crystallization phase turns those parameters and LookupEntry objects into Transformers/Reducers and raw pointers.
 
 #ifndef CONTROL_MODE_REMAPPER_HPP
 #define CONTROL_MODE_REMAPPER_HPP
@@ -49,13 +64,15 @@ struct OriginalDefinitions
  * \tparam T    All basic types held by the input source, that can be mapped to each other (float, uint8_t, etc)
  */
 template<typename ... T>
-struct AlgorithmInputs{
+struct AlgorithmInputs
+{
   std::tuple<OriginalDefinitions<T>...> originals;
 };
 
 // Cartesian product metafunction
-template <typename A, typename... B>
-struct PairWithEach {
+template<typename A, typename ... B>
+struct PairWithEach
+{
   using pre_param = std::tuple<typename PairAssoc<A, B>::pre_param...>;
 };
 
@@ -68,15 +85,20 @@ struct ParamPhaseData
   /// Maps name to index and info to identify the appropriate container
   std::array<std::map<std::string, LookupEntry>, sizeof...(T)> lookup{};
 
+  std::array<size_t, sizeof...(T)> transformed_value_counts{};
+
   // Expand over all T[i]
-  using pre_param_tuple_type = std::tuple<std::map<std::string, typename PairWithEach<T, T...>::pre_param>...>;
+  using pre_param_tuple_type = std::tuple<std::map<std::string, typename PairWithEach<T,
+      T...>::pre_param>...>;
   pre_param_tuple_type pre_params;
 
   template<std::size_t I>
-  inline void constructor_foreach_type() {
+  inline void constructor_foreach_type()
+  {
     auto og_names = std::get<I>(inputs.originals).names;
-    for (size_t j = 0; j < og_names.size(); ++j)
+    for (size_t j = 0; j < og_names.size(); ++j) {
       lookup[I][og_names[j]] = LookupEntry{j, true};
+    }
   }
 
   template<std::size_t... I>
@@ -85,7 +107,8 @@ struct ParamPhaseData
     (constructor_foreach_type<I>(), ...);
   }
 
-  explicit ParamPhaseData(AlgorithmInputs<T...> inputs) : inputs(inputs)
+  explicit ParamPhaseData(AlgorithmInputs<T...> inputs)
+  : inputs(inputs)
   {
     constructor_foreach_type_aux(std::make_index_sequence<sizeof...(T)>{});
   }
@@ -107,8 +130,17 @@ class Remapper
 {
 public:
   static_assert(
-    (std::is_class_v<typename Assoc<T>::transforms>&& ...),
-    "All types must be mappable via Assoc");
+      (std::is_class_v<typename Assoc<T>::transforms>&& ...),
+      "All types must be mappable via Assoc");
+
+  rclcpp::Logger logger;
+  ParametersInterface::SharedPtr interface;
+  /// All the original definitions exported by the input source
+  //  std::tuple<OriginalDefinitions<T>...> originals;
+  /// For each type T, the set of names actually used by the system consuming inputs.
+  //  std::array<std::set<std::string>, sizeof...(T)> used_name_sets;
+  /// For each type T, additional transformed values from complex remappings
+  std::tuple<std::vector<std::shared_ptr<TransformedValue<T>>>...> transformed_values;
 
   Remapper(
     rclcpp::Logger logger, ParametersInterface::SharedPtr interface)
@@ -154,7 +186,7 @@ public:
     }
 
     using From = std::tuple_element_t<J, std::tuple<T...>>;
-    static_assert( 
+    static_assert(
       std::is_class_v<typename PairAssoc<Type, From>::from>,
       "Pair is not mappable! Define values for PairAssoc for these types.");
     using Pair = PairAssoc<Type, From>;
@@ -188,37 +220,42 @@ public:
   }
 
   template<std::size_t I, typename Type>
-  inline bool param_phase_try_make_exist(ParamPhaseData<T...>& data, const std::string & used_name);
+  inline bool param_phase_try_make_exist(
+    ParamPhaseData<T...> & data,
+    const std::string & used_name);
 
   template<std::size_t I, typename Type>
-  inline bool param_phase_ensure_exists(ParamPhaseData<T...>& data, const std::string & used_name);
+  inline bool param_phase_ensure_exists(ParamPhaseData<T...> & data, const std::string & used_name);
 
-  /// Needs to find the list of all ~~names~~ VectorRefs + params for a certain type pair
+  /// Needs to find the list of all LookupEntry + params for a certain type pair
   /// Has the responsibility to set pre_params for used_name under this type pair
   /// Return the number of mapped values
   template<std::size_t I, typename Type, std::size_t J>
-  inline size_t get_params_for_pair_to_used_name(ParamPhaseData<T...>& data, const std::string & used_name) {
+  inline size_t get_params_for_pair_to_used_name(
+    ParamPhaseData<T...> & data,
+    const std::string & used_name)
+  {
     using From = std::tuple_element_t<J, std::tuple<T...>>;
     using Pair = PairAssoc<Type, From>;
 
-    auto& pre_params_for_type = std::get<I>(data.pre_params);
+    auto & pre_params_for_type = std::get<I>(data.pre_params);
     auto pre_param_lookup_result = pre_params_for_type.emplace(used_name); // , {{{},{}},{{},{}},{{},{}}}
-    auto& pre_params_for_pair = std::get<J>(*(pre_param_lookup_result.first));
+    auto & pre_params_for_pair = std::get<J>(*(pre_param_lookup_result.first));
 
     // Same type
     std::vector<std::string> map_to_names{};
     // TODO(BaileyChessum): Direct mappings don't actually use this
     std::vector<typename Pair::params> map_to_params{};
 
-    auto& lookup = data.lookup[J];
-    std::vector<LookupEntry>& entries = pre_params_for_pair.first;
-    std::vector<typename Pair::params>& params = pre_params_for_pair.second;
+    auto & lookup = data.lookup[J];
+    std::vector<LookupEntry> & entries = pre_params_for_pair.first;
+    std::vector<typename Pair::params> & params = pre_params_for_pair.second;
 
     // Populate map_to_names
-    if constexpr (std::is_same_v<Type, From>) {
+    if constexpr (I == J) {
+      // Mapping between same type, no extra params
       map_to_names = Pair::get_params(interface, used_name);
-    }
-    else {
+    } else {
       auto pair_params = Pair::get_params(interface, used_name);
       map_to_names = pair_params.first;
       map_to_params = pair_params.second;
@@ -233,15 +270,17 @@ public:
 
       if (it == lookup.end()) {
         // The given name doesn't exist yet -- try make it exist
-        if (!param_phase_ensure_exists<J, From>(data, name))
+        if (!param_phase_ensure_exists<J, From>(data, name)) {
           continue;
+        }
         // I don't think that this should ever fail? We could change the return type of the above to give us
         // it->second conditionally as a std::optional, where std::nullopt means it failed
         it = lookup.find(name);
       }
 
-      if (it == lookup.end())
+      if (it == lookup.end()) {
         continue;
+      }
 
       entries.emplace_back(it->second);
       if constexpr (I != J) {
@@ -254,22 +293,26 @@ public:
   }
 
   template<std::size_t I, typename Type, std::size_t... J>
-  inline auto get_all_params_to_used_name(ParamPhaseData<T...>& data, const std::string & used_name, std::index_sequence<J...>) {
+  inline auto get_all_params_to_used_name(
+    ParamPhaseData<T...> & data,
+    const std::string & used_name, std::index_sequence<J...>)
+  {
     return std::make_tuple(get_params_for_pair_to_used_name<I, Type, J>(data, used_name)...);
   }
 
   template<std::size_t I, typename Type>
-  inline bool param_phase_create_leaves_for_type(ParamPhaseData<T...>& data) {
+  inline bool param_phase_create_leaves_for_type(ParamPhaseData<T...> & data)
+  {
     using Pair = PairAssoc<Type, Type>;
 
-    auto& inputs = data.inputs;
-    auto& lookup = data.lookup[I];
-    auto& originals = std::get<I>(inputs.originals);
+    auto & inputs = data.inputs;
+    auto & lookup = data.lookup[I];
+    auto & originals = std::get<I>(inputs.originals);
 
     std::vector<std::string> overwritten_original_names{};
 
     for (size_t i = 0; i < originals.names.size(); ++i) {
-      const auto& name = originals.names[i];
+      const auto & name = originals.names[i];
 
       // Try create a leaf for this name
       auto direct_names = Pair::get_params(interface, name);
@@ -295,7 +338,7 @@ public:
    * \tparam I  The index of the type we are mapping values to in typename ... T
    */
   template<std::size_t I>
-  inline void param_phase_remap_inputs_of_type(ParamPhaseData<T...>& data)
+  inline void param_phase_remap_inputs_of_type(ParamPhaseData<T...> & data)
   {
     using Type = std::tuple_element_t<I, std::tuple<T...>>;
 
@@ -312,7 +355,7 @@ public:
 
   // Outer loop over all I
   template<std::size_t... I>
-  inline void param_phase_all_types_aux(ParamPhaseData<T...>& data, std::index_sequence<I...>)
+  inline void param_phase_all_types_aux(ParamPhaseData<T...> & data, std::index_sequence<I...>)
   {
     (param_phase_remap_inputs_of_type<I>(data), ...);
   }
@@ -324,27 +367,21 @@ public:
     param_phase_all_types_aux(data, std::make_index_sequence<sizeof...(T)>{});
   }
 
-  rclcpp::Logger logger;
-  ParametersInterface::SharedPtr interface;
-  /// All the original definitions exported by the input source
-//  std::tuple<OriginalDefinitions<T>...> originals;
-  /// For each type T, the set of names actually used by the system consuming inputs.
-//  std::array<std::set<std::string>, sizeof...(T)> used_name_sets;
-  /// For each type T, additional transformed values from complex remappings
-  std::tuple<std::vector<std::shared_ptr<TransformedValue<T>>>...> transformed_values;
 };
 
-template <typename... T>
-template <std::size_t I, typename Type>
-bool Remapper<T...>::param_phase_ensure_exists(ParamPhaseData<T...>& data, const std::string& used_name)
+template<typename ... T>
+template<std::size_t I, typename Type>
+bool Remapper<T...>::param_phase_ensure_exists(
+  ParamPhaseData<T...> & data,
+  const std::string & used_name)
 {
-  auto& inputs = data.inputs;
-  auto& lookup = data.lookup[I];
+  auto & inputs = data.inputs;
+  auto & lookup = data.lookup[I];
 
   auto it = lookup.find(used_name);
 
   if (it != lookup.end()) {
-    auto& entry = *it;
+    auto & entry = *it;
 
     // Already exists
     return true;
@@ -354,36 +391,66 @@ bool Remapper<T...>::param_phase_ensure_exists(ParamPhaseData<T...>& data, const
   return param_phase_try_make_exist(data, used_name);
 }
 
-template <typename... T>
-template <std::size_t I, typename Type>
-bool Remapper<T...>::param_phase_try_make_exist(ParamPhaseData<T...>& data, const std::string& used_name)
+template<typename ... T>
+template<std::size_t I, typename Type>
+bool Remapper<T...>::param_phase_try_make_exist(
+  ParamPhaseData<T...> & data,
+  const std::string & used_name)
 {
-  auto& inputs = data.inputs;
-  auto& lookup = data.lookup[I];
-  auto& originals = std::get<I>(inputs.originals);
+  auto & inputs = data.inputs;
+  auto & lookup = data.lookup[I];
+  auto & originals = std::get<I>(inputs.originals);
 
-  auto& params_results = get_all_params_to_used_name<I, Type>(data, used_name, std::make_index_sequence<sizeof...(T)>{});
+  // The number of mapped values for each 'From' type
+  auto & params_results = get_all_params_to_used_name<I, Type>(
+    data, used_name,
+    std::make_index_sequence<sizeof...(T)>{});
   bool has_any_def = false;
   bool needs_transform_value = false;
 
-  for (size_t i = 0; i < params_results.size(); ++i)
-  {
+
+  // Get values for has_any_def and needs_transform_value
+  for (size_t i = 0; i < params_results.size(); ++i) {
     if (i == I) {
-      if (params_results[i].size() > 0) {
+      if (params_results[i] > 0) {
         has_any_def = true;
-        if (params_results[i].size() > 1)
+        // Special case when mapping between the same type --
+        // we only need a transform value when there are more than 2 source values
+        if (params_results[i].size() > 1) {
           needs_transform_value = true;
+        }
       }
-    }
-    else {
-      if (params_results[i].names.size() > 0) {
+    } else {
+      if (params_results[i].names > 0) {
         has_any_def = true;
         needs_transform_value = true;
       }
     }
   }
 
-  return has_any_def;
+  if (!has_any_def) {
+    return false;
+  }
+
+  LookupEntry entry{};
+
+  if (needs_transform_value) {
+    // Create a new transformed value in memory (actual creation is deferred until the crystallization phase)
+    entry.index = data.transformed_value_counts[I]++;
+    entry.original = false;   // Mark that the crystallized pointer should point into the transformed vector.
+  } else {
+    // Find the single direct LookupEntry and copy that
+    // TODO(BaileyChessum): Duplicated from get_params_for_pair_to_used_name -- collate to avoid duplicate lookup
+    auto & pre_params_for_type = std::get<I>(data.pre_params);
+    auto pre_param_lookup_result = pre_params_for_type.emplace(used_name); // , {{{},{}},{{},{}},{{},{}}}
+    auto & pre_params_for_direct_mapping = std::get<I>(*(pre_param_lookup_result.first));
+    std::vector<LookupEntry> & direct_mapping_entries = pre_params_for_direct_mapping.first;
+
+    assert(direct_mapping_entries.size() == 1);
+    entry = direct_mapping_entries[0];
+  }
+
+  return true;
 }
 
 }  // namespace teleop::internal::remapping

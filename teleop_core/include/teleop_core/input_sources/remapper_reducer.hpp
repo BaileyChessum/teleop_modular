@@ -9,7 +9,8 @@
 #include <cstdint>
 #include <memory>
 
-namespace teleop::internal::remapping {
+namespace teleop::internal::remapping
+{
 
 template<typename T>
 struct Transformer
@@ -73,7 +74,7 @@ struct TransformedValue final
   }
 
   explicit TransformedValue(std::vector<std::shared_ptr<Transformer<T>>> transformers)
-      : transformers(std::move(transformers))
+  : transformers(std::move(transformers))
   {
     value = 0;
   }
