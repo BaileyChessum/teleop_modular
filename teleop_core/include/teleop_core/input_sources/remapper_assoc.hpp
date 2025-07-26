@@ -33,13 +33,6 @@ struct ParamDefinitions
   std::vector<ParamT> params;
 };
 
-template<typename ParamT>
-struct PreParamDefinitions
-{
-  std::vector<LookupEntry> entries;
-  std::vector<ParamT> params;
-};
-
 using DirectParamDefinitions = ParamDefinitions<bool>;
 
 struct AxisTransformParams final : public Transformer<float>
@@ -262,6 +255,21 @@ struct PairAssoc<float, uint8_t>
     const std::string & used_name)
   {
     ParamDefinitions<params> result;
+    const auto prefix = "remap.buttons." + used_name + ".from_axis.";
+
+    const auto from_axis_name = utils::get_parameter<std::string>(
+        interface, prefix + "name",
+        "The name of the axis to read the button value from.");
+
+    if (!from_axis_name.has_value())
+      return result;
+
+    const auto threshold = utils::get_parameter_or_default<float>(
+        interface, prefix + "threshold",
+        "The threshold below which the button will be triggered.", 0.0);
+
+    result.names = {from_axis_name.value()};
+    result.params = {threshold};
 
     return result;
   }

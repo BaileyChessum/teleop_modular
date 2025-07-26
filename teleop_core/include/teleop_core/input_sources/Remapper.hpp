@@ -247,7 +247,7 @@ public:
     auto & pre_params_for_pair = std::get<J>(pre_params_for_type[used_name]); //std::get<J>(*(pre_param_lookup_result.first));
 
     RCLCPP_INFO(
-      logger, "Getting all " C_INPUT "%s" C_RESET "inputs to " C_INPUT "%s '%s'" C_RESET,
+      logger, "Getting all " C_INPUT "%s" C_RESET " inputs to " C_INPUT "%s '%s'" C_RESET,
       Assoc<From>::name.data(), Assoc<Type>::name.data(), used_name.c_str());
 
     // Same type
@@ -390,7 +390,6 @@ public:
     RCLCPP_INFO(logger, "Remapped parameters in %ld microseconds", duration);
 
   }
-
 };
 
 template<typename ... T>
