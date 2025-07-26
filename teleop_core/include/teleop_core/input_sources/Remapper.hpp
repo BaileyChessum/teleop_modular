@@ -22,13 +22,11 @@
 #include <rclcpp/node_interfaces/node_interfaces.hpp>
 #include <rclcpp/node_interfaces/node_parameters.hpp>
 #include "teleop_core/utilities/get_parameter.hpp"
+#include "teleop_core/input_sources/remapper_reducer.hpp"
+#include "teleop_core/input_sources/remapper_assoc.hpp"
 
-namespace teleop
+namespace teleop::internal::remapping
 {
-namespace internal::remapping
-{
-
-using ParametersInterface = rclcpp::node_interfaces::NodeParametersInterface;
 
 // To get span<T> without the prefix
 using namespace input_source;
@@ -45,287 +43,34 @@ struct OriginalDefinitions
   const span<T> values;
 };
 
-
-template<typename T>
-struct Transformer
-{
-  virtual void accumulate(T & result) noexcept = 0;
-};
-
-/**
- * Either something that reduces multiple original inputs into a single result, or a transform
- */
-template<typename Type, typename From>
-struct Reducer : Transformer<Type>
-{
-  std::vector<From *> values;
-
-  [[nodiscard]] bool empty() const noexcept
-  {
-    return values.empty();
-  }
-
-  [[nodiscard]] size_t size() const noexcept
-  {
-    return values.size();
-  }
-};
-
-template<typename T>
-struct DirectReducer final : public Reducer<T, T>
-{
-  std::vector<T *> values;
-
-  inline void accumulate(uint8_t & result) noexcept final
-  {
-    for (size_t i = 0; i < values.size(); ++i) {
-      result += *values[i];
-    }
-  }
-
-  /// Special case for DirectReducers to allow direct mapping
-  [[nodiscard]] T * first() const noexcept
-  {
-    assert(this->size() == 1);
-    return values[0];
-  }
-};
-
-
-/// What we actually store in memory for transformed things
-template<typename T>
-struct TransformedValue final
-{
-  T value;
-  const std::vector<std::shared_ptr<Transformer<T>>> transformers;
-
-  inline void update() noexcept
-  {
-    value = 0;
-    for (const auto & transformer : transformers) {
-      transformer->accumulate(value);
-    }
-  }
-
-  explicit TransformedValue(std::vector<std::shared_ptr<Transformer<T>>> transformers)
-  : transformers(std::move(transformers))
-  {
-    value = 0;
-  }
-};
-
-struct AxisTransformParams final : public Transformer<float>
-{
-  inline void accumulate(float & result) noexcept final
-  {
-    // TODO(BaileyChessum): Do transformation stuff here
-  }
-};
-
-struct ButtonTransformParams final : public Transformer<uint8_t>
-{
-  inline void accumulate(uint8_t & result) noexcept final
-  {
-    // TODO(BaileyChessum): Do transformation stuff here
-  }
-};
-
-struct AxisFromButtonParams final : public Reducer<float, uint8_t>
-{
-  std::vector<uint8_t *> values;
-  /// When the value is true, the equivalent will be added to the output. 1.0 for positive, -1.0 for negative buttons.
-  std::vector<float> equivalents;
-
-
-  void push_back(uint8_t * value, bool negative)
-  {
-    if (!value) {
-      return;
-    }
-
-    values.emplace_back(value);
-    equivalents.emplace_back(negative ? -1.0f : 1.0f);
-  }
-
-  inline void accumulate(float & result) noexcept final
-  {
-    for (size_t i = 0; i < values.size(); ++i) {
-      result += static_cast<float>(*values[i]) * equivalents[i];
-    }
-  }
-};
-
-struct ButtonFromAxisParams final : public Reducer<uint8_t, float>
-{
-  std::vector<float> thresholds;
-
-  void push_back(float * value, float threshold)
-  {
-    if (!value) {
-      return;
-    }
-
-    values.emplace_back(value);
-    thresholds.emplace_back(threshold);
-  }
-
-  inline void accumulate(uint8_t & result) noexcept final
-  {
-    for (size_t i = 0; i < values.size(); ++i) {
-      if (*values[i] < thresholds[i]) {
-        ++result;
-      }
-    }
-  }
-};
-
-/**
- * The result of some part of the parameterization stage
- */
-template<typename ParamT>
-struct ParamDefinitions
-{
-  std::vector<std::string> names;
-  std::vector<ParamT> params;
-};
-
-//region Assoc
-
-/**
- * \breif helper to associate various extra types with T
- * We use this to associate transform params with T
- */
-template<typename T, typename = void>
-struct Assoc;  // Defined per T
-
-// Map Params for different types
-template<>
-struct Assoc<uint8_t>
-{
-  static constexpr const std::string_view name = "Button";
-  using transforms = ButtonTransformParams;
-};
-
-template<>
-struct Assoc<float>
-{
-  static constexpr const std::string_view name = "Axis";
-  using transforms = AxisTransformParams;
-};
-
-
-/**
- * \breif helper to associate how one type relates to another
- * We use this to define from params in remapping, such as making a button from an axis
- */
-template<typename T, typename TFrom, typename = void>
-struct PairAssoc;  // Defined per T
-
-template<>
-struct PairAssoc<uint8_t, uint8_t>
-{
-  using from = DirectReducer<uint8_t>;
-
-  static std::vector<std::string> get_params(
-    const ParametersInterface::SharedPtr & interface,
-    const std::string & used_name)
-  {
-    auto from_any = utils::get_parameter_or_default<std::vector<std::string>>(
-      interface,
-      "remap.buttons." + used_name + ".from_any",
-      "The original button names to derive values for this name from.", {});
-    const auto from = utils::get_parameter<std::string>(
-      interface,
-      "remap.buttons." + used_name + ".from",
-      "The original button name to derive values for this name from.");
-
-    if (from.has_value())
-      from_any.emplace_back(from.value());
-
-    return from_any;
-  }
-};
-
-template<>
-struct PairAssoc<uint8_t, float>
-{
-  using from = ButtonFromAxisParams;
-  using params = float;
-
-  static ParamDefinitions<params> get_params(
-    const ParametersInterface::SharedPtr & interface,
-    const std::string & used_name)
-  {
-    ParamDefinitions<params> result;
-
-
-
-
-    return result;
-  }
-};
-
-template<>
-struct PairAssoc<float, float>
-{
-  using from = DirectReducer<float>;
-
-  static std::vector<std::string> get_params(
-    const ParametersInterface::SharedPtr & interface,
-    const std::string & used_name)
-  {
-    auto from_any = utils::get_parameter_or_default<std::vector<std::string>>(
-      interface,
-      "remap.axes." + used_name + ".from_any",
-      "The original axis names to derive values for this name from.", {});
-    const auto from = utils::get_parameter<std::string>(
-      interface,
-      "remap.axes." + used_name + ".from",
-      "The original axis name to derive values for this name from.");
-
-    if (from.has_value())
-      from_any.emplace_back(from.value());
-
-    return from_any;
-  }
-};
-
-template<>
-struct PairAssoc<float, uint8_t>
-{
-  using from = AxisFromButtonParams;
-  using params = float;
-};
-
-//endregion
-
 /**
  * The inputs given by the external system to run the algorithm on
+ *
+ * \tparam T    All basic types held by the input source, that can be mapped to each other (float, uint8_t, etc)
  */
 template<typename ... T>
 struct AlgorithmInputs{
-
   std::tuple<OriginalDefinitions<T>...> originals;
-
 };
 
-
+// Cartesian product metafunction
+template <typename A, typename... B>
+struct PairWithEach {
+  using pre_param = std::tuple<typename PairAssoc<A, B>::pre_param...>;
+};
 
 template<typename ... T>
 struct ParamPhaseData
 {
-  struct LookupEntry {
-    size_t index{};
-    bool original = false;
-  };
-
   /// The original inputs to the algorithm
   AlgorithmInputs<T...> inputs;
 
   /// Maps name to index and info to identify the appropriate container
-
   std::array<std::map<std::string, LookupEntry>, sizeof...(T)> lookup{};
-  size_t new_entries = 0;
+
+  // Expand over all T[i]
+  using pre_param_tuple_type = std::tuple<std::map<std::string, typename PairWithEach<T, T...>::pre_param>...>;
+  pre_param_tuple_type pre_params;
 
   template<std::size_t I>
   inline void constructor_foreach_type() {
@@ -355,7 +100,7 @@ struct ParamPhaseData
 /**
  * \brief A templated class to reduce duplicated logic for input source remapping
  *
- * \tparam T    The basic type held by the input source, that can be mapped to each other (float, uint8_t, etc)
+ * \tparam T    All basic types held by the input source, that can be mapped to each other (float, uint8_t, etc)
  */
 template<typename ... T>
 class Remapper
@@ -409,7 +154,7 @@ public:
     }
 
     using From = std::tuple_element_t<J, std::tuple<T...>>;
-    static_assert(
+    static_assert( 
       std::is_class_v<typename PairAssoc<Type, From>::from>,
       "Pair is not mappable! Define values for PairAssoc for these types.");
     using Pair = PairAssoc<Type, From>;
@@ -441,6 +186,108 @@ public:
 
     return nullptr;
   }
+
+  template<std::size_t I, typename Type>
+  inline bool param_phase_try_make_exist(ParamPhaseData<T...>& data, const std::string & used_name);
+
+  template<std::size_t I, typename Type>
+  inline bool param_phase_ensure_exists(ParamPhaseData<T...>& data, const std::string & used_name);
+
+  /// Needs to find the list of all ~~names~~ VectorRefs + params for a certain type pair
+  /// Has the responsibility to set pre_params for used_name under this type pair
+  /// Return the number of mapped values
+  template<std::size_t I, typename Type, std::size_t J>
+  inline size_t get_params_for_pair_to_used_name(ParamPhaseData<T...>& data, const std::string & used_name) {
+    using From = std::tuple_element_t<J, std::tuple<T...>>;
+    using Pair = PairAssoc<Type, From>;
+
+    auto& pre_params_for_type = std::get<I>(data.pre_params);
+    auto pre_param_lookup_result = pre_params_for_type.emplace(used_name); // , {{{},{}},{{},{}},{{},{}}}
+    auto& pre_params_for_pair = std::get<J>(*(pre_param_lookup_result.first));
+
+    // Same type
+    std::vector<std::string> map_to_names{};
+    // TODO(BaileyChessum): Direct mappings don't actually use this
+    std::vector<typename Pair::params> map_to_params{};
+
+    auto& lookup = data.lookup[J];
+    std::vector<LookupEntry>& entries = pre_params_for_pair.first;
+    std::vector<typename Pair::params>& params = pre_params_for_pair.second;
+
+    // Populate map_to_names
+    if constexpr (std::is_same_v<Type, From>) {
+      map_to_names = Pair::get_params(interface, used_name);
+    }
+    else {
+      auto pair_params = Pair::get_params(interface, used_name);
+      map_to_names = pair_params.first;
+      map_to_params = pair_params.second;
+    }
+
+    for (size_t i = 0; i < map_to_names.size(); ++i) {
+      std::string name = map_to_names[i];
+      typename Pair::params param = map_to_params[i];
+
+      // TODO(BaileyChessum): Ensure the name exists, then add if exists
+      auto it = lookup.find(name);
+
+      if (it == lookup.end()) {
+        // The given name doesn't exist yet -- try make it exist
+        if (!param_phase_ensure_exists<J, From>(data, name))
+          continue;
+        // I don't think that this should ever fail? We could change the return type of the above to give us
+        // it->second conditionally as a std::optional, where std::nullopt means it failed
+        it = lookup.find(name);
+      }
+
+      if (it == lookup.end())
+        continue;
+
+      entries.emplace_back(it->second);
+      if constexpr (I != J) {
+        // Types are different
+        params.emplace_back(param);
+      }
+    }
+
+    return entries.size();
+  }
+
+  template<std::size_t I, typename Type, std::size_t... J>
+  inline auto get_all_params_to_used_name(ParamPhaseData<T...>& data, const std::string & used_name, std::index_sequence<J...>) {
+    return std::make_tuple(get_params_for_pair_to_used_name<I, Type, J>(data, used_name)...);
+  }
+
+  template<std::size_t I, typename Type>
+  inline bool param_phase_create_leaves_for_type(ParamPhaseData<T...>& data) {
+    using Pair = PairAssoc<Type, Type>;
+
+    auto& inputs = data.inputs;
+    auto& lookup = data.lookup[I];
+    auto& originals = std::get<I>(inputs.originals);
+
+    std::vector<std::string> overwritten_original_names{};
+
+    for (size_t i = 0; i < originals.names.size(); ++i) {
+      const auto& name = originals.names[i];
+
+      // Try create a leaf for this name
+      auto direct_names = Pair::get_params(interface, name);
+
+      if (!direct_names.empty() && !(direct_names.size() == 1 && direct_names[0] == name)) {
+        // Uh oh -- this isn't direct :(
+        overwritten_original_names.emplace_back(name);
+        continue;
+      }
+
+      // This is done implicitly:
+      // lookup[name] = {i, true};
+    }
+
+    // TODO(BaileyChessum): Deal with overwritten original names
+    return true;
+  }
+
 
   /**
    * \brief Remap values for the Ith type in typename ... T.
@@ -487,7 +334,59 @@ public:
   std::tuple<std::vector<std::shared_ptr<TransformedValue<T>>>...> transformed_values;
 };
 
-}  // namespace internal
-}  // namespace teleop
+template <typename... T>
+template <std::size_t I, typename Type>
+bool Remapper<T...>::param_phase_ensure_exists(ParamPhaseData<T...>& data, const std::string& used_name)
+{
+  auto& inputs = data.inputs;
+  auto& lookup = data.lookup[I];
+
+  auto it = lookup.find(used_name);
+
+  if (it != lookup.end()) {
+    auto& entry = *it;
+
+    // Already exists
+    return true;
+  }
+
+  // Try make it exist
+  return param_phase_try_make_exist(data, used_name);
+}
+
+template <typename... T>
+template <std::size_t I, typename Type>
+bool Remapper<T...>::param_phase_try_make_exist(ParamPhaseData<T...>& data, const std::string& used_name)
+{
+  auto& inputs = data.inputs;
+  auto& lookup = data.lookup[I];
+  auto& originals = std::get<I>(inputs.originals);
+
+  auto& params_results = get_all_params_to_used_name<I, Type>(data, used_name, std::make_index_sequence<sizeof...(T)>{});
+  bool has_any_def = false;
+  bool needs_transform_value = false;
+
+  for (size_t i = 0; i < params_results.size(); ++i)
+  {
+    if (i == I) {
+      if (params_results[i].size() > 0) {
+        has_any_def = true;
+        if (params_results[i].size() > 1)
+          needs_transform_value = true;
+      }
+    }
+    else {
+      if (params_results[i].names.size() > 0) {
+        has_any_def = true;
+        needs_transform_value = true;
+      }
+    }
+  }
+
+  return has_any_def;
+}
+
+}  // namespace teleop::internal::remapping
+
 
 #endif  // CONTROL_MODE_REMAPPER_HPP
