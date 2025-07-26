@@ -32,7 +32,14 @@ struct ParamDefinitions
   std::vector<ParamT> params;
 };
 
-using DirectParamDefinitions = std::vector<std::string>;
+template<typename ParamT>
+struct PreParamDefinitions
+{
+  std::vector<LookupEntry> entries;
+  std::vector<ParamT> params;
+};
+
+using DirectParamDefinitions = ParamDefinitions<bool>;
 
 struct AxisTransformParams final : public Transformer<float>
 {
@@ -153,7 +160,7 @@ struct PairAssoc<uint8_t, uint8_t>
       from_any.emplace_back(from.value());
     }
 
-    return from_any;
+    return {from_any, {}};
   }
 };
 
@@ -199,7 +206,7 @@ struct PairAssoc<float, float>
       from_any.emplace_back(from.value());
     }
 
-    return from_any;
+    return {from_any, {}};
   }
 };
 

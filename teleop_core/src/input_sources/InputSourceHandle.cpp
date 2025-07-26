@@ -175,15 +175,25 @@ void InputSourceHandle::declare_and_link_inputs()
   auto declarations = source_->export_inputs();
   const auto remap_params = get_remap_params();
 
-  std::set<std::string> button_names;
+  std::vector<std::string> button_names;
   for (const auto & button : inputs_.get().get_buttons()) {
-    button_names.insert(button->get_name());
+    button_names.emplace_back(button->get_name());
   }
 
-  std::set<std::string> axis_names;
+  std::vector<std::string> axis_names;
   for (const auto & axis : inputs_.get().get_axes()) {
-    axis_names.insert(axis->get_name());
+    axis_names.emplace_back(axis->get_name());
   }
+
+  remapping::Remapper<uint8_t, float> remapper(logger,
+    source_->get_node()->get_node_parameters_interface());
+
+  remapper.remap(
+    {
+      {{declarations.button_names, declarations.buttons},
+        {declarations.axis_names, declarations.axes}},
+      {button_names, axis_names}
+    });
 
   /*Remapper<uint8_t, float> remapper(
     OriginalDefinitions<uint8_t>{declarations.button_names, declarations.buttons},

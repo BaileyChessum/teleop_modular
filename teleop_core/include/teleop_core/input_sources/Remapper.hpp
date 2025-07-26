@@ -67,6 +67,7 @@ template<typename ... T>
 struct AlgorithmInputs
 {
   std::tuple<OriginalDefinitions<T>...> originals;
+  std::array<std::vector<std::string>, sizeof...(T)> used_names;
 };
 
 // Cartesian product metafunction
@@ -119,6 +120,11 @@ struct ParamPhaseData
 //  }
 };
 
+/// Added to be compatible with C++ 17
+//template <typename... T>
+//constexpr auto make_array(T&&... t) -> std::array<std::common_type_t<T...>, sizeof...(T)> {
+//  return {std::forward<T>(t)...};
+//}
 
 /**
  * \brief A templated class to reduce duplicated logic for input source remapping
@@ -130,8 +136,8 @@ class Remapper
 {
 public:
   static_assert(
-      (std::is_class_v<typename Assoc<T>::transforms>&& ...),
-      "All types must be mappable via Assoc");
+    (std::is_class_v<typename Assoc<T>::transforms>&& ...),
+    "All types must be mappable via Assoc");
 
   rclcpp::Logger logger;
   ParametersInterface::SharedPtr interface;
@@ -239,8 +245,15 @@ public:
     using Pair = PairAssoc<Type, From>;
 
     auto & pre_params_for_type = std::get<I>(data.pre_params);
-    auto pre_param_lookup_result = pre_params_for_type.emplace(used_name); // , {{{},{}},{{},{}},{{},{}}}
-    auto & pre_params_for_pair = std::get<J>(*(pre_param_lookup_result.first));
+
+    typename PairWithEach<Type, T...>::pre_param default_pre_params{};
+    auto pre_param_lookup_result = pre_params_for_type.emplace(used_name, default_pre_params); // ,
+    // TODO(BaileyChessum): Idk how to get this from the above call
+    auto & pre_params_for_pair = std::get<J>(pre_params_for_type[used_name]); //std::get<J>(*(pre_param_lookup_result.first));
+
+    RCLCPP_INFO(
+      logger, "Getting all " C_INPUT "%s" C_RESET "inputs to " C_INPUT "%s '%s'" C_RESET,
+      Assoc<From>::name.data(), Assoc<Type>::name.data(), used_name.c_str());
 
     // Same type
     std::vector<std::string> map_to_names{};
@@ -254,11 +267,11 @@ public:
     // Populate map_to_names
     if constexpr (I == J) {
       // Mapping between same type, no extra params
-      map_to_names = Pair::get_params(interface, used_name);
+      map_to_names = Pair::get_params(interface, used_name).names;
     } else {
       auto pair_params = Pair::get_params(interface, used_name);
-      map_to_names = pair_params.first;
-      map_to_params = pair_params.second;
+      map_to_names = pair_params.names;
+      map_to_params = pair_params.params;
     }
 
     for (size_t i = 0; i < map_to_names.size(); ++i) {
@@ -283,6 +296,9 @@ public:
       }
 
       entries.emplace_back(it->second);
+      RCLCPP_INFO(
+        logger, "  Found " C_INPUT "%s" C_RESET " at " C_INPUT "%lu, %d" C_RESET,
+        name.c_str(), it->second.index, it->second.original);
       if constexpr (I != J) {
         // Types are different
         params.emplace_back(param);
@@ -293,11 +309,13 @@ public:
   }
 
   template<std::size_t I, typename Type, std::size_t... J>
-  inline auto get_all_params_to_used_name(
+  inline std::array<size_t, sizeof...(T)> get_all_params_to_used_name(
     ParamPhaseData<T...> & data,
     const std::string & used_name, std::index_sequence<J...>)
   {
-    return std::make_tuple(get_params_for_pair_to_used_name<I, Type, J>(data, used_name)...);
+    // TODO: Turn back to normal
+    return std::array<size_t, 2>{0, 0};
+    // return make_array(get_params_for_pair_to_used_name<I, Type, J>(data, used_name)...);
   }
 
   template<std::size_t I, typename Type>
@@ -320,6 +338,9 @@ public:
       if (!direct_names.empty() && !(direct_names.size() == 1 && direct_names[0] == name)) {
         // Uh oh -- this isn't direct :(
         overwritten_original_names.emplace_back(name);
+        RCLCPP_WARN(
+          logger, "%s is remapped, which is currently undefined behaviour!",
+          name.c_str());
         continue;
       }
 
@@ -342,15 +363,12 @@ public:
   {
     using Type = std::tuple_element_t<I, std::tuple<T...>>;
 
-    // Get names that control modes actually use
+    std::vector<std::string> & used_names = data.inputs.used_names[I];
 
-//    for (auto & name : used_names) {
-//      RCLCPP_INFO(
-//        logger, "Checking remap for %s " C_INPUT "%s" C_RESET, Assoc<Type>::name.data(),
-//        name.c_str());
-//
-//      // Get mapping for every other type
-//    }
+    for (auto & used_name : used_names) {
+      RCLCPP_INFO(logger, "Remapping %s %s", Assoc<Type>::name.data(), used_name.c_str());
+      param_phase_ensure_exists<I, Type>(data, used_name);
+    }
   }
 
   // Outer loop over all I
@@ -360,11 +378,24 @@ public:
     (param_phase_remap_inputs_of_type<I>(data), ...);
   }
 
-  inline ParamPhaseData<T...> param_phase_all_types(AlgorithmInputs<T...> inputs)
+  inline ParamPhaseData<T...> param_phase(AlgorithmInputs<T...> inputs)
   {
     ParamPhaseData<T...> data = ParamPhaseData<T...>(inputs);
-
     param_phase_all_types_aux(data, std::make_index_sequence<sizeof...(T)>{});
+    return data;
+  }
+
+  inline void remap(AlgorithmInputs<T...> inputs)
+  {
+    auto start = std::chrono::high_resolution_clock::now();
+
+    ParamPhaseData<T...> param_phase_data = param_phase(inputs);
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+
+    RCLCPP_INFO(logger, "Remapped parameters in %ld microseconds", duration);
+
   }
 
 };
@@ -388,7 +419,7 @@ bool Remapper<T...>::param_phase_ensure_exists(
   }
 
   // Try make it exist
-  return param_phase_try_make_exist(data, used_name);
+  return param_phase_try_make_exist<I, Type>(data, used_name);
 }
 
 template<typename ... T>
@@ -398,16 +429,14 @@ bool Remapper<T...>::param_phase_try_make_exist(
   const std::string & used_name)
 {
   auto & inputs = data.inputs;
-  auto & lookup = data.lookup[I];
   auto & originals = std::get<I>(inputs.originals);
 
   // The number of mapped values for each 'From' type
-  auto & params_results = get_all_params_to_used_name<I, Type>(
+  auto params_results = get_all_params_to_used_name<I, Type>(
     data, used_name,
     std::make_index_sequence<sizeof...(T)>{});
   bool has_any_def = false;
   bool needs_transform_value = false;
-
 
   // Get values for has_any_def and needs_transform_value
   for (size_t i = 0; i < params_results.size(); ++i) {
@@ -416,12 +445,12 @@ bool Remapper<T...>::param_phase_try_make_exist(
         has_any_def = true;
         // Special case when mapping between the same type --
         // we only need a transform value when there are more than 2 source values
-        if (params_results[i].size() > 1) {
+        if (params_results[i] > 1) {
           needs_transform_value = true;
         }
       }
     } else {
-      if (params_results[i].names > 0) {
+      if (params_results[i] > 0) {
         has_any_def = true;
         needs_transform_value = true;
       }
@@ -442,13 +471,22 @@ bool Remapper<T...>::param_phase_try_make_exist(
     // Find the single direct LookupEntry and copy that
     // TODO(BaileyChessum): Duplicated from get_params_for_pair_to_used_name -- collate to avoid duplicate lookup
     auto & pre_params_for_type = std::get<I>(data.pre_params);
-    auto pre_param_lookup_result = pre_params_for_type.emplace(used_name); // , {{{},{}},{{},{}},{{},{}}}
-    auto & pre_params_for_direct_mapping = std::get<I>(*(pre_param_lookup_result.first));
+//    auto & pre_params_for_pair = std::get<I>(pre_params_for_type[used_name]); //std::get<J>(*(pre_param_lookup_result.first));
+    auto & pre_params_for_pair = std::get<I>(pre_params_for_type[used_name]); //std::get<J>(*(pre_param_lookup_result.first));
+
+    // TODO: Do we need to emplace here??
+    typename PairWithEach<Type, T...>::pre_param default_pre_params{};
+    auto pre_param_lookup_result = pre_params_for_type.emplace(used_name, default_pre_params); // ,
+
+    auto & pre_params_for_direct_mapping = std::get<I>(pre_params_for_type[used_name]);
     std::vector<LookupEntry> & direct_mapping_entries = pre_params_for_direct_mapping.first;
 
     assert(direct_mapping_entries.size() == 1);
     entry = direct_mapping_entries[0];
   }
+
+  auto & lookup = data.lookup[I];
+  lookup[used_name] = entry;
 
   return true;
 }
