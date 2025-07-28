@@ -294,7 +294,7 @@ void ControlModeManager::update(const rclcpp::Time & now, const rclcpp::Duration
       continue;
     }
 
-    control_mode->update(now, period);
+    control_mode->on_update(now, period);
     any_control_mode_updated = true;
   }
 

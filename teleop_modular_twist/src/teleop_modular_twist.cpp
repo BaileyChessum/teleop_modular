@@ -24,7 +24,7 @@ TwistControlMode::~TwistControlMode() = default;
 
 return_type TwistControlMode::on_init()
 {
-  param_listener_ = std::make_shared<teleop_modular_twist::ParamListener>(node_);
+  param_listener_ = std::make_shared<teleop_modular_twist::ParamListener>(get_node());
 
   return return_type::OK;
 }
@@ -86,11 +86,10 @@ CallbackReturn TwistControlMode::on_configure(const State &)
   return CallbackReturn::SUCCESS;
 }
 
-void TwistControlMode::capture_inputs(Inputs inputs)
+void TwistControlMode::on_capture_inputs(Inputs inputs)
 {
   // TODO: Implement a remapping functionality to avoid boilerplate parameters for names, like input source remapping
   speed_ = inputs.axes[params_.input_names.speed];
-  locked_ = inputs.buttons[params_.input_names.locked];
 
   linear_.axes = {
     inputs.axes[params_.input_names.linear.x],
@@ -132,12 +131,12 @@ void TwistControlMode::publish_halt_message(const rclcpp::Time & now) const
   }
 }
 
-return_type TwistControlMode::update(const rclcpp::Time & now, const rclcpp::Duration &)
+return_type TwistControlMode::on_update(const rclcpp::Time & now, const rclcpp::Duration &)
 {
   auto logger = get_node()->get_logger();
 
   // Don't move when locked
-  if (*locked_) {
+  if (is_locked()) {
     publish_halt_message(now);
     return return_type::OK;
   }

@@ -30,8 +30,8 @@ public:
   void publish_halt_message(const rclcpp::Time & now) const;
 
   return_type on_init() override;
-  void capture_inputs(Inputs inputs) override;
-  return_type update(const rclcpp::Time & now, const rclcpp::Duration & period) override;
+  void on_capture_inputs(Inputs inputs) override;
+  return_type on_update(const rclcpp::Time & now, const rclcpp::Duration & period) override;
 
   CallbackReturn on_configure(const State & previous_state) override;
   CallbackReturn on_activate(const State & previous_state) override;
@@ -105,8 +105,6 @@ private:
 
   /// Input from 0 to 1 that directly scales the output speed.
   Axis::SharedPtr speed_;
-  /// Do nothing when this is true
-  Button::SharedPtr locked_;
 };
 
 }  // namespace teleop_modular_twist
