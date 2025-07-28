@@ -33,6 +33,13 @@ struct ParamDefinitions
   std::vector<ParamT> params;
 };
 
+/// ParamDefinitions but when passed to the crystallization phase
+template<typename ParamT>
+struct TransformedParamDefinitions {
+  std::vector<LookupEntry> names;
+  std::vector<ParamT> params;
+};
+
 using DirectParamDefinitions = ParamDefinitions<bool>;
 
 struct AxisTransformParams final : public Transformer<float>
@@ -136,6 +143,7 @@ struct PairAssoc<uint8_t, uint8_t>
   // TODO(BaileyChessum): Direct mappings don't actually use this -- should be void
   using params = bool;
   using pre_param = std::pair<std::vector<LookupEntry>, std::vector<params>>;
+  using transformed_params =
 
   static DirectParamDefinitions get_params(
     const ParametersInterface::SharedPtr & interface,

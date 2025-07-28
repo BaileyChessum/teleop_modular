@@ -76,6 +76,7 @@ template<typename A, typename ... B>
 struct PairWithEach
 {
   using pre_param = std::tuple<typename PairAssoc<A, B>::pre_param...>;
+  using transformed_params = std::tuple<TransformedParamDefinitions<typename PairAssoc<A, B>::params>...>;
 };
 
 template<typename ... T>
@@ -93,6 +94,9 @@ struct ParamPhaseData
   using pre_param_tuple_type = std::tuple<std::map<std::string, typename PairWithEach<T,
       T...>::pre_param>...>;
   pre_param_tuple_type pre_params;
+
+  using transformed_params_tuple_type = std::tuple<std::vector<typename PairWithEach<T, T...>::transformed_params>...>;
+  transformed_params_tuple_type transformed_params;
 
   template<std::size_t I>
   inline void constructor_foreach_type()
@@ -127,7 +131,7 @@ struct ParamPhaseData
  * \tparam T    All basic types held by the input source, that can be mapped to each other (float, uint8_t, etc)
  */
 template<typename ... T>
-class Remapper
+class Remapper final
 {
 public:
   static_assert(
@@ -140,8 +144,13 @@ public:
   //  std::tuple<OriginalDefinitions<T>...> originals;
   /// For each type T, the set of names actually used by the system consuming inputs.
   //  std::array<std::set<std::string>, sizeof...(T)> used_name_sets;
+
+  // TODO(BaileyChessum): Replace with ECS style system (very complex with intertype dependencies -- but doable).
+  // Implement if there are performance issues in update cycles in comparison to using only direct mappings
   /// For each type T, additional transformed values from complex remappings
   std::tuple<std::vector<std::shared_ptr<TransformedValue<T>>>...> transformed_values;
+
+
 
   Remapper(
     rclcpp::Logger logger, ParametersInterface::SharedPtr interface)
@@ -378,17 +387,32 @@ public:
     return data;
   }
 
+  template<std::size_t... I>
+  inline void crystallization_resize_transformed_values(ParamPhaseData<T...> & params, std::index_sequence<I...>) {
+    // For each I, resize transformed_values to params.transformed_value_counts
+    (std::get<I>(transformed_values.resize(std::get<I>(params.transformed_value_counts))), ...);
+  }
+
+  inline void crystallization_phase(ParamPhaseData<T...> & params) {
+    // Set up vectors based on params
+    crystallization_resize_transformed_values(params, std::make_index_sequence<sizeof...(T)>{});
+
+    // Set up 5
+
+  }
+
+  /// Does all steps to remap inputs to be able to start using update()
   inline void remap(AlgorithmInputs<T...> inputs)
   {
     auto start = std::chrono::high_resolution_clock::now();
 
     ParamPhaseData<T...> param_phase_data = param_phase(inputs);
+    crystallization_phase(param_phase_data);
 
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
     RCLCPP_INFO(logger, "Remapped parameters in %ld microseconds", duration);
-
   }
 };
 
@@ -459,11 +483,12 @@ bool Remapper<T...>::param_phase_try_make_exist(
     // Create a new transformed value in memory (actual creation is deferred until the crystallization phase)
     entry.index = data.transformed_value_counts[I]++;
     entry.original = false;   // Mark that the crystallized pointer should point into the transformed vector.
+
   } else {
     // Find the single direct LookupEntry and copy that
     // TODO(BaileyChessum): Duplicated from get_params_for_pair_to_used_name -- collate to avoid duplicate lookup
     auto & pre_params_for_type = std::get<I>(data.pre_params);
-//    auto & pre_params_for_pair = std::get<I>(pre_params_for_type[used_name]); //std::get<J>(*(pre_param_lookup_result.first));
+    // auto & pre_params_for_pair = std::get<I>(pre_params_for_type[used_name]); //std::get<J>(*(pre_param_lookup_result.first));
     auto & pre_params_for_pair = std::get<I>(pre_params_for_type[used_name]); //std::get<J>(*(pre_param_lookup_result.first));
 
     // TODO: Do we need to emplace here??
