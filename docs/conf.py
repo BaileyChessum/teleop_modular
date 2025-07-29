@@ -70,11 +70,11 @@ html_context = {
     "github_version": "main/",
     "conf_py_path": "docs/",
     "source_suffix": ".rst",
-    "favicon": "logo.ico",
+    # "favicon": "favicon/favicon.ico",
     "logo": "logo.svg"
 }
 
-html_favicon = "images/logo.ico"
+# html_favicon = "images/favicon/favicon.ico"
 html_logo = "images/logo.svg"
 
 github_url = "https://github.com/BaileyChessum/teleop_modular"

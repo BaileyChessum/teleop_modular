@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-teleop_modular documentation
+Teleop Modular Documentation
 ============================
 
 Welcome to the documentation for the `teleop_modular <https://github.com/BaileyChessum/teleop_modular>`_ packages!
