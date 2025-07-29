@@ -38,13 +38,13 @@ This is a list of plugins you can use with teleop_modular. Please post plugins t
 
 #### Control Modes
 
-- [teleop_modular_twist/TwistControlMode](./teleop_modular_twist) -- A control mode for sending TwistStamped messages.
+- [teleop_modular_twist/TwistControlMode](./teleop_modular_twist) -- A control mode that sends [Twist](https://docs.ros2.org/latest/api/geometry_msgs/msg/Twist.html) and [TwistStamped](https://docs.ros2.org/latest/api/geometry_msgs/msg/TwistStamped.html) messages.
 
 Use [control_mode_template](https://github.com/BaileyChessum/control_mode_template) to generate empty control mode packages, and implement custom control modes for your robot.
 
 #### Input Sources
 
-- [teleop_modular_joy/JoyInputSource](./teleop_modular_joy) -- An input source for joystick devices.
+- [teleop_modular_joy/JoyInputSource](./teleop_modular_joy) -- An input source for joystick devices, accepting [Joy](https://docs.ros2.org/latest/api/sensor_msgs/msg/Joy.html) messages.
 
 ## Contributing
 
