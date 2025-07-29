@@ -38,6 +38,8 @@ This is a list of plugins you can use with teleop_modular. Please post plugins t
 
 - [teleop_modular_twist/TwistControlMode](./teleop_modular_twist) -- A control mode for sending TwistStamped messages.
 
+Use [control_mode_template](https://github.com/BaileyChessum/control_mode_template) to generate empty control mode packages, and implement custom control modes for your robot.
+
 #### Input Sources
 
 - [teleop_modular_joy/JoyInputSource](./teleop_modular_joy) -- An input source for joystick devices.
