@@ -1,4 +1,4 @@
-<a href="https://github.com/BaileyChessum/teleop_modular/tree/main/docs/README.md">
+<a href="https://baileychessum.github.io/teleop_modular/">
   <div align="center">
     <picture>
       <source media="(prefers-color-scheme: light)" srcset="docs/images/logo_text.svg">
@@ -17,7 +17,7 @@
 
 Teleop Modular is a general framework for multimodal teleoperation in ROS2.
 
-Please refer to the [documentation](./docs/README.md) for information on how to use the teleop_modular packages.
+Please refer to the [documentation](https://baileychessum.github.io/teleop_modular/) for information on how to use the teleop_modular packages.
 
 ## Motivation
 
