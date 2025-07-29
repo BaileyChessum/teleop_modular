@@ -1,9 +1,9 @@
 <a href="https://github.com/BaileyChessum/teleop_modular/tree/main/docs/README.md">
   <div align="center">
     <picture>
-      <source media="(prefers-color-scheme: light)" srcset="docs/assets/logo_text.svg">
-      <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo_white_text.svg">
-      <img src="docs/assets/logo_text.svg" width="625px" alt="teleop_modular logo">
+      <source media="(prefers-color-scheme: light)" srcset="docs/images/logo_text.svg">
+      <source media="(prefers-color-scheme: dark)" srcset="docs/images/logo_white_text.svg">
+      <img src="docs/images/logo_text.svg" width="625px" alt="teleop_modular logo">
     </picture>
   </div>
 </a>
