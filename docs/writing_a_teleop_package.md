@@ -96,7 +96,7 @@ ament_package()
 
 Next, we need to add a launch file that
 
-- Runs `teleop_node`
+- Runs `teleop_node` with a unique name
 - Passes `teleop_node` the appropriate parameter files
 
 > **Sidenote:** In this tutorial, I will be using python launch files, as you can use python to have the launch file
@@ -131,6 +131,9 @@ def launch_setup(context, *args, **kwargs):
             package='teleop_node',
             executable='teleop_node',
             output='screen',
+
+            # Give your teleop_node a unique name to match the package here
+            arguments=['--node-name', 'teleop_example'],
 
             # You can add multiple parameter files here:
             parameters=[
@@ -180,7 +183,7 @@ Create a teleop.yaml file to configure the behavior of the core teleop_node.
 
 ```yaml
 # teleop.yaml
-teleop_node:
+teleop_example:
   ros__parameters:
     # The maximum rate at which updates should occur, and hence the max rate at which commands are sent. 
     # Leaving this unset makes the max update rate unlimited. 
@@ -192,6 +195,8 @@ teleop_node:
 
     # Note: all update rates are in hz
 ```
+
+> **Note**: Make sure you use the same name you gave the node in the launch file at the root of the yaml.
 
 We'll add control modes and input sources later.
 
@@ -205,14 +210,14 @@ ros2 launch teleop_example teleop.launch.py
 
 Your output might look like:
 
-<pre>$ ros2 launch teleop_example teleop.launch.py log_inputs:=true
+<pre>$ ros2 launch teleop_example teleop.launch.py
 [INFO] [launch]: All log files can be found below /home/nova/.ros/log/2025-07-20-23-34-41-464329-nixos-2142296
 [INFO] [launch]: Default logging verbosity is set to INFO
 [INFO] [teleop_node-1]: process started with pid [2142306]
-[teleop_node-1] <font color="#C01C28">[ERROR] [teleop_node] control_modes.names was not set.</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#2A7BDE"><b>Control Modes:</b></font>
+[teleop_node-1] <font color="#C01C28">[ERROR] [teleop_example] control_modes.names was not set.</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#2A7BDE"><b>Control Modes:</b></font>
 [teleop_node-1] 
-[teleop_node-1] [INFO] [teleop_node] <font color="#2A7BDE"><b>Input Sources:</b></font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#2A7BDE"><b>Input Sources:</b></font>
 [teleop_node-1] 
 </pre>
 
@@ -222,7 +227,7 @@ In `teleop.yaml` define a control mode. I'll be using [teleop_modular_twist/Twis
 
 ```yaml
 # teleop.yaml
-teleop_node:
+teleop_example:
   ros__parameters:
     # ... 
 
@@ -258,7 +263,7 @@ of `teleop.yaml`, or make a new parameter file. I will just be adding them to th
 
 ```yaml
 # teleop.yaml
-teleop_node:
+teleop_example:
   ros__parameters:
   # ...
 
@@ -301,12 +306,12 @@ should be listed.
 [INFO] [launch]: All log files can be found below /home/nova/.ros/log/2025-07-21-01-35-16-545322-nixos-2213788
 [INFO] [launch]: Default logging verbosity is set to INFO
 [INFO] [teleop_node-1]: process started with pid [2213791]
-[teleop_node-1] [INFO] [teleop_node] <font color="#2A7BDE"><b>Control Modes:</b></font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#2A7BDE"><b>Control Modes:</b></font>
 [teleop_node-1] 	- Twist Control Mode	<font color="#5D5D5D">: teleop_modular_twist/TwistControlMode</font>
 [teleop_node-1] 
-[teleop_node-1] [INFO] [teleop_node] <font color="#2A7BDE"><b>Input Sources:</b></font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#2A7BDE"><b>Input Sources:</b></font>
 [teleop_node-1] 
-[teleop_node-1] [INFO] [teleop_node] <font color="#A347BA">Twist Control Mode activated</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A347BA">Twist Control Mode activated</font>
 </pre>
 
 If you have any issues, please post in
@@ -320,7 +325,7 @@ In `teleop.yaml` define an input source. I'll be using [teleop_modular_joy/JoyIn
 
 ```yaml
 # teleop.yaml
-teleop_node:
+teleop_example:
   ros__parameters:
     # ... 
 
@@ -341,7 +346,7 @@ of `teleop.yaml`, or make a new parameter file. I will just be adding them to th
 
 ```yaml
 # teleop.yaml
-teleop_node:
+teleop_example:
   ros__parameters:
   # ...
 
@@ -430,68 +435,68 @@ Mess around with controller inputs, and you should see them appear in your origi
 [INFO] [launch]: All log files can be found below /home/nova/.ros/log/2025-07-21-02-16-07-117871-nixos-2232880
 [INFO] [launch]: Default logging verbosity is set to INFO
 [INFO] [teleop_node-1]: process started with pid [2232890]
-[teleop_node-1] [INFO] [teleop_node] <font color="#2A7BDE"><b>Control Modes:</b></font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#2A7BDE"><b>Control Modes:</b></font>
 [teleop_node-1] 	- Twist Control Mode	<font color="#5D5D5D">: teleop_modular_twist/TwistControlMode</font>
 [teleop_node-1] 
-[teleop_node-1] [INFO] [teleop_node] <font color="#2A7BDE"><b>Input Sources:</b></font>
-[teleop_node-1] 	- Joy Input Source	<font color="#5D5D5D">teleop_modular_joy/JoyInputSource</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#2A7BDE"><b>Input Sources:</b></font>
+[teleop_node-1] 	- Joy Input Source	<font color="#5D5D5D">: teleop_modular_joy/JoyInputSource</font>
 [teleop_node-1] 
-[teleop_node-1] [INFO] [teleop_node] <font color="#A347BA">Twist Control Mode activated</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  RIGHTY</font>	<font color="#A2734C">0.116634</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  RIGHTX</font>	<font color="#A2734C">-0.306491</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  RIGHTY</font>	<font color="#A2734C">0.744094</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  RIGHTX</font>	<font color="#A2734C">-0.504636</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  RIGHTY</font>	<font color="#A2734C">0.983520</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  RIGHTX</font>	<font color="#A2734C">-0.364283</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  RIGHTX</font>	<font color="#A2734C">-0.124858</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  RIGHTX</font>	<font color="#A2734C">-0.017529</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  RIGHTY</font>	<font color="#A2734C">0.801887</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  RIGHTY</font>	<font color="#A2734C">0.636765</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  RIGHTY</font>	<font color="#A2734C">0.455132</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  RIGHTY</font>	<font color="#A2734C">0.034073</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  DPAD_RIGHT</font>	<font color="#A2734C">1</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  DPAD_RIGHT</font>	<font color="#A2734C">0</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  DPAD_LEFT</font>	<font color="#A2734C">1</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  DPAD_LEFT</font>	<font color="#A2734C">0</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  DPAD_DOWN</font>	<font color="#A2734C">1</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  DPAD_DOWN</font>	<font color="#A2734C">0</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  DPAD_UP</font>	<font color="#A2734C">1</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  DPAD_UP</font>	<font color="#A2734C">0</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  DPAD_RIGHT</font>	<font color="#A2734C">1</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  DPAD_RIGHT</font>	<font color="#A2734C">0</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  DPAD_LEFT</font>	<font color="#A2734C">1</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  DPAD_LEFT</font>	<font color="#A2734C">0</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  A</font>	<font color="#A2734C">1</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  A</font>	<font color="#A2734C">0</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  B</font>	<font color="#A2734C">1</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  B</font>	<font color="#A2734C">0</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  B</font>	<font color="#A2734C">1</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  B</font>	<font color="#A2734C">0</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  Y</font>	<font color="#A2734C">1</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  Y</font>	<font color="#A2734C">0</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  X</font>	<font color="#A2734C">1</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  X</font>	<font color="#A2734C">0</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  TRIGGERRIGHT</font>	<font color="#A2734C">-0.252811</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  TRIGGERRIGHT</font>	<font color="#A2734C">-0.529405</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  TRIGGERRIGHT</font>	<font color="#A2734C">-0.706894</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  TRIGGERRIGHT</font>	<font color="#A2734C">-0.872015</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  TRIGGERRIGHT</font>	<font color="#A2734C">-1.000000</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  TRIGGERRIGHT</font>	<font color="#A2734C">-0.471612</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  TRIGGERRIGHT</font>	<font color="#A2734C">-0.050553</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  TRIGGERLEFT</font>	<font color="#A2734C">-0.203274</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  TRIGGERLEFT</font>	<font color="#A2734C">-0.686270</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  TRIGGERLEFT</font>	<font color="#A2734C">-1.000000</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  TRIGGERLEFT</font>	<font color="#A2734C">-0.884415</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  TRIGGERLEFT</font>	<font color="#A2734C">-0.323003</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  TRIGGERLEFT</font>	<font color="#A2734C">-0.000000</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  LEFTSHOULDER</font>	<font color="#A2734C">1</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  LEFTSHOULDER</font>	<font color="#A2734C">0</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  RIGHTSHOULDER</font>	<font color="#A2734C">1</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  RIGHTSHOULDER</font>	<font color="#A2734C">0</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  GUIDE</font>	<font color="#A2734C">1</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  GUIDE</font>	<font color="#A2734C">0</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  START</font>	<font color="#A2734C">1</font>
-[teleop_node-1] [INFO] [teleop_node] <font color="#A2734C">  START</font>	<font color="#A2734C">0</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A347BA">Twist Control Mode activated</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  RIGHTY</font>	<font color="#A2734C">0.116634</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  RIGHTX</font>	<font color="#A2734C">-0.306491</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  RIGHTY</font>	<font color="#A2734C">0.744094</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  RIGHTX</font>	<font color="#A2734C">-0.504636</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  RIGHTY</font>	<font color="#A2734C">0.983520</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  RIGHTX</font>	<font color="#A2734C">-0.364283</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  RIGHTX</font>	<font color="#A2734C">-0.124858</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  RIGHTX</font>	<font color="#A2734C">-0.017529</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  RIGHTY</font>	<font color="#A2734C">0.801887</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  RIGHTY</font>	<font color="#A2734C">0.636765</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  RIGHTY</font>	<font color="#A2734C">0.455132</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  RIGHTY</font>	<font color="#A2734C">0.034073</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  DPAD_RIGHT</font>	<font color="#A2734C">1</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  DPAD_RIGHT</font>	<font color="#A2734C">0</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  DPAD_LEFT</font>	<font color="#A2734C">1</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  DPAD_LEFT</font>	<font color="#A2734C">0</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  DPAD_DOWN</font>	<font color="#A2734C">1</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  DPAD_DOWN</font>	<font color="#A2734C">0</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  DPAD_UP</font>	<font color="#A2734C">1</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  DPAD_UP</font>	<font color="#A2734C">0</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  DPAD_RIGHT</font>	<font color="#A2734C">1</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  DPAD_RIGHT</font>	<font color="#A2734C">0</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  DPAD_LEFT</font>	<font color="#A2734C">1</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  DPAD_LEFT</font>	<font color="#A2734C">0</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  A</font>	<font color="#A2734C">1</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  A</font>	<font color="#A2734C">0</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  B</font>	<font color="#A2734C">1</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  B</font>	<font color="#A2734C">0</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  B</font>	<font color="#A2734C">1</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  B</font>	<font color="#A2734C">0</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  Y</font>	<font color="#A2734C">1</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  Y</font>	<font color="#A2734C">0</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  X</font>	<font color="#A2734C">1</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  X</font>	<font color="#A2734C">0</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  TRIGGERRIGHT</font>	<font color="#A2734C">-0.252811</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  TRIGGERRIGHT</font>	<font color="#A2734C">-0.529405</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  TRIGGERRIGHT</font>	<font color="#A2734C">-0.706894</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  TRIGGERRIGHT</font>	<font color="#A2734C">-0.872015</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  TRIGGERRIGHT</font>	<font color="#A2734C">-1.000000</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  TRIGGERRIGHT</font>	<font color="#A2734C">-0.471612</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  TRIGGERRIGHT</font>	<font color="#A2734C">-0.050553</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  TRIGGERLEFT</font>	<font color="#A2734C">-0.203274</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  TRIGGERLEFT</font>	<font color="#A2734C">-0.686270</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  TRIGGERLEFT</font>	<font color="#A2734C">-1.000000</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  TRIGGERLEFT</font>	<font color="#A2734C">-0.884415</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  TRIGGERLEFT</font>	<font color="#A2734C">-0.323003</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  TRIGGERLEFT</font>	<font color="#A2734C">-0.000000</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  LEFTSHOULDER</font>	<font color="#A2734C">1</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  LEFTSHOULDER</font>	<font color="#A2734C">0</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  RIGHTSHOULDER</font>	<font color="#A2734C">1</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  RIGHTSHOULDER</font>	<font color="#A2734C">0</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  GUIDE</font>	<font color="#A2734C">1</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  GUIDE</font>	<font color="#A2734C">0</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  START</font>	<font color="#A2734C">1</font>
+[teleop_node-1] [INFO] [teleop_example] <font color="#A2734C">  START</font>	<font color="#A2734C">0</font>
 </pre>
 
 You could also change your launch file to run `game_controller_node` or `joy_node` alongside `teleop_node`:
