@@ -552,7 +552,7 @@ If you have any issues, please post in
 Congrats! You've reached the fun part.
 
 Currently, your control mode isn't getting any inputs from the input source. If we check the documentation
-for :class:`teleop_modular_twist/TwistControlMode <../teleop_modular_twist>`, we'll find that it
+for :class:`teleop_modular_twist/TwistControlMode <https://github.com/BaileyChessum/teleop_modular/tree/main/teleop_modular_twist>`_, we'll find that it
 expects to get these axis inputs:
 
 - ``linear.x``: The input axis providing the x component of the twist linear velocity from -1 to 1.
@@ -568,7 +568,7 @@ You could change the names of the inputs in ``joy_input_source``'s ``axis_defini
 the control mode. But, chances are, the inputs aren't behaving exactly as you'd like. Some input axes might be inverted,
 for example.
 
-Teleop Modular solves this problem with the set of :ref:`remap parameters <input_source_remapping>` automatically added
+Teleop Modular solves this problem with the set of remap params automatically added
 to every input source implementation. We can use them to:
 
 * Rename inputs
