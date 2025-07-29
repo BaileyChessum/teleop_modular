@@ -21,6 +21,7 @@ release = 'v0.1.1'
 extensions = [
     'sphinx_rtd_theme',
     'sphinx.ext.autodoc',
+    'sphinx.ext.autosectionlabel',
 ]
 
 templates_path = ['_templates']
@@ -42,6 +43,7 @@ language = "en"
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
 
+numfig = True
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -58,6 +60,8 @@ html_theme_options = {
 }
 
 html_static_path = ['_static']
+# Relative to html_static_path
+html_css_files = ['custom.css']
 
 html_context = {
     "display_github": True,
