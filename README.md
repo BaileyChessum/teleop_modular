@@ -13,14 +13,16 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![CI (Rolling, Jazzy, and Humble)](https://github.com/BaileyChessum/teleop_modular/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/BaileyChessum/teleop_modular/actions/workflows/ci.yml?query=branch%3Amain)
 
-# A framework for multimodal teleoperation in ROS2
+# teleop_modular
 
-Please refer to the [documentation](./docs/README.md).
+Teleop Modular is a general framework for multimodal teleoperation in ROS2.
+
+Please refer to the [documentation](./docs/README.md) for information on how to use the teleop_modular packages.
 
 ## Motivation
 
 `teleop_modular` aims to replace packages like `teleop_twist_joy` and `teleop_twist_keyboard`, with the intent to:
-- Prevent control mode logic being tightly coupled to a specific input source.
+- Prevent tight coupling to a specific input source.
 - Centralize management of multiple control modes.
   - Integration with `ros2_control` to dynamically switch active controllers for each control mode.
 - Allow new control modes to be easily added to teleop systems using plugins.
