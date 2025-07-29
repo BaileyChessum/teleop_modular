@@ -1,31 +1,37 @@
-# https://tech.michaelaltfield.net/2020/07/18/sphinx-rtd-github-pages-1/
-name: docs_pages_workflow
+name: Sphinx docs to gh-pages
 
-# execute this workflow automatically when we push to master
 on:
-  workflow_dispatch:
   push:
-    branches: [ main ]
+    branches:
+      - main
+
+# workflow_dispatch:        # Un comment line if you also want to trigger action manually
 
 jobs:
-
-  build_docs_job:
+  sphinx_docs_to_gh-pages:
     runs-on: ubuntu-latest
-    # container: debian:buster-slim
-
+    name: Sphinx docs to gh-pages
     steps:
-
-      - name: Prereqs
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Make conda environment
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: 3.10    # Python version to build the html sphinx documentation
+          environment-file: devtools/conda-envs/docs_env.yaml    # Path to the documentation conda environment
+          auto-update-conda: false
+          auto-activate-base: false
+          show-channel-urls: true
+      - name: Installing the library
+        shell: bash -l {0}
         run: |
-          apt-get update
-          apt-get install -y git
-          git clone --depth 1 "https://token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" .
-        shell: bash
-
-      - name: Execute script to build our documentation and update pages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: "docs/buildDocs.sh"
-        shell: bash
+          python setup.py install
+      - name: Running the Sphinx to gh-pages Action
+        uses: uibcdf/action-sphinx-docs-to-gh-pages@v2.1.0
+        with:
+          branch: main
+          dir_docs: docs
+          sphinx-apidoc-opts: '--separate -o . ../'
+          sphinx-apidoc-exclude: '../*setup* ../*.ipynb'
+          sphinx-opts: ''
