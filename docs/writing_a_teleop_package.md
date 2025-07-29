@@ -1,11 +1,22 @@
 # Writing a teleop package
 
+**Goal**: Create a package to run a custom configuration of teleop_modular. 
+
+**Tutorial level**: Intermediate
+
+**Time**: 40 minutes
+
 ## Background
 
 To be able to do anything useful with `teleop_modular`, you'll need to make a package to contain:
 
 - Your launch file to run `teleop_node`
 - Your parameter files
+
+## Prerequisites
+
+You should have `teleop_modular` installed in your workspace.
+- [Getting started](./getting_started.md)
 
 # Tasks
 

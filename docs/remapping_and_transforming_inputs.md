@@ -1,5 +1,10 @@
 # Remapping and transforming inputs
 
+**Goal**: Learn how to make control schemes with input source remapping.
+
+**Tutorial level**: Intermediate
+
+**Time**: 20 minutes
 
 ## Background
 
@@ -18,3 +23,7 @@ implementation. They allow us to:
 
 This guide is yet to be written. All the tools you need to figure out how to solve the given problem should be available 
 in [this document](./input_source_remapping.md) if you want to give it a crack early.
+
+---
+
+- [Writing a `ControlMode` plugin](./writing_a_control_mode.md)

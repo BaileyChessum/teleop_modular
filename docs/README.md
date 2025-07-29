@@ -16,7 +16,7 @@ To get started using Teleop Modular, please follow these guides:
 - [Getting started](./getting_started.md)
 - [Writing a teleop package](./writing_a_teleop_package.md)
 - [Remapping and transforming inputs](./remapping_and_transforming_inputs.md)
-- Writing a `ControlMode` plugin
+- [Writing a `ControlMode` plugin](./writing_a_control_mode.md)
 - Using multiple control modes
 - Adding a lock
 
