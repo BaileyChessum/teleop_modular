@@ -111,7 +111,7 @@ Check ``plugins.xml`` or the title of the generated ``README.md`` to find the st
 config. It should be ``project_name/control_mode_class_name``. A simple example parameter file can also be found at the
 bottom of ``README.md``.
 
-- See :ref:`writing_a_teleop_package`_ for help setting up and running a control mode with teleop_modular.
+- See :ref:`writing_a_teleop_package` for help setting up and running a control mode with teleop_modular.
 
 Open up the project in your favourite IDE with the necessary dependencies available in your shell and load
 ``CMakeLists.txt``. Then, let's get started editing the control mode.
@@ -406,7 +406,7 @@ Your control mode plugin should be listed:
    [teleop_node-1]
    [teleop_node-1] [INFO] [teleop_example] Input Sources:
    [teleop_node-1]
-   [teleop_node-1] [INFO] [teleop_example] Twist Control Mode activated
+   [teleop_node-1] [INFO] [teleop_example] Custom Control Mode activated
 
 Enjoy writing control modes!
 

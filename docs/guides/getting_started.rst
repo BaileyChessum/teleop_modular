@@ -106,7 +106,6 @@ And your output might look like:
 
 But until we configure ``teleop_node``, it won't do anything.
 
----
-
 Follow the next guide to start writing your own teleop package with the framework:
-- `Writing a teleop package <./writing_a_teleop_package.rst>`_
+
+- :ref:`writing_a_teleop_package`
