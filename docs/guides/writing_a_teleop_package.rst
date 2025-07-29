@@ -238,7 +238,7 @@ Your output might look like:
 5. Add a control mode
 ^^^^^^^^^^^^^^^^^^^^^
 
-In ``teleop.yaml`` define a control mode. I'll be using `teleop_modular_twist/TwistControlMode <../teleop_modular_twist>`_.
+In ``teleop.yaml`` define a control mode. I'll be using `teleop_modular_twist/TwistControlMode <https://github.com/BaileyChessum/teleop_modular/tree/main/teleop_modular_twist>`_.
 
 .. code-block:: yaml
 
@@ -336,7 +336,7 @@ If you have any issues, please post in
 
 Adding an input source is a very similar process to the previous step.
 
-In ``teleop.yaml`` define an input source. I'll be using :class:`teleop_modular_joy/JoyInputSource <../teleop_modular_joy>`.
+In ``teleop.yaml`` define an input source. I'll be using `teleop_modular_joy/JoyInputSource <https://github.com/BaileyChessum/teleop_modular/tree/main/teleop_modular_joy>`.
 
 .. code-block:: yaml
 
