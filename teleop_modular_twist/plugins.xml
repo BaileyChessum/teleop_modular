@@ -17,4 +17,7 @@
     <class name="set_axis" type="teleop::SetAxisCommand" base_class_type="teleop::Command">
         <description>A command to set the value of an axis input.</description>
     </class>
+    <class name="increment_axis" type="teleop::IncrementAxisCommand" base_class_type="teleop::Command">
+        <description>A command to increment/decrement the value of an axis input.</description>
+    </class>
 </library>
