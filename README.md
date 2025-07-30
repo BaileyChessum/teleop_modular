@@ -45,7 +45,7 @@ Every input source and control mode get their own node from which to retrieve pa
 > twist.linear.x = joy_msg[3];    //< Not meaningful, and tightly coupled to joy
 > ```
 >
-> Instead, teleop_modular allows control modes to ask for with a name that describes what the input is actually used
+> Instead, teleop_modular allows control modes to ask for an input with a name that describes what the input is actually used
 > for:
 >
 > ```cpp
