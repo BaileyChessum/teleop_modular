@@ -55,6 +55,7 @@ add_library(${PROJECT_NAME} SHARED
 
   src/input_sources/InputSourceManager.cpp
   src/commands/CommandManager.cpp
+  src/commands/SetAxisCommand.cpp
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)  # Require C++17

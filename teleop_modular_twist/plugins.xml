@@ -14,4 +14,7 @@
     <class name="set_button" type="teleop::SetButtonCommand" base_class_type="teleop::Command">
         <description>A command to set the value of a boolean input.</description>
     </class>
+    <class name="set_axis" type="teleop::SetAxisCommand" base_class_type="teleop::Command">
+        <description>A command to set the value of an axis input.</description>
+    </class>
 </library>
