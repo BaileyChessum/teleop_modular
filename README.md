@@ -21,15 +21,15 @@ Please refer to the [documentation](https://baileychessum.github.io/teleop_modul
 
 ## Overview
 
-<a href="https://baileychessum.github.io/teleop_modular/">
-  <div align="center">
-    <picture>
-      <source media="(prefers-color-scheme: light)" srcset="docs/images/diagrams/architecture_diagram_light.svg">
-      <source media="(prefers-color-scheme: dark)" srcset="docs/images/diagrams/architecture_diagram_dark.svg">
-      <img src="docs/images/diagrams/architecture_diagram_light.svg" width="700px" alt="teleop_node architecture diagram">
-    </picture>
-  </div>
-</a>
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: light)" srcset="docs/images/diagrams/architecture_diagram_light.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/diagrams/architecture_diagram_dark.svg">
+    <img src="docs/images/diagrams/architecture_diagram_light.svg" width="800px" alt="teleop_node architecture diagram">
+  </picture>
+</div>
+
+<br/>
 
 There are two main plugin types used in the framework:
 
