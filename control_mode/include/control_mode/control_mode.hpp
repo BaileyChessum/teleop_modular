@@ -105,17 +105,18 @@ public:
   }
 
   /**
-   * \brief Gets if the control mode should be locked, checking if the "locked" input button is true. When true, the 
+   * \brief Gets if the control mode should be locked, checking if the "locked" input button is true. When true, the
    * control mode is expected to tell the control system to do nothing.
-   * 
+   *
    * \returns True when the "locked" input is true
    */
-  [[nodiscard]] bool is_locked() {
+  [[nodiscard]] bool is_locked()
+  {
     return locked_->value();
   }
 
   /**
-   * \brief Called after the control_mode is created, allowing the control_mode to set up any structures that need to 
+   * \brief Called after the control_mode is created, allowing the control_mode to set up any structures that need to
    * exist for the entire lifecycle of the control_mode.
    */
   virtual return_type on_init()
@@ -125,28 +126,28 @@ public:
 
   /**
    * \brief Called after on_init, allows the node to get any configuration from node parameters or otherwise.
-   * 
+   *
    * If the configuration cannot be successfully achieved it will transition to ErrorProcessing calling on_error().
-   * 
+   *
    * \param previous_state The previous lifecycle state being transitioned from.
    */
   CallbackReturn on_configure(const State &) override
   {
     return CallbackReturn::SUCCESS;
   }
-  
+
   /**
-   * \brief Exposes inputs to the control mode so that it can capture shared pointers to any inputs it needs. Called 
+   * \brief Exposes inputs to the control mode so that it can capture shared pointers to any inputs it needs. Called
    * after configure.
-   * 
+   *
    * \param inputs References to the collection of buttons and axes to be used by the control_mode.
    */
   void capture_inputs(Inputs inputs);
 
   /**
-   * \brief Called after on_configure, allows the implementer to capture shared pointers to any inputs needed by the 
+   * \brief Called after on_configure, allows the implementer to capture shared pointers to any inputs needed by the
    * control mode.
-   * 
+   *
    * \param inputs References to the collection of buttons and axes to be used by the control_mode.
    */
   virtual void on_capture_inputs(Inputs inputs) = 0;
@@ -154,32 +155,32 @@ public:
   /**
    * \brief Called when there are new inputs available. The implementer should send a message to the control system
    * based on input values.
-   * 
+   *
    * \param now   The theoretical current time, based on the time the inputs were received.
    * \param period    The difference in time since the last update.
    */
   virtual return_type on_update(const rclcpp::Time & now, const rclcpp::Duration & period) = 0;
-  
+
   /**
-   * \brief This method is expected to do any final preparations to start executing. This may include acquiring 
-   * resources that are only held while the node is actually active, such as access to hardware. Ideally, no preparation 
+   * \brief This method is expected to do any final preparations to start executing. This may include acquiring
+   * resources that are only held while the node is actually active, such as access to hardware. Ideally, no preparation
    * that requires significant time (such as lengthy hardware initialisation) should be performed in this callback.
-   * 
+   *
    * If this cannot be successfully achieved it will transition to ErrorProcessing calling on_error().
-   * 
+   *
    * \param previous_state The previous lifecycle state being transitioned from.
    */
   CallbackReturn on_activate(const State &) override
   {
     return CallbackReturn::SUCCESS;
   }
-  
+
   /**
-   * \brief This method is expected to clear all state and return the node to a functionally equivalent state as when 
+   * \brief This method is expected to clear all state and return the node to a functionally equivalent state as when
    * first created. You may also wish to tell dependent control systems to halt as part of this method.
-   * 
+   *
    * If the deactivating cannot be successfully achieved it will transition to ErrorProcessing calling on_error().
-   * 
+   *
    * \param previous_state The previous lifecycle state being transitioned from.
    */
   CallbackReturn on_deactivate(const State &) override
@@ -188,11 +189,11 @@ public:
   }
 
   /**
-   * \brief This method is expected to clear all state and return the node to a functionally equivalent state as when 
-   * first created. 
-   * 
+   * \brief This method is expected to clear all state and return the node to a functionally equivalent state as when
+   * first created.
+   *
    * If the cleanup cannot be successfully achieved it will transition to ErrorProcessing calling on_error().
-   * 
+   *
    * \param previous_state The previous lifecycle state being transitioned from.
    */
   CallbackReturn on_cleanup(const State &) override
@@ -201,14 +202,14 @@ public:
   }
 
   /**
-   * \brief This transition state is where any error can be cleaned up. It is possible to enter this state from any 
-   * state where user code will be executed. If error handling is successfully completed the node can return to 
-   * Unconfigured, If a full cleanup is not possible it must fail and the node will transition to Finalized in 
+   * \brief This transition state is where any error can be cleaned up. It is possible to enter this state from any
+   * state where user code will be executed. If error handling is successfully completed the node can return to
+   * Unconfigured, If a full cleanup is not possible it must fail and the node will transition to Finalized in
    * preparation for destruction.
-   * 
-   * Transitions to ErrorProcessing may be caused by error return codes in callbacks as well as methods within a 
+   *
+   * Transitions to ErrorProcessing may be caused by error return codes in callbacks as well as methods within a
    * callback or an uncaught exception.
-   * 
+   *
    * \param previous_state The previous lifecycle state being transitioned from.
    */
   CallbackReturn on_error(const State &) override
@@ -218,7 +219,7 @@ public:
 
   /**
    * \brief This method is expected to do any cleanup necessary before destruction.
-   * 
+   *
    * \param previous_state The previous lifecycle state being transitioned from.
    */
   CallbackReturn on_shutdown(const State &) override
@@ -231,12 +232,12 @@ public:
 
   /// Gets the names of all ros2_control controllers to activate alongside this control mode.
   [[nodiscard]] const std::vector<std::string> & get_controllers() const;
-  
+
 protected:
-  /// An input button to represent a lock for the control mode. The control mode should tell the control system to halt 
+  /// An input button to represent a lock for the control mode. The control mode should tell the control system to halt
   /// when ->value() is true
   Button::SharedPtr locked_;
-  
+
 private:
   /// The ROS2 node created by teleop_modular, which we get params from (for base and child classes)
   std::shared_ptr<rclcpp_lifecycle::LifecycleNode> node_;

@@ -74,7 +74,8 @@ return_type ControlMode::init(
   return return_type::OK;
 }
 
-void ControlMode::capture_inputs(Inputs inputs) {
+void ControlMode::capture_inputs(Inputs inputs)
+{
   locked_ = inputs.buttons["locked"];
   on_capture_inputs(inputs);
 }

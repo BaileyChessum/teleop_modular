@@ -24,8 +24,8 @@ class IncrementAxisCommand : public Command
 public:
   IncrementAxisCommand() = default;
   void on_initialize(
-      const std::string & prefix,
-      const ParameterInterface::SharedPtr & parameters) override;
+    const std::string & prefix,
+    const ParameterInterface::SharedPtr & parameters) override;
 
   void execute(CommandDelegate & context, const rclcpp::Time & now) override;
 

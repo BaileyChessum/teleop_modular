@@ -15,8 +15,9 @@
 namespace teleop
 {
 
-void IncrementAxisCommand::on_initialize(const std::string& prefix,
-                                         const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr& parameters)
+void IncrementAxisCommand::on_initialize(
+  const std::string & prefix,
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & parameters)
 {
   Params params{};
 
@@ -33,10 +34,10 @@ void IncrementAxisCommand::on_initialize(const std::string& prefix,
   by_descriptor.name = prefix + "by";
   by_descriptor.description = "The amount to increment/decrement the axis by to when invoked.";
   parameters->declare_parameter(
-      by_descriptor.name, rclcpp::ParameterValue(0.0),
-      by_descriptor);
+    by_descriptor.name, rclcpp::ParameterValue(0.0),
+    by_descriptor);
   if (rclcpp::Parameter by_param;
-      parameters->get_parameter(by_descriptor.name, by_param))
+    parameters->get_parameter(by_descriptor.name, by_param))
   {
     params.by = static_cast<float>(by_param.as_double());
   }
@@ -46,12 +47,13 @@ void IncrementAxisCommand::on_initialize(const std::string& prefix,
 
   auto until_descriptor = rcl_interfaces::msg::ParameterDescriptor{};
   until_descriptor.name = prefix + "until";
-  until_descriptor.description = "The max (or min when 'by' is negative) amount to increment/decrement the axis until when invoked.";
+  until_descriptor.description =
+    "The max (or min when 'by' is negative) amount to increment/decrement the axis until when invoked.";
   parameters->declare_parameter(
-      until_descriptor.name, rclcpp::ParameterValue(default_until),
-      until_descriptor);
+    until_descriptor.name, rclcpp::ParameterValue(default_until),
+    until_descriptor);
   if (rclcpp::Parameter until_param;
-      parameters->get_parameter(until_descriptor.name, until_param))
+    parameters->get_parameter(until_descriptor.name, until_param))
   {
     params.until = static_cast<float>(until_param.as_double());
   }
@@ -59,22 +61,25 @@ void IncrementAxisCommand::on_initialize(const std::string& prefix,
   params_ = params;
 }
 
-void IncrementAxisCommand::execute(CommandDelegate& context, const rclcpp::Time& now)
+void IncrementAxisCommand::execute(CommandDelegate & context, const rclcpp::Time & now)
 {
   const auto state = context.get_states().get_axes()[params_.name];
 
-  if (!state)
+  if (!state) {
     return;   //< This should never be possible
 
+  }
   // Do nothing when limit is reached
-  if (params_.by < 0.0 && state->value <= params_.until || params_.by >= 0.0 && state->value >= params_.until)
+  if (params_.by < 0.0 && state->value <= params_.until || params_.by >= 0.0 &&
+    state->value >= params_.until)
+  {
     return;
+  }
 
   // increment state->value, while limiting against params_.until, depending on the sign of params_.by
   if (params_.by < 0.0) {
     state->value = std::max(state->value + params_.by, params_.until);
-  }
-  else {
+  } else {
     state->value = std::min(state->value + params_.by, params_.until);
   }
 }

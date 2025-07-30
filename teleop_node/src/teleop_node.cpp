@@ -205,10 +205,8 @@ int main(int argc, char * argv[])
   std::string node_name = "teleop_node";
 
   // Manual CLI parsing to get --node-name
-  for (int i = 1; i < argc; ++i)
-  {
-    if (std::string(argv[i]) == "--node-name" && i + 1 < argc)
-    {
+  for (int i = 1; i < argc; ++i) {
+    if (std::string(argv[i]) == "--node-name" && i + 1 < argc) {
       node_name = argv[i + 1];
       ++i;  // Skip next argv as it's consumed
     }

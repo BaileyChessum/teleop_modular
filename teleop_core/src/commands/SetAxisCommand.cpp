@@ -15,8 +15,9 @@
 namespace teleop
 {
 
-void SetAxisCommand::on_initialize(const std::string & prefix,
-                                   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & parameters)
+void SetAxisCommand::on_initialize(
+  const std::string & prefix,
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & parameters)
 {
   Params params{};
 
@@ -32,10 +33,10 @@ void SetAxisCommand::on_initialize(const std::string & prefix,
   value_descriptor.name = prefix + "value";
   value_descriptor.description = "The value to set the axis to when invoked.";
   parameters->declare_parameter(
-      value_descriptor.name, rclcpp::ParameterValue(0.0),
-      value_descriptor);
+    value_descriptor.name, rclcpp::ParameterValue(0.0),
+    value_descriptor);
   if (rclcpp::Parameter value_param;
-      parameters->get_parameter(value_descriptor.name, value_param))
+    parameters->get_parameter(value_descriptor.name, value_param))
   {
     params.value = static_cast<float>(value_param.as_double());
   }
