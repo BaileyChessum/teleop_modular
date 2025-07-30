@@ -67,8 +67,42 @@ Every input source and control mode get their own node from which to retrieve pa
   - Promote experimentation with control modes.
   - Allow control mode code to be reused to achieve different functionality 
     (e.g. configuring control modes to use different reference frames).
-- Allow novel input sources to be developed and integrated with existing systems
-- Improve configuration for individual input sources
+- Allow novel input sources to be developed and integrated with existing systems.
+- Improve configuration for individual input sources.
+
+## Quick Start
+
+To try it out, install teleop_modular in your workspace (see [Getting Started](https://baileychessum.github.io/teleop_modular/guides/getting_started.html)), and use [teleop_template](https://github.com/BaileyChessum/teleop_template?tab=readme-ov-file) to create a simple teleop package for a turtlesim turtle:
+
+```shell
+# Add teleop_modular to your workspace
+cd workspace/src
+# (if not using git, just do): git clone https://github.com/BaileyChessum/teleop_modular.git
+git submodule add https://github.com/BaileyChessum/teleop_modular.git teleop_modular
+git add ./teleop_modular
+git commit -m "feat: added teleop_modular as a submodule"
+
+# Create a teleop package with cookiecutter and teleop_template
+sudo apt install cookiecutter
+cookiecutter https://github.com/BaileyChessum/teleop_template.git
+
+# Add turtlesim if you want to try the quick start demo. Change DISTRO to your ros2 distro
+sudo apt install ros-DISTRO-turtlesim
+
+# Build it
+colcon build
+. install/setup.bash
+
+# Plug in a game controller and drive the turtle! (change teleop_turtle to the name you chose)
+ros2 launch teleop_turtle teleop.launch.py
+```
+
+Then, try applying it to your robot, and write Control Mode plugins for your use case (see [Writing a ControlMode plugin](https://baileychessum.github.io/teleop_modular/guides/writing_a_control_mode.html)). 
+
+Follow our [documentation](https://baileychessum.github.io/teleop_modular/guides/getting_started.html) and guides to learn more:
+- [Getting Started](https://baileychessum.github.io/teleop_modular/guides/getting_started.html)
+- [Writing a teleop package](https://baileychessum.github.io/teleop_modular/guides/writing_a_teleop_package.html#add-an-input-source) (Creates [teleop_template](https://github.com/BaileyChessum/teleop_template?tab=readme-ov-file) from scratch, in more detail)
+- [Writing a ControlMode plugin](https://baileychessum.github.io/teleop_modular/guides/writing_a_control_mode.html)
 
 ## Plugins
 
