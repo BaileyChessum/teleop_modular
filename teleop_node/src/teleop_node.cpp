@@ -169,7 +169,7 @@ std::shared_ptr<rclcpp::Node> TeleopNode::get_node() const
   return node_;
 }
 
-const InputManager & TeleopNode::get_inputs() const
+InputManager & TeleopNode::get_inputs()
 {
   return inputs_;
 }

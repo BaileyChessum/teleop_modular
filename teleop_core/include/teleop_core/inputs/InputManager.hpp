@@ -66,6 +66,15 @@ public:
     return axes_;
   }
 
+  [[nodiscard]] const InputCollection<Button> & get_buttons() const
+  {
+    return buttons_;
+  }
+  [[nodiscard]] const InputCollection<Axis> & get_axes() const
+  {
+    return axes_;
+  }
+
   /**
    * @brief polls the current input state and propagates changes:
    *   - Debounces buttons and axes

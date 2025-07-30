@@ -35,6 +35,7 @@ protected:
     std::string name;
     float by = 0.0;
     float until = 1.0;
+    bool log = true;
   };
 
   Params params_{};

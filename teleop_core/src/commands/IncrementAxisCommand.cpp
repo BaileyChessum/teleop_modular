@@ -11,6 +11,8 @@
 //
 
 #include "teleop_core/commands/IncrementAxisCommand.hpp"
+#include "teleop_core/colors.hpp"
+#include "teleop_core/utilities/get_parameter.hpp"
 
 namespace teleop
 {
@@ -58,21 +60,37 @@ void IncrementAxisCommand::on_initialize(
     params.until = static_cast<float>(until_param.as_double());
   }
 
+  params_.log = utils::get_parameter_or_default<bool>(
+    parameters, prefix + "log",
+    "Whether to log changes to the value.", true);
+
   params_ = params;
 }
 
 void IncrementAxisCommand::execute(CommandDelegate & context, const rclcpp::Time & now)
 {
+  const auto logger = context.get_node()->get_logger();
   const auto state = context.get_states().get_axes()[params_.name];
+  auto axis = context.get_inputs().get_axes()[params_.name];
 
   if (!state) {
+    if (params_.log) {
+      RCLCPP_ERROR(
+        logger, C_INPUT "  %s\tinvalid shared pointer!\t" C_QUIET "(state)" C_RESET,
+        params_.name.c_str());
+    }
     return;   //< This should never be possible
-
   }
+
   // Do nothing when limit is reached
   if (params_.by < 0.0 && state->value <= params_.until || params_.by >= 0.0 &&
     state->value >= params_.until)
   {
+    if (params_.log) {
+      RCLCPP_INFO(
+        logger, C_INPUT "  %s\t%.2f\t" C_QUIET "(state, limit reached!)" C_RESET,
+        params_.name.c_str(), axis->value());
+    }
     return;
   }
 
@@ -81,6 +99,12 @@ void IncrementAxisCommand::execute(CommandDelegate & context, const rclcpp::Time
     state->value = std::max(state->value + params_.by, params_.until);
   } else {
     state->value = std::min(state->value + params_.by, params_.until);
+  }
+
+  if (params_.log) {
+    RCLCPP_INFO(
+      logger, C_INPUT "  %s\t%.2f\t" C_QUIET "(state)" C_RESET, params_.name.c_str(),
+      axis->value());
   }
 }
 
