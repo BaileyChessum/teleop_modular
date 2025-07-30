@@ -19,13 +19,51 @@ Teleop Modular is a general framework for multimodal teleoperation in ROS2.
 
 Please refer to the [documentation](https://baileychessum.github.io/teleop_modular/) for information on how to use the teleop_modular packages.
 
-## Motivation
+## Overview
 
-`teleop_modular` aims to replace packages like `teleop_twist_joy` and `teleop_twist_keyboard`, with the intent to:
+<a href="https://baileychessum.github.io/teleop_modular/">
+  <div align="center">
+    <picture>
+      <source media="(prefers-color-scheme: light)" srcset="docs/images/diagrams/architecture_diagram_light.svg">
+      <source media="(prefers-color-scheme: dark)" srcset="docs/images/diagrams/architecture_diagram_dark.svg">
+      <img src="docs/images/diagrams/architecture_diagram_light.svg" width="700px" alt="teleop_node architecture diagram">
+    </picture>
+  </div>
+</a>
+
+There are two main plugin types used in the framework:
+
+- **Input Sources** provide input values
+- **Control Modes** use *meaningfully* named inputs to create high level control messages to send to some control system.
+
+Every input source and control mode get their own node from which to retrieve parameters, spawned by the teleop_node 
+(architecture for which is simplified in the above diagram).
+
+> What does *meaningfully* named mean? Most teleop packages map inputs from specific sources directly to control messages:
+>
+> ```cpp
+> twist.linear.x = joy_msg[3];    //< Not meaningful, and tightly coupled to joy
+> ```
+>
+> Instead, teleop_modular allows control modes to ask for with a name that describes what the input is actually used
+> for:
+>
+> ```cpp
+> linear_.x = inputs.axes["linear.x"];  //< get input shared_ptr with meaningful name
+> // ...
+> twist.linear.x = *linear_.x;
+> ```
+> 
+> We no longer need to care where we get our inputs from.
+
+### Motivation
+
+`teleop_modular` aims to:
+- Make it easier to extend your teleop packages.
 - Prevent tight coupling to a specific input source.
 - Centralize management of multiple control modes.
   - Integration with `ros2_control` to dynamically switch active controllers for each control mode.
-- Allow new control modes to be easily added to teleop systems using plugins.
+- Allow new control modes to be easily added using plugins.
   - Promote experimentation with control modes.
   - Allow control mode code to be reused to achieve different functionality 
     (e.g. configuring control modes to use different reference frames).
