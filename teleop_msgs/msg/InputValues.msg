@@ -15,7 +15,7 @@
 # All arrays for an input type in the InputValues.msg message and InputNames.msg message should have the same size, or
 # be empty. This is the only way to uniquely associate the input name with the correct values.
 
-Header header           # timestamp in the header is the time the data is received from the triggering input source
+std_msgs/Header header           # timestamp in the header is the time the data is received from the triggering input source
 
 # Represent true/false values
 byte[] buttons          # the buttons values from a teleop_node
