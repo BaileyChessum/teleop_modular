@@ -7,6 +7,8 @@
 , teleop-modular-joy
 , teleop-modular-twist
 , teleop-modular-node
+, teleop-modular-msgs
+, teleop-modular-srvs
 }:
 
 buildRosPackage {
@@ -34,6 +36,8 @@ buildRosPackage {
     teleop-modular-joy
     teleop-modular-core
     teleop-modular-node
+    teleop-modular-msgs
+    teleop-modular-srvs
   ];
 
   meta = {

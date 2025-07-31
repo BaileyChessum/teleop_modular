@@ -1,0 +1,5 @@
+# The ListControlModes service returns a list of control mode names/states/types of the control modes that are loaded
+# inside the teleop_node's ControlModeManager.
+
+---
+teleop_srvs/ControlModeDetails[] control_modes

@@ -1,0 +1,6 @@
+string name         # instance name
+# Type should be inferred from parameter file
+
+---
+bool ok             # Whether switching was successful
+string message      # Any associated error message, or the empty if no error

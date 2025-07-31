@@ -1,0 +1,10 @@
+# This message is for activating/deactivating control_modes with specified names.
+
+# The name of the control_mode to activate
+string[] deactivate     # Names of controllers to set inactive. Use "*" to deactivate all controllers.
+string[] activate       # Names of controllers to set active
+
+---
+
+bool ok         # Whether switching was successful
+string message  # Any associated error message, or the empty if no error

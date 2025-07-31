@@ -8,6 +8,8 @@ self: super:
       teleop-modular-core = rosSuper.callPackage ./teleop_core { };
       teleop-modular-twist = rosSuper.callPackage ./teleop_modular_twist { };
       teleop-modular-joy = rosSuper.callPackage ./teleop_modular_joy { };
+      teleop-modular-msgs = rosSuper.callPackage ./teleop_msgs { };
+      teleop-modular-srvs = rosSuper.callPackage ./teleop_srvs { };
       teleop-modular-node = rosSuper.callPackage ./teleop_node { };
 
       # Metapackage for teleop_modular, contains all of the above

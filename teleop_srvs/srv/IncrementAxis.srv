@@ -1,0 +1,8 @@
+# Adds a value to an axis state value
+
+string name     # The name of the axis to change the value of
+float32 by      # The amount to add to the state value
+float32 until   # The limit to increment/decrement until (lower limit if by is negative, upper limit if by is positive)
+---
+float32 accumulated_value  # The value after adding all input sources values ontop of the one provided
+bool limit_reached         # Whether the amount added was truncated by the limit

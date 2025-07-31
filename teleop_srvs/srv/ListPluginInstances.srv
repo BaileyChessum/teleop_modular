@@ -1,0 +1,4 @@
+# Used to get the commands, or other simple plugin types that exist
+
+---
+teleop_srvs/PluginInstanceDetails[] instances
