@@ -1,0 +1,5 @@
+# Used to invoke a names event in the teleop_node
+# This also doubles as a message type to invoke a command directly
+
+string name     # The name of the event (or command when used in a command service) to trigger
+---

@@ -1,0 +1,6 @@
+# Sets an axis value using state
+
+string name
+float32 value
+---
+float32 accumulated_value   # The value after adding all input sources values ontop of the one provided

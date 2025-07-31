@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(teleop_msgs)
+project(teleop_srvs)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -11,9 +11,19 @@ find_package(rosidl_default_generators REQUIRED)
 
 # Add definitions here
 rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/Inputs.msg"
-  "msg/InputNames.msg"
-  "msg/InputValues.msg"
+  "msg/ControlModeDetails.msg"
+  "msg/InputSourceDetails.msg"
+  "msg/PluginInstanceDetails.msg"
+
+  "srv/IncrementAxis.srv"
+  "srv/ListControlModes.srv"
+  "srv/ListInputSources.srv"
+  "srv/ListPluginInstances.srv"
+  "srv/LoadPlugin.srv"
+  "srv/SetAxis.srv"
+  "srv/SetButton.srv"
+  "srv/SwitchControlMode.srv"
+  "srv/TriggerEvent.srv"
 )
 
 if(BUILD_TESTING)

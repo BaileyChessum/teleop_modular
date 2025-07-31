@@ -1,0 +1,6 @@
+# Sets a button value using state
+
+string name
+bool value
+---
+bool accumulated_value  # The value after adding all input sources values ontop of the one provided

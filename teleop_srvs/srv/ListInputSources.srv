@@ -1,0 +1,5 @@
+# The ListInputSources service returns a list of input source names/types/exported inputs of the input sources that are
+# loaded inside the teleop_node's ControlModeManager.
+
+---
+teleop_srvs/InputSourceDetails[] input_sources
