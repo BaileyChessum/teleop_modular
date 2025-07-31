@@ -39,7 +39,7 @@ public:
   virtual ~CommandDelegate() = default;
 
   [[nodiscard]] virtual std::shared_ptr<rclcpp::Node> get_node() const = 0;
-  [[nodiscard]] virtual const InputManager & get_inputs() const = 0;
+  [[nodiscard]] virtual InputManager & get_inputs() = 0;
   [[nodiscard]] virtual state::StateManager & get_states() = 0;
   [[nodiscard]] virtual const std::shared_ptr<internal::ControlModeManager> get_control_modes()
   const = 0;

@@ -46,7 +46,7 @@ public:
   void service_input_updates();
 
   [[nodiscard]] std::shared_ptr<rclcpp::Node> get_node() const override;
-  [[nodiscard]] const InputManager & get_inputs() const override;
+  [[nodiscard]] InputManager & get_inputs() override;
   [[nodiscard]] state::StateManager & get_states() override;
   [[nodiscard]] const std::shared_ptr<internal::ControlModeManager> get_control_modes() const
   override;
