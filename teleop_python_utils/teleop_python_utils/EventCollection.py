@@ -11,7 +11,7 @@
 #
 # Created by Bailey Chessum on 2/8/25.
 #
-from typing import Dict, Iterator, Tuple, Any, Generator, List
+from typing import Dict, Iterator, Tuple
 from teleop_python_utils.teleop_python_utils.Event import Event
 
 
@@ -59,5 +59,3 @@ class EventCollection:
         :return: An iterator that returns a tuple containing a name and event for every event in the collection.
         """
         return ((name, self.__events[name]) for name in self.__events)
-
-
