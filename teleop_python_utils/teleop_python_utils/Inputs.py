@@ -27,8 +27,8 @@ from teleop_python_utils.Axis import Axis
 from teleop_python_utils.AxisCollection import AxisCollection
 
 # We want to support both Nodes and LifecycleNodes
-NodeType: Union[Node, LifecycleNode]
-QoSType: Union[QoSProfile, int]
+NodeType = Union[Node, LifecycleNode]
+QoSType = Union[QoSProfile, int]
 
 
 class Inputs:
@@ -40,9 +40,8 @@ class Inputs:
     DEFAULT_EVENTS_QOS = 10
     DEFAULT_SPARSE_QOS = 10
 
-    def __init__(self, node: NodeType, auto_invoke_button_events: bool = True) -> None:
-        """
-        Constructor for the Inputs class.
+    def __init__(self, node: NodeType, auto_invoke_button_events: bool = True):
+        """ Constructor for the Inputs class.
 
         You should call other fluent constructors after this! (e.g: .with_topics("name_topic", "name_topic/values"))
 
@@ -77,12 +76,11 @@ class Inputs:
 
     def with_topics(self,
                     name_topic: str,
-                    combined_values_topic: Optional[str],
-                    values_qos: Union[QoSProfile, int, None] = DEFAULT_VALUES_QOS,
-                    names_qos: Union[QoSProfile, int, None] = DEFAULT_NAMES_QOS
+                    combined_values_topic: Optional[str] = None,
+                    values_qos: QoSType = DEFAULT_VALUES_QOS,
+                    names_qos: QoSType = DEFAULT_NAMES_QOS
                     ) -> "Inputs":
         """ Alias for with_combined_topics, to help suggest this as the default fluent constructor to use.
-
         :return: The current object, so you can continue to chain calls to fluent constructor methods
         """
         self.with_combined_topics(name_topic, combined_values_topic, values_qos, names_qos)
@@ -91,13 +89,12 @@ class Inputs:
     # Fluent Constructors
     def with_combined_topics(self,
                              name_topic: str,
-                             combined_values_topic: Optional[str],
+                             combined_values_topic: Optional[str] = None,
                              values_qos: QoSType = DEFAULT_VALUES_QOS,
                              names_qos: QoSType = DEFAULT_NAMES_QOS,
                              ) -> "Inputs":
         """ Fluent constructor method to accept an InputNames topic and a CombinedInputValues topic to receive values
         and events from.
-
         :return: The current object, so you can continue to chain calls to fluent constructor methods
         """
         if self.__assert_names_subscription_being_created_for_first_time():
@@ -112,13 +109,12 @@ class Inputs:
 
     def with_frequent_topics(self,
                              name_topic: str,
-                             values_topic: Optional[str],
+                             values_topic: Optional[str] = None,
                              values_qos: QoSType = DEFAULT_VALUES_QOS,
                              names_qos: QoSType = DEFAULT_NAMES_QOS
                              ) -> "Inputs":
         """ Fluent constructor method to accept an InputNames topic and an InputValues topic to receive values from.
         This message type doesn't include event invocations.
-
         :return: The current object, so you can continue to chain calls to fluent constructor methods
         """
         if self.__assert_names_subscription_being_created_for_first_time():
@@ -136,7 +132,6 @@ class Inputs:
                           qos: QoSType = DEFAULT_EVENTS_QOS
                           ) -> "Inputs":
         """ Fluent constructor method to accept an InvokedEvents topic, to invoke events in self.events
-
         :return: The current object, so you can continue to chain calls to fluent constructor methods
         """
         self.__subscriptions += [
@@ -150,13 +145,13 @@ class Inputs:
                           ) -> "Inputs":
         """ Fluent constructor method to accept an Inputs topic, which defined the names of every input, along with
         input values. This allows inputs to be provided sparsely.
-
         :return: The current object, so you can continue to chain calls to fluent constructor methods
         """
         self.__subscriptions += [
             self.node.create_subscription(InputsMessage, topic, self.__sparse_inputs_callback, qos)
         ]
         return self
+
 
     def __assert_names_subscription_being_created_for_first_time(self) -> bool:
         """ Tries setting self.__names_subscription_create to True, but if it has already been set, logs a cranky
@@ -173,34 +168,42 @@ class Inputs:
 
     # Update management
 
-    def add_callback(self, callback: Callback[[]]):
-        """ Adds a callback method to be called whenever an input is received. Same as .on_update.add_callback(). """
+    def add_callback(self, callback: Callback[[]]) -> "Inputs":
+        """ Adds a callback method to be called whenever an input is received. Same as .on_update.add_callback().
+        :return: The current object, so you can continue to chain calls to fluent constructor methods
+        """
         self.on_update.add_callback(callback)
+        return self
 
     def get_button(self, name: str) -> Button:
         """ Gets an object that stores the value for the button with the given name. """
         return self.buttons.get(name)
 
-    def get_axis(self, name: str) -> Button:
+    def get_axis(self, name: str) -> Axis:
         """ Gets an object that stores the value for the axis with the given name. """
         return self.axes.get(name)
 
-    def get_event(self, name: str) -> Button:
+    def get_event(self, name: str) -> Event:
         """ Gets an Event object for the teleop_modular event with the given name. """
         return self.events[name]
 
-    def __update(self):
+    @property
+    def is_locked(self) -> bool:
+        """ Shorthand for the button named "locked" -- self.buttons["locked"].value """
+        return bool(self.buttons["locked"])
+
+    def __update(self) -> None:
         """ Called whenever an input is received. """
         self.__invoke_pending_events()
         self.on_update.invoke()
         self.__clear_pending_events()
 
-    def __invoke_pending_events(self):
+    def __invoke_pending_events(self) -> None:
         """ Invokes all pending events, but doesnt clear them from the __event_invocation_queue. """
         for event in self.__event_invocation_queue:
             event.invoke()
 
-    def __clear_pending_events(self):
+    def __clear_pending_events(self) -> None:
         """ Clears all pending events from the __event_invocation_queue, and resets all is_invoked flags to False. """
         for event in self.__event_invocation_queue:
             event.reset_invocation()
@@ -220,11 +223,13 @@ class Inputs:
             if self.__auto_invoke_button_events:
                 # Automatically generates events for buttons
                 if buttons[i] != 0 and button.value == 0:
-                    button.on_pressed.invoke_silently()
-                    self.__event_invocation_queue.append(button.on_pressed)
+                    button.on_down.invoke_silently()
+                    if button.on_down not in self.__event_invocation_queue:
+                        self.__event_invocation_queue.append(button.on_down)
                 elif buttons[i] == 0 and button.value != 0:
-                    button.on_released.invoke_silently()
-                    self.__event_invocation_queue.append(button.on_released)
+                    button.on_up.invoke_silently()
+                    if button.on_up not in self.__event_invocation_queue:
+                        self.__event_invocation_queue.append(button.on_up)
 
             button.value = buttons[i]
 

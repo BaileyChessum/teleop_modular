@@ -25,8 +25,12 @@ class Button:
         self.value: int = 0
 
         # Helpers to just point to the correct name to use for button pressing and releasing
-        self.on_pressed = events[name + "/down"]
-        self.on_released = events[name + "/up"]
+        self.on_down = events[name + "/down"]
+        self.on_up = events[name + "/up"]
+
+    def add_callback(self, callback):
+        """ Shorthand for on_down.add_callback. Calls the given callback when the button BEGINS being pressed. """
+        self.on_down.add_callback(callback)
 
     def __bool__(self) -> bool:
         """ Conversion to bool values, allowing it to be used as the condition in an if statement. """
@@ -38,8 +42,8 @@ class Button:
 
     def down(self) -> bool:
         """ Returns true when the button has just become true since the last update. """
-        return self.on_pressed.is_invoked
+        return self.on_down.is_invoked
 
     def up(self) -> bool:
         """ Returns true when the button has just become false since the last update. """
-        return self.on_released.is_invoked
+        return self.on_up.is_invoked
