@@ -6,17 +6,18 @@
 }:
 
 buildRosPackage {
-  name = "python-control";
+  name = "teleop-python-utils";
   buildType = "ament_python";
 
   src = builtins.path rec {
-    name = "python-control-source";
+    name = "teleop-python-utils-source";
     path = ./.;
-    filter = lib.novaSourceFilter [ ] path;
   };
 
   propagatedBuildInputs = [
     rclpy
     teleop-modular-msgs
   ];
+
+  doCheck = true;
 }

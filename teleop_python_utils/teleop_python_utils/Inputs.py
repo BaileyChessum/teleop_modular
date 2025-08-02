@@ -19,10 +19,9 @@ from typing import Union, Optional, Dict, List
 from teleop_msgs.msg import InputNames, InputValues, InvokedEvents, CombinedInputValues, CombinedInputs
 from teleop_msgs.msg import Inputs as InputsMessage
 
-from teleop_python_utils.teleop_python_utils.EventCollection import EventCollection
-from teleop_python_utils.teleop_python_utils.Event import Event, Callback
-from teleop_python_utils.teleop_python_utils.Button import Button
-from teleop_python_utils.teleop_python_utils.ButtonCollection import ButtonCollection
+from teleop_python_utils.EventCollection import EventCollection
+from teleop_python_utils.Event import Event, Callback
+from teleop_python_utils.ButtonCollection import ButtonCollection
 
 # We want to support both Nodes and LifecycleNodes
 NodeType: Union[Node, LifecycleNode]
@@ -61,6 +60,8 @@ class Inputs:
 
         # Just holds references to any subscription that get made, to keep them alive
         self.__subscriptions = []
+
+        self.__event_invocation_queue: List[Event] = []
 
         # For the split InputNames / InputValues configuration
         self.__names_subscription_created = False
@@ -169,49 +170,67 @@ class Inputs:
     # Update management
 
     def add_callback(self, callback: Callback[[]]):
-        """ Adds a callback method to be called whenever an input is received. same as .on_update.add_callback(). """
+        """ Adds a callback method to be called whenever an input is received. Same as .on_update.add_callback(). """
         self.on_update.add_callback(callback)
 
     def __update(self):
         """ Called whenever an input is received. """
-        self.__generate_button_event_invocations()
+        self.__invoke_pending_events()
         self.on_update.invoke()
+        self.__clear_pending_events()
 
+    def __invoke_pending_events(self):
+        """ Invokes all pending events, but doesnt clear them from the __event_invocation_queue. """
+        for event in self.__event_invocation_queue:
+            event.invoke()
 
-    def __generate_button_event_invocations(self):
-        """ Generates on_pressed and on_released event invocations for buttons. """
-        if not self.__auto_invoke_button_events:
-            return
-
-        # TODO:
-        pass
+    def __clear_pending_events(self):
+        """ Clears all pending events from the __event_invocation_queue, and resets all is_invoked flags to False. """
+        for event in self.__event_invocation_queue:
+            event.reset_invocation()
+        self.__event_invocation_queue.clear()
 
     # Subscription Callbacks
+
+    def __process_inputs(self, buttons: List[int], button_names: List[str], axes: List[float], axis_names: List[str]):
+        for i in range(min(len(axis_names), len(axes))):
+            name = axis_names[i]
+            self.axes[name] = axes[i]
+
+        for i in range(min(len(button_names), len(buttons))):
+            name = self.__button_names[i]
+            button = self.buttons[name]
+
+            if self.__auto_invoke_button_events:
+                # Automatically generates events for buttons
+                if buttons[i] != 0 and button.value == 0:
+                    button.on_pressed.invoke_silently()
+                    self.__event_invocation_queue.append(button.on_pressed)
+                elif buttons[i] == 0 and button.value != 0:
+                    button.on_released.invoke_silently()
+                    self.__event_invocation_queue.append(button.on_released)
+
+            self.buttons[name].value = buttons[i]
 
     def __process_input_values(self, values: InputValues):
         if not self.__names_initialized:
             self.node.get_logger().debug("Didn't set input values because the name topic hasn't sent a message yet.")
             return
-
-        for i in range(min(len(values.axes), len(self.__axis_names))):
-            name = self.__axis_names[i]
-            self.axes[name] = values.axes[i]
-
-        for i in range(min(len(values.buttons), len(self.__button_names))):
-            name = self.__axis_names[i]
-            self.buttons[name] = values.axes[i]
+        self.__process_inputs(values.buttons, self.__button_names, values.axes, self.__axis_names)
+        self.__update()
 
     def __process_invoked_events(self, events: InvokedEvents):
         for event_name in events.names:
-            self.events[event_name].invoke_silently()
-        for event_name in events.names:
-            self.events[event_name].invoke()
+            event = self.events[event_name]
+            event.invoke_silently()
+            self.__event_invocation_queue.append(event)
 
     def __input_names_callback(self, msg: InputNames):
         self.__axis_names = msg.axis_names
         self.__button_names = msg.button_names
 
         self.__names_initialized = True
+        self.__update()
 
     def __input_values_callback(self, msg: InputValues):
         self.__process_input_values(msg)
@@ -227,13 +246,5 @@ class Inputs:
         self.__update()
 
     def __sparse_inputs_callback(self, msg: InputsMessage):
-
-        for i in range(min(len(msg.axis_names), len(msg.axes))):
-            name = msg.axis_names[i]
-            self.axes[name] = msg.axes[i]
-
-        for i in range(min(len(msg.button_names), len(msg.buttons))):
-            name = self.__axis_names[i]
-            self.buttons[name] = msg.axes[i]
-
+        self.__process_inputs(msg.buttons, msg.button_names, msg.axes, msg.axis_names)
         self.__update()
