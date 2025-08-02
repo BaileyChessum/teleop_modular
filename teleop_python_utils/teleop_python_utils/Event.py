@@ -9,12 +9,15 @@
 #
 # Created by Bailey Chessum on 2/8/25.
 #
-from typing import List, Callable
+from typing import List, Callable, ParamSpec, Generic
 
-Callback: Callable[[], None]
+P = ParamSpec('P')  # Generic type for 'any parameters'
+Callback = Callable[P, None]    # You can have events and callbacks with 'any parameters',
+# but teleop will only ever have events without ANY parameters.
+# This is only if you wanted to use your own custom events for whatever reason. It's a handy type!
 
 
-class Event:
+class Event(Generic[P]):
     """ An object you can add callbacks to, and invoke to call all the assigned callbacks.
     In teleop, you can add callbacks for when a teleop event is invoked, and check if the event was invoked for this
     update by checking .is_invoked.
@@ -27,7 +30,7 @@ class Event:
 
         :param call_callbacks_on_reset: When true, the event will call callbacks when reset() is called
         """
-        self.callbacks: List[Callback] = []
+        self.callbacks: List[Callback[P]] = []
         self.is_invoked: bool = False
 
     def __bool__(self):
@@ -42,14 +45,24 @@ class Event:
         """ Removes a previously added callback function. """
         self.callbacks.remove(callback)
 
-    def invoke(self) -> None:
+    def invoke(self, *args: P.args, **kwargs: P.kwargs) -> None:
         """ Calls all the callback methods.
-        Don't call this yourself for teleop events, but you can use it if you want to make your own Events.
+        You can use it if you want to make your own Events.
 
+        Call with any arguments you want to call the callback functions with.
+        The args and kwargs just mean 'forward any arguments to callback'
+
+        :param args: Positional arguments accepted by the callbacks
+        :param kwargs: Keyword arguments accepted by the callbacks
         :return: None
         """
+        self.is_invoked = True
         for callback in self.callbacks:
-            callback()
+            callback(*args, **kwargs)
+
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> None:
+        """ Shorthand for .invoke() """
+        self.invoke(*args, **kwargs)
 
     def invoke_silently(self) -> None:
         """ Sets is_invoked without triggering the callbacks.
