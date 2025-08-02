@@ -43,6 +43,3 @@ class Button:
     def up(self) -> bool:
         """ Returns true when the button has just become false since the last update. """
         return self.on_released.is_invoked
-
-    def __set_value(self, value: int) -> None:
-        self.value = value

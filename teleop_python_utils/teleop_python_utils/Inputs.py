@@ -21,7 +21,10 @@ from teleop_msgs.msg import Inputs as InputsMessage
 
 from teleop_python_utils.EventCollection import EventCollection
 from teleop_python_utils.Event import Event, Callback
+from teleop_python_utils.Button import Button
 from teleop_python_utils.ButtonCollection import ButtonCollection
+from teleop_python_utils.Axis import Axis
+from teleop_python_utils.AxisCollection import AxisCollection
 
 # We want to support both Nodes and LifecycleNodes
 NodeType: Union[Node, LifecycleNode]
@@ -52,7 +55,8 @@ class Inputs:
 
         # Stores input and event values
         self.events: EventCollection = EventCollection()
-        self.axes: Dict[str, float] = {}
+
+        self.axes: AxisCollection = AxisCollection()
         self.buttons: ButtonCollection = ButtonCollection(self.events)
 
         # Invoked whenever a message is received
@@ -173,6 +177,18 @@ class Inputs:
         """ Adds a callback method to be called whenever an input is received. Same as .on_update.add_callback(). """
         self.on_update.add_callback(callback)
 
+    def get_button(self, name: str) -> Button:
+        """ Gets an object that stores the value for the button with the given name. """
+        return self.buttons.get(name)
+
+    def get_axis(self, name: str) -> Button:
+        """ Gets an object that stores the value for the axis with the given name. """
+        return self.axes.get(name)
+
+    def get_event(self, name: str) -> Button:
+        """ Gets an Event object for the teleop_modular event with the given name. """
+        return self.events[name]
+
     def __update(self):
         """ Called whenever an input is received. """
         self.__invoke_pending_events()
@@ -195,11 +211,11 @@ class Inputs:
     def __process_inputs(self, buttons: List[int], button_names: List[str], axes: List[float], axis_names: List[str]):
         for i in range(min(len(axis_names), len(axes))):
             name = axis_names[i]
-            self.axes[name] = axes[i]
+            self.axes.get(name).value = axes[i]
 
         for i in range(min(len(button_names), len(buttons))):
             name = self.__button_names[i]
-            button = self.buttons[name]
+            button = self.buttons.get(name)
 
             if self.__auto_invoke_button_events:
                 # Automatically generates events for buttons
@@ -210,7 +226,7 @@ class Inputs:
                     button.on_released.invoke_silently()
                     self.__event_invocation_queue.append(button.on_released)
 
-            self.buttons[name].value = buttons[i]
+            button.value = buttons[i]
 
     def __process_input_values(self, values: InputValues):
         if not self.__names_initialized:

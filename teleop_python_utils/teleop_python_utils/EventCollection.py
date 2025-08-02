@@ -59,3 +59,7 @@ class EventCollection:
         :return: An iterator that returns a tuple containing a name and event for every event in the collection.
         """
         return ((name, self.__events[name]) for name in self.__events)
+
+    def get(self, name: str) -> Event:
+        """ alias for __getitem__, to be consistent with other collections. """
+        return self[name]
