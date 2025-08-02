@@ -13,6 +13,7 @@ namespace
 {
 // This value is used to avoid normalized limits that would cause a divide by zero
 constexpr double EPSILON = 1e-6;
+
 }
 
 namespace teleop_modular_twist
@@ -248,6 +249,7 @@ void TwistControlMode::VectorHandle::apply_to(
     msg.x = result[0];
     msg.y = result[1];
     msg.z = result[2];
+
     return;
   }
 
