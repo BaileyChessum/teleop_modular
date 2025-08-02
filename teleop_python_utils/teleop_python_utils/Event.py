@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+#
 # Copyright 2025 Bailey Chessum
 # SPDX-License-Identifier: Apache-2.0
 #
