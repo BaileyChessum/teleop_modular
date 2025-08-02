@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>teleop_python_utils</name>
-  <version>0.0.0</version>
+  <version>0.1.2</version>
   <description>Python utility classes for working with teleop_modular.</description>
   <maintainer email="bailey.chessum1@gmail.com">nova</maintainer>
   <license>Apache-2.0</license>
