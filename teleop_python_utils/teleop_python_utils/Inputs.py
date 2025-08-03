@@ -238,7 +238,6 @@ class Inputs:
             self.node.get_logger().debug("Didn't set input values because the name topic hasn't sent a message yet.")
             return
         self.__process_inputs(values.buttons, self.__button_names, values.axes, self.__axis_names)
-        self.__update()
 
     def __process_invoked_events(self, events: InvokedEvents):
         for event_name in events.names:
@@ -251,7 +250,6 @@ class Inputs:
         self.__button_names = msg.button_names
 
         self.__names_initialized = True
-        self.__update()
 
     def __input_values_callback(self, msg: InputValues):
         self.__process_input_values(msg)

@@ -17,7 +17,7 @@ class Axis:
     def __init__(self):
         """ Constructor. You shouldn't call this directly. Get it through the Input class instead.
         """
-        self.value: float = 0
+        self.value: float = 0.0
 
     def __float__(self) -> float:
         """ Shorthand access to self.value when converting with float(). """

@@ -45,4 +45,4 @@ class ButtonCollection:
 
     def get(self, name: str) -> Button:
         """ Gets an object that holds the value for a button, to avoid the cost of string lookup every update. """
-        return self.__items[name]
+        return self[name]

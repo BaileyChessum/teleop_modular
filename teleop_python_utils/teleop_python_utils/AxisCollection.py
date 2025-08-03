@@ -43,4 +43,10 @@ class AxisCollection:
 
     def get(self, name: str) -> Axis:
         """ Gets an object that holds the value for an axis, to avoid the cost of string lookup every update. """
-        return self.__items[name]
+        if name in self.__items:
+            return self.__items[name]
+
+        # Make a new event if it doesn't already exist
+        item = Axis()
+        self.__items[name] = item
+        return item
