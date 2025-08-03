@@ -38,4 +38,4 @@ jobs:
         env: # either pass all entries explicitly
           ROS_DISTRO: ${{ matrix.ROS_DISTRO }}
           ROS_REPO: ${{ matrix.ROS_REPO }}
-          ADDITIONAL_DEBS: "ros-${{ matrix.ROS_DISTRO }}-controller-manager-msgs ament-python"
+          ADDITIONAL_DEBS: "ros-${{ matrix.ROS_DISTRO }}-controller-manager-msgs ros-${{ matrix.ROS_DISTRO }}-ament-python"
