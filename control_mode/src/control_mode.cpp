@@ -74,10 +74,10 @@ return_type ControlMode::init(
   return return_type::OK;
 }
 
-void ControlMode::capture_inputs(Inputs inputs)
+void ControlMode::configure_inputs(Inputs inputs)
 {
   locked_ = inputs.buttons["locked"];
-  on_capture_inputs(inputs);
+  on_configure_inputs(inputs);
 }
 
 const rclcpp_lifecycle::State & ControlMode::get_lifecycle_state() const

@@ -253,9 +253,9 @@ values, ``Button::SharedPtr`` for true/false values, or some other structure tha
    // project_name.hpp
      // ...
 
-     // TODO: Add shared pointers for any buttons/axes you need here, then set them in on_capture_inputs().
+     // TODO: Add shared pointers for any buttons/axes you need here, then set them in on_configure_inputs().
 
-     // You can hold references to inputs like this, and set their values in on_capture_inputs:
+     // You can hold references to inputs like this, and set their values in on_configure_inputs:
      /// Input from 0 to 1 that directly scales the output speed.
      Axis::SharedPtr speed_;
 
@@ -266,13 +266,13 @@ values, ``Button::SharedPtr`` for true/false values, or some other structure tha
      // ...
    }
 
-Then, in ``on_capture_inputs()`` in your ``.cpp`` file, assign your input shared pointers:
+Then, in ``on_configure_inputs()`` in your ``.cpp`` file, assign your input shared pointers:
 
 .. code-block:: cpp
 
    // project_name.cpp
    // ...
-   void ExampleControlMode::on_capture_inputs(Inputs inputs)
+   void ExampleControlMode::on_configure_inputs(Inputs inputs)
    {
      // This method is always run after on_configure(),
      // so you can assume that you already have any necessary parameters
