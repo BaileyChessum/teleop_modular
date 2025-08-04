@@ -166,7 +166,7 @@ void ControlModeManager::configure(InputManager & inputs)
     }
 
     control_mode->get_node()->configure();
-    control_mode->capture_inputs(control_mode_inputs);
+    control_mode->configure_inputs(control_mode_inputs);
   }
 }
 
