@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>teleop_modular_twist</name>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
   <description>A control mode that moves some reference frame of the robot by a Twist.</description>
   <maintainer email="bailey.chessum1@gmail.com">Bailey Chessum</maintainer>
   <license>Apache-2.0</license>
