@@ -17,6 +17,7 @@
   <exec_depend>teleop_node</exec_depend>
   <exec_depend>teleop_msgs</exec_depend>
   <exec_depend>teleop_srvs</exec_depend>
+  <exec_depend>teleop_python_utils</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

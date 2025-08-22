@@ -18,7 +18,7 @@
 std_msgs/Header header           # timestamp in the header is the time the data is received from the triggering input source
 
 # Represent true/false values
-byte[] buttons          # the buttons values from a teleop_node
+uint8[] buttons          # the buttons values from a teleop_node
 
 # Represent number values
 float32[] axes          # the axis values from a teleop_node
