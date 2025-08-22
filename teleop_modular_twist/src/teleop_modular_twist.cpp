@@ -87,7 +87,7 @@ CallbackReturn TwistControlMode::on_configure(const State &)
   return CallbackReturn::SUCCESS;
 }
 
-void TwistControlMode::on_capture_inputs(Inputs inputs)
+void TwistControlMode::on_configure_inputs(Inputs inputs)
 {
   // TODO: Implement a remapping functionality to avoid boilerplate parameters for names, like input source remapping
   speed_ = inputs.axes[params_.input_names.speed];

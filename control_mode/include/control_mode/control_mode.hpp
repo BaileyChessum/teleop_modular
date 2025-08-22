@@ -142,7 +142,7 @@ public:
    *
    * \param inputs References to the collection of buttons and axes to be used by the control_mode.
    */
-  void capture_inputs(Inputs inputs);
+  void configure_inputs(Inputs inputs);
 
   /**
    * \brief Called after on_configure, allows the implementer to capture shared pointers to any inputs needed by the
@@ -150,7 +150,7 @@ public:
    *
    * \param inputs References to the collection of buttons and axes to be used by the control_mode.
    */
-  virtual void on_capture_inputs(Inputs inputs) = 0;
+  virtual void on_configure_inputs(Inputs inputs) = 0;
 
   /**
    * \brief Called when there are new inputs available. The implementer should send a message to the control system

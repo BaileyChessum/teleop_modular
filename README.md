@@ -126,7 +126,7 @@ Please post in the [discussions](https://github.com/BaileyChessum/teleop_modular
 
 #### PRs
 
-Feel free to make a fork of the repository, and raise a pull request with any changes you wish to contribute. Any changes you submit will be under the [Apache 2.0 License](./LICENSE.txt).
+Feel free to make a fork of the repository, and raise a pull request with any changes you wish to contribute. Any changes you submit will be under the [Apache 2.0 License](./LICENSE).
 
 #### Issues
 

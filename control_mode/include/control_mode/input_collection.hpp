@@ -25,7 +25,7 @@ namespace control_mode
  * @class An interface for whatever provides InputInterfaces to control modes.
  *
  * You do not own the lifecycle of the InputCollection. Do not hold a reference to the object. Attempting to use an
- * InputCollection outside of ControlMode::capture_inputs() will cause a segfault.
+ * InputCollection outside of ControlMode::configure_inputs() will cause a segfault.
  */
 template<typename InputT>
 class CONTROL_MODE_PUBLIC InputCollection
