@@ -17,7 +17,7 @@
 #include <rclcpp/time.hpp>
 #include <utility>
 
-#include "teleop_core/inputs/state/InputDeclaration.hpp"
+#include "teleop_core/inputs/state/InputDefinition.hpp"
 #include "control_mode/input_interface.hpp"
 
 namespace teleop
@@ -104,7 +104,7 @@ private:
   T previous_debounce_value_ = 0;
   T current_debounce_value_ = 0;
 
-  /// Reference wrappers obtained through InputDeclaration<T>s, that provide the value for the input
+  /// Reference wrappers obtained through InputDefinition<T>s, that provide the value for the input
   std::vector<std::reference_wrapper<T>> definitions_{};
 };
 

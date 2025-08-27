@@ -75,6 +75,8 @@ public:
     return axes_;
   }
 
+  void init(std::vector<Definition<uint8_t, Button>> button_definitions, std::vector<>);
+
   /**
    * @brief polls the current input state and propagates changes:
    *   - Debounces buttons and axes

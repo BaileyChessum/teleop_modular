@@ -16,14 +16,14 @@
 
 #include <memory>
 #include <string>
-#include "InputDeclaration.hpp"
+#include "InputDefinition.hpp"
 
 namespace teleop::state
 {
 
-/// Same as a InputDeclaration, but it actually holds the value being referenced too.
+/// Same as a InputDefinition, but it actually holds the value being referenced too.
 template<typename T>
-struct State : InputDeclaration<T>
+struct State : InputDefinition<T>
 {
   using SharedPtr = std::shared_ptr<State>;
 
@@ -32,7 +32,7 @@ struct State : InputDeclaration<T>
   // TODO: Timeout
 
   State(const std::string & name, T initial_value)
-  : InputDeclaration<T>(name, value), value(initial_value)
+  : InputDefinition<T>(name, &value), value(initial_value)
   {
   }
 

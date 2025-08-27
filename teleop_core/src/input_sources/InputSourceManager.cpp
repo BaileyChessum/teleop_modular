@@ -207,4 +207,13 @@ void InputSourceManager::setup_input_sources()
     registered_sources_log.str().c_str());
 }
 
+void InputSourceManager::link_inputs(InputManager& inputs)
+{
+  inputs.init()
+
+
+
+
+}
+
 }  // namespace teleop::internal

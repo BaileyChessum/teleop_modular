@@ -74,6 +74,8 @@ private:
 
   void setup_input_sources();
 
+  void link_inputs(InputManager& inputs);
+
   /// The owning teleop_modular ROS2 node.
   std::shared_ptr<rclcpp::Node> node_;
   /// Add spawned nodes to this to get them to spin

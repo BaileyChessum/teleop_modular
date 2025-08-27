@@ -15,6 +15,7 @@
 #define TELEOP_MODULAR_INPUTSOURCEHANDLE_HPP
 
 #include <memory>
+#include <utility>
 #include <vector>
 #include <rclcpp/node_interfaces/node_parameters_interface.hpp>
 #include "input_source/input_source.hpp"
@@ -98,12 +99,12 @@ private:
   struct TransformedRemapValue
   {
     T value;
-    std::optional<std::reference_wrapper<T>> from;
+    std::optional<T*> from;
     std::optional<fromOtherT> from_other;
     std::optional<transformT> transform;
 
     TransformedRemapValue(
-      T value, std::optional<std::reference_wrapper<T>> from, std::optional<fromOtherT> from_other,
+      T value, std::optional<T*> from, std::optional<fromOtherT> from_other,
       std::optional<transformT> transform)
     : value(value), from(from), from_other(from_other), transform(transform)
     {
@@ -114,13 +115,13 @@ private:
 
   struct TransformedRemapButtonFromAxis
   {
-    std::reference_wrapper<float> axis;
+    float* axis;
     float threshold = 0.0f;
   };
   struct TransformedRemapAxisFromButtons
   {
-    std::optional<std::reference_wrapper<uint8_t>> negative;
-    std::optional<std::reference_wrapper<uint8_t>> positive;
+    std::optional<uint8_t*> negative;
+    std::optional<uint8_t*> positive;
   };
 
   using TransformedRemapButton = TransformedRemapValue<uint8_t, TransformedRemapButtonFromAxis,
@@ -129,23 +130,13 @@ private:
       AxisTransformParams>;
 
   /// This is an actual connection of an input to a defining value
-  template<typename T, typename InputT>
+  template<typename T>
   struct Definition
   {
-    static_assert(
-      std::is_base_of_v<InputCommon<T>, InputT>,
-      "InputT must be an input type inheriting from InputCommon (Button, Axis).");
+    std::string name;
+    T* ptr;
 
-    /// We hold a shared pointer to keep any exported input alive
-    std::shared_ptr<InputT> input;
-    std::vector<std::reference_wrapper<T>> references;
-
-    Definition(
-      const std::shared_ptr<InputT> input,
-      const std::vector<std::reference_wrapper<T>> & references)
-    : input(input), references(references)
-    {
-    }
+    Definition(std::string name, T* ptr) : name(std::move(name)), ptr(ptr) {}
   };
 
   void remap(input_source::InputDeclarationSpans declarations, RemapParams remap_params);
@@ -157,8 +148,8 @@ private:
   std::optional<RemapAxisParams> get_remap_axis_params(const std::string & name);
   std::optional<AxisTransformParams> get_axis_transform_params(const std::string & name);
 
-  std::vector<Definition<uint8_t, Button>> button_definitions_;
-  std::vector<Definition<float, Axis>> axis_definitions_;
+  std::vector<Definition<uint8_t>> button_definitions_;
+  std::vector<Definition<float>> axis_definitions_;
 
   std::vector<TransformedRemapButton> transformed_buttons_;
   std::vector<TransformedRemapAxis> transformed_axes_;
