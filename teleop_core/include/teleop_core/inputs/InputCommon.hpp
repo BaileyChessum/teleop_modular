@@ -27,7 +27,7 @@ class InputCommon : public control_mode::InputInterface<T>
 public:
   virtual ~InputCommon() = default;
 
-  constexpr T value() const noexcept override
+  T value() override
   {
     if (!definition_)
       return 0;
@@ -44,7 +44,7 @@ public:
   /**
    * Adds the given definition to the input
    */
-  void add_definition(const T* definition)
+  void add_definition(T* definition)
   {
     definition_ = definition;
   }

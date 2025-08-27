@@ -77,7 +77,7 @@ install(FILES plugins.xml
 )
 
 # Test cases
-#if(TR)
+if(TR)
   find_package(ament_cmake_gtest REQUIRED)
 #  find_package(ament_lint_auto REQUIRED)
 
@@ -99,7 +99,7 @@ install(FILES plugins.xml
 
   # Enable linting
 #  ament_lint_auto_find_test_dependencies()
-#endif()
+endif()
 
 # -- Install
 

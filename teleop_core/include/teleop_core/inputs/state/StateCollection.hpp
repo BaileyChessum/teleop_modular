@@ -72,20 +72,20 @@ public:
    */
   void set(const std::string & name, T value)
   {
-    if (std::shared_ptr<State<T>> ptr = (*this)[name]) {
-      ptr->value = value;
-      return;
-    }
+    // if (std::shared_ptr<State<T>> ptr = (*this)[name]) {
+    //   ptr->value = value;
+    //   return;
+    // }
 
-    // Make and register a new state
-    const auto state = std::make_shared<State<T>>(name, value);
-    const auto & input = inputs_.get()[name];
+    // // Make and register a new state
+    // const auto state = std::make_shared<State<T>>(name, value);
+    // const auto & input = inputs_.get()[name];
 
-    StateHandle handle{state, input};
+    // StateHandle handle{state, input};
 
-    input->add_definition(handle.state->reference);
+    // input->add_definition(handle.state->reference);
 
-    items_.insert({name, handle});
+    // items_.insert({name, handle});
   }
 
   /**
@@ -95,15 +95,15 @@ public:
   void clear(const std::string & name)
   {
     // Find the element
-    auto it = items_.find(name);
+    // auto it = items_.find(name);
 
-    if (it == items_.end()) {
-      // Do nothing, as its already undefined
-      return;
-    }
+    // if (it == items_.end()) {
+    //   // Do nothing, as its already undefined
+    //   return;
+    // }
 
-    it->second.input->remove_definition(it->second.state->reference);
-    items_.erase(name);
+    // it->second.input->remove_definition(it->second.state->reference);
+    // items_.erase(name);
   }
 
 private:

@@ -454,8 +454,8 @@ void InputSourceHandle::remap(
   }
 
   // Reset definitions
-  axis_definitions_.clear();
-  axis_definitions_.reserve(declarations.axis_names.size());
+  axis_definitions.clear();
+  axis_definitions.reserve(declarations.axis_names.size());
   transformed_axes_.clear();
   transformed_axes_.reserve(remap_params.axes.size());
   std::vector<std::string> transformed_axes_deferred_registration;
@@ -494,7 +494,7 @@ void InputSourceHandle::remap(
         continue;
       }
 
-      axis_definitions_.emplace_back(name, reference.value());
+      axis_definitions.emplace_back(name, reference.value());
       continue;
     }
 
@@ -559,7 +559,7 @@ void InputSourceHandle::remap(
   for (size_t i = 0; i < transformed_axes_deferred_registration.size(); ++i) {
     auto & transformed_axis = transformed_axes_[i];
     const auto & name = transformed_axes_deferred_registration[i];
-    axis_definitions_.emplace_back(name, &transformed_axis.value);
+    axis_definitions.emplace_back(name, &transformed_axis.value);
   }
 
   // Create definitions for unmapped inputs
@@ -583,7 +583,7 @@ void InputSourceHandle::remap(
     const auto & name = declarations.axis_names[i];
     const auto reference = &declarations.axes[i];
 
-    axis_definitions_.emplace_back(name, reference);
+    axis_definitions.emplace_back(name, reference);
   }
 }
 
