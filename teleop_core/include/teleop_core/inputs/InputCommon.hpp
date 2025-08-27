@@ -16,23 +16,16 @@
 
 #include <rclcpp/time.hpp>
 #include <utility>
-#include "control_mode/input_interface.hpp"
+#include "control_mode/input_ptr.hpp"
 
 namespace teleop
 {
 
 template<typename T>
-class InputCommon : public control_mode::InputInterface<T>
+class InputCommon : public control_mode::InputPtr<T>
 {
 public:
   virtual ~InputCommon() = default;
-
-  T value() override
-  {
-    if (!definition)
-      return 0;
-    return *definition;
-  }
 
   void debounce(const rclcpp::Time & now);
 
@@ -58,12 +51,14 @@ public:
   }
 
   /// Pointers obtained through InputDefinition<T>s, that provide the value for the input
-  T* definition = nullptr;
+  [[nodiscard]] const T* get_definition() const {
+    return ptr_;
+  }
 
 protected:
   // Constructor is protected, as to ensure plugin classes don't accidentally use this type directly
-  explicit InputCommon(std::string name)
-  : control_mode::InputInterface<T>(std::move(name))
+  explicit InputCommon(std::string name, T* definition)
+  : control_mode::InputPtr<T>(std::make_shared<std::string>(name), definition)
   {
   }
 

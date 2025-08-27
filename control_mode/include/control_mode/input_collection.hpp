@@ -15,7 +15,7 @@
 #define TELEOP_MODULAR_CONTROL_MODE_INPUT_COLLECTION_HPP
 
 #include "visibility_control.h"
-#include "input_interface.hpp"
+#include "input_ptr.hpp"
 #include <string>
 
 namespace control_mode
@@ -41,7 +41,7 @@ public:
    *
    * Names of returned inputs may be remapped, such that (*this)[name]->get_name() may not equal name.
    */
-  virtual typename InputT::SharedPtr operator[](const std::string & name) = 0;
+  virtual InputT operator[](const std::string & name) = 0;
 
 protected:
   InputCollection() = default;

@@ -16,7 +16,7 @@
 
 #include <utility>
 #include "InputCommon.hpp"
-#include "control_mode/input_interface.hpp"
+#include "control_mode/input_ptr.hpp"
 
 namespace teleop
 {

@@ -106,6 +106,10 @@ public:
     // items_.erase(name);
   }
 
+  void link_inputs(InputMapBuilder<T>& builder) {
+
+  }
+
 private:
   struct StateHandle
   {

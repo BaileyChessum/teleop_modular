@@ -22,7 +22,7 @@
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <rclcpp/executor.hpp>
 #include "visibility_control.h"
-#include "input_interface.hpp"
+#include "input_ptr.hpp"
 #include "input_collection.hpp"
 
 namespace control_mode
