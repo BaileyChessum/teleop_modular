@@ -21,6 +21,7 @@
 #include <rclcpp/logger.hpp>
 #include "teleop_core/inputs/InputAggregator.hpp"
 #include "teleop_core/inputs/InputMap.hpp"
+#include "teleop_core/inputs/InputDefinition.hpp"
 
 namespace teleop
 {
@@ -29,6 +30,12 @@ template <typename T>
 class InputMapBuilder
 {
 public:
+  InputMapBuilder() = default;
+  explicit InputMapBuilder(const std::vector<InputDefinition<uint8_t>> & definitions) {
+    for (auto& definition : definitions)
+      declare_aggregate(definition.name, definition.reference);
+  }
+
   /**
    * Declares an external T* (or size_t id for internal use) for lookup
    * \name The name of the input, such that the index of the input can be found by looking up this name.
@@ -146,7 +153,7 @@ public:
   /**
    * Gets an input vector with the right size to store all input values in. Use this to crystallize inputs
    */
-  [[nodiscard]] InputMap<T> construct() {
+  [[nodiscard]] InputMap<T> construct() const {
     std::vector<typename InputAggregator<T>::Props> aggregates_vector{};
     aggregates_vector.reserve(aggregates_.size());
     for (auto [name, aggregate] : aggregates_)

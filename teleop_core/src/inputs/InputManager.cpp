@@ -12,35 +12,32 @@
 //
 
 #include "teleop_core/inputs/InputManager.hpp"
-#include "teleop_core/inputs/InputMapBuilder.hpp"
 
 namespace teleop
 {
 
 void InputManager::update(const rclcpp::Time & now)
 {
-  for (auto & button : buttons_) {
-    button->debounce(now);
-  }
+  button_map_.update();
+  axis_map_.update();
 
-  for (auto & axis : axes_) {
+  for (const auto& button: buttons_)
+    button->debounce(now);
+  for (const auto& axis: axes_)
     axis->debounce(now);
-  }
 }
 
-void InputManager::init(std::vector<InputDefinition<uint8_t>> button_definitions, std::vector<InputDefinition<float>> axis_definitions) {
-  InputMapBuilder<uint8_t> button_builder{};
-  for (auto& definition : button_definitions)
-    button_builder.declare_aggregate(definition.name, definition.reference);
+void InputManager::init(const InputManager::Props& props) {
+  button_map_ = props.button_builder.construct();
+  axis_map_ = props.axis_builder.construct();
 
-  InputMapBuilder<float> axis_builder{};
-  for (auto& definition : axis_definitions)
-    axis_builder.declare_aggregate(definition.name, definition.reference);
+  for (auto& [name, input] : button_map_) {
+    buttons_[name]->add_definition(input);
+  }
 
-
-
-
-
+  for (auto& [name, input] : axis_map_) {
+    axes_[name]->add_definition(input);
+  }
 }
 
 }  // namespace teleop

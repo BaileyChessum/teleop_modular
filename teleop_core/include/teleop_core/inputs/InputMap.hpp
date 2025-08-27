@@ -59,9 +59,9 @@ public:
   using iterator = typename std::map<std::string, T*>::iterator;
   using const_iterator = typename std::map<std::string, T*>::const_iterator;
 
-  constexpr iterator begin() const noexcept { return map_.begin(); };
+  constexpr iterator begin() noexcept { return map_.begin(); };
+  constexpr iterator end() noexcept { return map_.end(); };
   constexpr const_iterator cbegin() const noexcept { return map_.begin(); }
-  constexpr iterator end() const noexcept { return map_.end(); };
   constexpr const_iterator cend() const noexcept { return map_.end(); }
 
 private:

@@ -16,7 +16,6 @@
 
 #include <rclcpp/time.hpp>
 #include <utility>
-
 #include "control_mode/input_interface.hpp"
 
 namespace teleop

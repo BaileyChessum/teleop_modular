@@ -21,6 +21,7 @@
 #include "InputCollection.hpp"
 #include "teleop_core/inputs/InputDefinition.hpp"
 #include "InputMap.hpp"
+#include "InputMapBuilder.hpp"
 
 namespace teleop
 {
@@ -31,6 +32,14 @@ namespace teleop
 class InputManager
 {
 public:
+  /**
+   * Everything you need to initialize the input manager
+   */
+  struct Props {
+    InputMapBuilder<uint8_t> button_builder;
+    InputMapBuilder<float> axis_builder;
+  };
+
   InputManager()
   : buttons_()
     , axes_()
@@ -77,7 +86,7 @@ public:
     return axes_;
   }
 
-  void init(std::vector<InputDefinition<uint8_t>> button_definitions, std::vector<InputDefinition<float>> axis_definitions);
+  void init(const Props & props);
 
   /**
    * @brief polls the current input state and propagates changes:
