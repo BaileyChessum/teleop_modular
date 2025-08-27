@@ -57,6 +57,9 @@ add_library(${PROJECT_NAME} SHARED
   src/commands/CommandManager.cpp
   src/commands/SetAxisCommand.cpp
   src/commands/IncrementAxisCommand.cpp
+
+  src/inputs/InputVector.cpp
+  src/inputs/InputAggregator.cpp
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)  # Require C++17
