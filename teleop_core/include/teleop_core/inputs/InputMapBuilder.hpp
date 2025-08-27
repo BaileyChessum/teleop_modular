@@ -48,6 +48,8 @@ public:
       map_[name] = input;
       return;
     }
+    // The id of the existing definition for name
+    const auto existing_id = it->second;
 
     // Name collision! Resolve through aggregation
     // If there is an existing aggregate, simply append the id to its sources
@@ -58,7 +60,10 @@ public:
     else {
       // Otherwise make a new aggregate
       const auto aggregate_target_id = push_replace(name);
-      typename InputAggregator<T>::Props aggregate{{ it->second, input }, aggregate_target_id };
+      typename InputAggregator<T>::Props aggregate{{}, aggregate_target_id };
+
+      aggregate.source_ids.push_back(existing_id);
+      aggregate.source_ids.push_back(input);
 
       aggregates_[name] = aggregate;
     }
@@ -112,27 +117,7 @@ public:
     size_t id = display_names_.size();
     display_names_.push_back(name);
 
-    const auto it = map_.find(name);
-    if (it == map_.end()) {
-      // No conflict -- set directly
-      map_[name] = id;
-      return id;
-    }
-
-    // Name collision! Resolve through aggregation
-    // If there is an existing aggregate, simply append the id to its sources
-    const auto aggregate_it = aggregates_.find(name);
-    if (aggregate_it != aggregates_.end()) {
-      aggregate_it->second.source_ids.push_back(id);
-    }
-    else {
-      // Otherwise make a new aggregate
-      const auto aggregate_target_id = push_replace(name);
-      typename InputAggregator<T>::Props aggregate{{ it->second, id }, aggregate_target_id };
-
-      aggregates_[name] = aggregate;
-    }
-
+    declare_aggregate(name, id);
     return id;
   }
 

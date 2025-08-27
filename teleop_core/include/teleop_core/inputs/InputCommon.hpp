@@ -29,9 +29,9 @@ public:
 
   T value() override
   {
-    if (!definition_)
+    if (!definition)
       return 0;
-    return *definition_;
+    return *definition;
   }
 
   void debounce(const rclcpp::Time & now);
@@ -44,9 +44,9 @@ public:
   /**
    * Adds the given definition to the input
    */
-  void add_definition(T* definition)
+  void add_definition(T* new_definition)
   {
-    definition_ = definition;
+    definition = new_definition;
   }
 
   /**
@@ -54,8 +54,11 @@ public:
    */
   void remove_definition()
   {
-    definition_ = nullptr;
+    definition = nullptr;
   }
+
+  /// Pointers obtained through InputDefinition<T>s, that provide the value for the input
+  T* definition = nullptr;
 
 protected:
   // Constructor is protected, as to ensure plugin classes don't accidentally use this type directly
@@ -74,9 +77,6 @@ private:
 
   T previous_debounce_value_ = 0;
   T current_debounce_value_ = 0;
-
-  /// Pointers obtained through InputDefinition<T>s, that provide the value for the input
-  T* definition_ = nullptr;
 };
 
 template<typename T>
