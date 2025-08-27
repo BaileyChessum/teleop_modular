@@ -61,5 +61,5 @@ buildRosPackage {
   ];
 
   # Enable running tests during build
-  doCheck = false;
+  doCheck = true;
 }

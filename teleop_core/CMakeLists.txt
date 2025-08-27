@@ -85,6 +85,7 @@ if(TR)
   ament_add_gtest(test_inputs
     test/test_inputs.cpp
     test/test_state.cpp
+    test/test_input_map.cpp
   )
   target_link_libraries(test_inputs
     ${PROJECT_NAME}
