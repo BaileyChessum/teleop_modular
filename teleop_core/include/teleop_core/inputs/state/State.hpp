@@ -35,6 +35,10 @@ struct State : InputDeclaration<T>
   : InputDeclaration<T>(name, value), value(initial_value)
   {
   }
+
+  // Dereference to get a pointer
+  T* operator*() { return &value; }
+  const T* operator*() const { return &value; }
 };
 
 }  // namespace teleop_modular

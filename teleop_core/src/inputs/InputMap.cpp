@@ -11,7 +11,7 @@
 // Created by Bailey Chessum on 8/27/25.
 //
 
-#include "teleop_core/inputs/InputAggregator.hpp"
+#include "teleop_core/inputs/InputMap.hpp"
 
 namespace teleop
 {

@@ -58,8 +58,9 @@ add_library(${PROJECT_NAME} SHARED
   src/commands/SetAxisCommand.cpp
   src/commands/IncrementAxisCommand.cpp
 
-  src/inputs/InputVectorBuilder.cpp
+  src/inputs/InputMapBuilder.cpp
   src/inputs/InputAggregator.cpp
+  src/inputs/InputMap.cpp
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)  # Require C++17

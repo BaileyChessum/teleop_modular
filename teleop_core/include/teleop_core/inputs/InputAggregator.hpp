@@ -38,10 +38,10 @@ public:
     size_t target_id;
   };
 
-  InputAggregator(std::vector<T> inputs, Props props) {
-    if (inputs.size() == 0)
+  InputAggregator(std::vector<T>& inputs, Props props) {
+    if (inputs.empty())
       throw std::invalid_argument("Inputs cannot have a length of zero. It is missing the null value at id 0.");
-    if (inputs.size() == 0)
+    if (props.source_ids.empty())
       throw std::invalid_argument("props.source_ids needs to have at least one element.");
 
     // Assign members from props
