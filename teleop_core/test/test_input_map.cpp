@@ -153,7 +153,7 @@ TEST_F(InputTest, MapAxisDependencyAccumulation)
   value = 1.0;
   value2 = 10.0;
   value3 = 100.0;
-  float value4 = 100.0;
+  float value4 = 1000.0;
   props.axis_builder.declare_aggregate("test_axis", &value4);
   inputs.init(props);
 
