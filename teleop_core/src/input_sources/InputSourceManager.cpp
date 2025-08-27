@@ -207,13 +207,15 @@ void InputSourceManager::setup_input_sources()
     registered_sources_log.str().c_str());
 }
 
-void InputSourceManager::link_inputs(InputManager& inputs)
+void InputSourceManager::link_inputs(InputManager::Props& props)
 {
-  inputs.init();
-
-
-
-
+  // Declare all declarations for all input sources
+  for (auto& handle : sources_) {
+    for (auto definition : handle.button_definitions)
+      props.button_builder.declare_aggregate(definition.name, definition.reference);
+    for (auto definition : handle.axis_definitions)
+      props.axis_builder.declare_aggregate(definition.name, definition.reference);
+  }
 }
 
 }  // namespace teleop::internal

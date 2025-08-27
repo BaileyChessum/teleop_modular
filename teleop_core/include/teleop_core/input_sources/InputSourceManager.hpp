@@ -65,16 +65,20 @@ public:
 
   bool create_input_source(const std::string & input_source_name);
 
+  /**
+   * Declares all input definitions from all input sources in the given props.
+   * \param[out] props the input manager properties to append definitions to.
+   */
+  void link_inputs(InputManager::Props& props);
+
 private:
   struct Params
   {
     double min_update_rate = 0.0;
   };
 
-
   void setup_input_sources();
 
-  void link_inputs(InputManager& inputs);
 
   /// The owning teleop_modular ROS2 node.
   std::shared_ptr<rclcpp::Node> node_;

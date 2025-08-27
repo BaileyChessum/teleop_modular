@@ -153,7 +153,7 @@ void InputSourceHandle::update(const rclcpp::Time & now)
 void InputSourceHandle::add_definitions_to_inputs() const
 {
 //  // Add declarations to inputs
-//  for (auto & button : button_definitions_) {
+//  for (auto & button : button_definitions) {
 //    for (auto & definition : button.references) {
 //      button.input->add_definition(definition);
 //    }
@@ -374,8 +374,8 @@ void InputSourceHandle::remap(
   std::vector<bool> is_axis_remapped(declarations.axis_names.size(), false);
 
   // Reset definitions
-  button_definitions_.clear();
-  button_definitions_.reserve(declarations.button_names.size());
+  button_definitions.clear();
+  button_definitions.reserve(declarations.button_names.size());
   transformed_buttons_.clear();
   transformed_buttons_.reserve(remap_params.buttons.size());
   std::vector<std::string> transformed_buttons_deferred_registration;
@@ -414,7 +414,7 @@ void InputSourceHandle::remap(
         continue;
       }
 
-      button_definitions_.emplace_back(name, reference.value());
+      button_definitions.emplace_back(name, reference.value());
       continue;
     }
 
@@ -450,7 +450,7 @@ void InputSourceHandle::remap(
   for (size_t i = 0; i < transformed_buttons_deferred_registration.size(); ++i) {
     auto & transformed_button = transformed_buttons_[i];
     const auto & name = transformed_buttons_deferred_registration[i];
-    button_definitions_.emplace_back(name, &transformed_button.value);
+    button_definitions.emplace_back(name, &transformed_button.value);
   }
 
   // Reset definitions
@@ -571,7 +571,7 @@ void InputSourceHandle::remap(
     const auto & name = declarations.button_names[i];
     const auto reference = &declarations.buttons[i];
 
-    button_definitions_.emplace_back(name, reference);
+    button_definitions.emplace_back(name, reference);
   }
 
   // Create definitions for unmapped inputs

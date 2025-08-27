@@ -46,6 +46,9 @@ public:
 
   void declare_and_link_inputs();
 
+  std::vector<InputDefinition<uint8_t>> button_definitions{};
+  std::vector<InputDefinition<float>> axis_definitions{};
+
 private:
   struct ButtonTransformParams
   {
@@ -140,8 +143,6 @@ private:
   std::optional<RemapAxisParams> get_remap_axis_params(const std::string & name);
   std::optional<AxisTransformParams> get_axis_transform_params(const std::string & name);
 
-  std::vector<InputDefinition<uint8_t>> button_definitions_;
-  std::vector<InputDefinition<float>> axis_definitions_;
 
   std::vector<TransformedRemapButton> transformed_buttons_;
   std::vector<TransformedRemapAxis> transformed_axes_;
