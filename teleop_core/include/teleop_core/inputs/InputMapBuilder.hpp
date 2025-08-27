@@ -28,6 +28,7 @@ namespace teleop
 template <typename T>
 class InputMapBuilder
 {
+public:
   /**
    * Declares an external T* (or size_t id for internal use) for lookup
    * \name The name of the input, such that the index of the input can be found by looking up this name.

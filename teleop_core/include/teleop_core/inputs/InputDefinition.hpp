@@ -14,7 +14,9 @@
 #ifndef TELEOP_MODULAR_INPUTDECLARATION_HPP
 #define TELEOP_MODULAR_INPUTDECLARATION_HPP
 
-namespace teleop::state
+#include <string>
+
+namespace teleop
 {
 
 /**

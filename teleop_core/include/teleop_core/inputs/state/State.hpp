@@ -16,7 +16,7 @@
 
 #include <memory>
 #include <string>
-#include "InputDefinition.hpp"
+#include "teleop_core/inputs/InputDefinition.hpp"
 
 namespace teleop::state
 {

@@ -21,6 +21,7 @@
 #include "input_source/input_source.hpp"
 #include "teleop_core/utilities/better_multimap.hpp"
 #include "teleop_core/inputs/InputManager.hpp"
+#include "teleop_core/inputs/InputDefinition.hpp"
 
 namespace teleop::internal
 {
@@ -129,15 +130,6 @@ private:
   using TransformedRemapAxis = TransformedRemapValue<float, TransformedRemapAxisFromButtons,
       AxisTransformParams>;
 
-  /// This is an actual connection of an input to a defining value
-  template<typename T>
-  struct Definition
-  {
-    std::string name;
-    T* ptr;
-
-    Definition(std::string name, T* ptr) : name(std::move(name)), ptr(ptr) {}
-  };
 
   void remap(input_source::InputDeclarationSpans declarations, RemapParams remap_params);
   RemapParams get_remap_params();
@@ -148,8 +140,8 @@ private:
   std::optional<RemapAxisParams> get_remap_axis_params(const std::string & name);
   std::optional<AxisTransformParams> get_axis_transform_params(const std::string & name);
 
-  std::vector<Definition<uint8_t>> button_definitions_;
-  std::vector<Definition<float>> axis_definitions_;
+  std::vector<InputDefinition<uint8_t>> button_definitions_;
+  std::vector<InputDefinition<float>> axis_definitions_;
 
   std::vector<TransformedRemapButton> transformed_buttons_;
   std::vector<TransformedRemapAxis> transformed_axes_;

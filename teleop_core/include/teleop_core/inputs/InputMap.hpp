@@ -32,19 +32,19 @@ public:
     // Populate map_, resolving size_t to T*
     for (auto pair : input_map) {
       // Destructuring not used as type inference was poor
-      const auto& name = pair->first;
-      const std::variant<size_t, T*> input = pair->second;
+      const auto& name = pair.first;
+      const std::variant<size_t, T*> input = pair.second;
 
       if (std::holds_alternative<size_t>(input)) {
-        map_[name] = inputs_[input];
+        map_[name] = &inputs_[std::get<size_t>(input)];
       }
       else {
-        map_[name] = input;
+        map_[name] = std::get<T*>(input);
       }
     }
 
     // Construct InputAggregators
-    for (auto [name, aggregate] : aggregates)
+    for (auto aggregate : aggregates)
       aggregators_.emplace_back(inputs_, aggregate);
   }
 

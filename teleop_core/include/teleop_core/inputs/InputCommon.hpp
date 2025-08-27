@@ -17,7 +17,6 @@
 #include <rclcpp/time.hpp>
 #include <utility>
 
-#include "teleop_core/inputs/state/InputDefinition.hpp"
 #include "control_mode/input_interface.hpp"
 
 namespace teleop
@@ -29,7 +28,12 @@ class InputCommon : public control_mode::InputInterface<T>
 public:
   virtual ~InputCommon() = default;
 
-  T value() override;
+  constexpr T value() const noexcept override
+  {
+    if (!definition_)
+      return 0;
+    return *definition_;
+  }
 
   void debounce(const rclcpp::Time & now);
 
@@ -41,30 +45,17 @@ public:
   /**
    * Adds the given definition to the input
    */
-  void add_definition(const std::reference_wrapper<T> & definition)
+  void add_definition(const T* definition)
   {
-    definitions_.emplace_back(definition);
+    definition_ = definition;
   }
 
   /**
    * Removes the first instance of the given definition
    */
-  void remove_definition(const std::reference_wrapper<T> & definition)
+  void remove_definition()
   {
-    using Ref = std::reference_wrapper<T>;
-    auto same_object = [&](const Ref & ref) {
-      return std::addressof(ref.get()) == std::addressof(definition.get());
-    };
-
-    // Erases all instances
-    // definitions_.erase(
-    //   std::remove_if(definitions_.begin(), definitions_.end(), same_object),
-    //   definitions_.end());
-
-    auto it = std::find_if(definitions_.begin(), definitions_.end(), same_object);
-    if (it != definitions_.end()) {
-      definitions_.erase(it);
-    }
+    definition_ = nullptr;
   }
 
 protected:
@@ -75,25 +66,6 @@ protected:
   }
 
 private:
-  // Consolidates multiple definitions into a single value
-  inline T accumulate_value()
-  {
-    if (definitions_.empty()) {
-      return params_.default_value;
-    }
-
-    auto it = definitions_.begin();
-    T accumulator = *it;
-    it++;
-
-    while (it != definitions_.end()) {
-      accumulator += *it;
-      it++;
-    }
-
-    return accumulator;
-  }
-
   struct Params
   {
     T default_value = 0;
@@ -104,8 +76,8 @@ private:
   T previous_debounce_value_ = 0;
   T current_debounce_value_ = 0;
 
-  /// Reference wrappers obtained through InputDefinition<T>s, that provide the value for the input
-  std::vector<std::reference_wrapper<T>> definitions_{};
+  /// Pointers obtained through InputDefinition<T>s, that provide the value for the input
+  T* definition_ = nullptr;
 };
 
 template<typename T>

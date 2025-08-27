@@ -8,7 +8,7 @@
 //     http://www.apache.org/licenses/LICENSE-2.0
 //
 //
-// Created by Bailey Chessum on 6/9/25.
+// Created by Bailey Chessum on 9/6/25.
 //
 
 #ifndef TELEOP_MODULAR_INPUTMANAGER_HPP
@@ -19,6 +19,8 @@
 #include "teleop_core/inputs/Button.hpp"
 #include "teleop_core/inputs/Axis.hpp"
 #include "InputCollection.hpp"
+#include "teleop_core/inputs/InputDefinition.hpp"
+#include "InputMap.hpp"
 
 namespace teleop
 {
@@ -75,7 +77,7 @@ public:
     return axes_;
   }
 
-  void init(std::vector<Definition<uint8_t, Button>> button_definitions, std::vector<>);
+  void init(std::vector<InputDefinition<uint8_t>> button_definitions, std::vector<InputDefinition<float>> axis_definitions);
 
   /**
    * @brief polls the current input state and propagates changes:
@@ -91,12 +93,14 @@ protected:
    * allows Events to be dropped.
    */
   InputCollection<Button> buttons_{};
+  InputMap<uint8_t> button_map_ = InputMap<uint8_t>(0, {}, {});
 
   /**
    * All double inputs referenced by an input source or control mode. This collection only holds weak references, and
    * allows Events to be dropped.
    */
   InputCollection<Axis> axes_{};
+  InputMap<float> axis_map_ = InputMap<float>(0, {}, {});
 };
 
 }  // namespace teleop

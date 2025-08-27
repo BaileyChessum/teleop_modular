@@ -209,7 +209,7 @@ void InputSourceManager::setup_input_sources()
 
 void InputSourceManager::link_inputs(InputManager& inputs)
 {
-  inputs.init()
+  inputs.init();
 
 
 
