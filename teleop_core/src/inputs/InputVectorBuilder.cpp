@@ -11,7 +11,7 @@
 // Created by Bailey Chessum on 8/27/25.
 //
 
-#include "teleop_core/inputs/InputVector.hpp"
+#include "teleop_core/inputs/InputVectorBuilder.hpp"
 
 namespace teleop
 {

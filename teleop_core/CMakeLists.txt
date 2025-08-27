@@ -58,7 +58,7 @@ add_library(${PROJECT_NAME} SHARED
   src/commands/SetAxisCommand.cpp
   src/commands/IncrementAxisCommand.cpp
 
-  src/inputs/InputVector.cpp
+  src/inputs/InputVectorBuilder.cpp
   src/inputs/InputAggregator.cpp
 )
 
