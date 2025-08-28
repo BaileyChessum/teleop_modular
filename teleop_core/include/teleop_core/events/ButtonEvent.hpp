@@ -38,7 +38,7 @@ protected:
 
 private:
   /// The button to listen to
-  Button::SharedPtr button_;
+  Button button_;
 
   /// When true, the event will be invoked when the button is pressed. When false, the event will be invoked when the
   /// event is released.

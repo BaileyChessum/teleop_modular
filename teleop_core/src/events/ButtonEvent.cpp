@@ -42,11 +42,11 @@ void ButtonEvent::on_update(const rclcpp::Time & now)
 {
   if (button_->changed()) {
     if (down_) {
-      if (button_->value()) {
+      if (button_.value()) {
         invoke();
       }
     } else {
-      if (!button_->value()) {
+      if (!button_.value()) {
         invoke();
       }
     }

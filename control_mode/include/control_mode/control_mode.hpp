@@ -112,7 +112,7 @@ public:
    */
   [[nodiscard]] bool is_locked()
   {
-    return locked_->value();
+    return locked_.value();
   }
 
   /**
@@ -235,8 +235,8 @@ public:
 
 protected:
   /// An input button to represent a lock for the control mode. The control mode should tell the control system to halt
-  /// when ->value() is true
-  Button::SharedPtr locked_;
+  /// when .value() is true
+  Button locked_;
 
 private:
   /// The ROS2 node created by teleop_modular, which we get params from (for base and child classes)

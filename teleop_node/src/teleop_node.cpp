@@ -81,20 +81,20 @@ void TeleopNode::log_all_inputs()
     if (!axis) {
       continue;
     }
-    RCLCPP_DEBUG(logger, C_INPUT "  %s\t%f", axis->get_name().c_str(), axis->value());
+    RCLCPP_DEBUG(logger, C_INPUT "  %s\t%f", axis->get_name().c_str(), axis.value());
 
     if (axis->changed()) {
-      RCLCPP_INFO(logger, C_INPUT "  %s\t%f", axis->get_name().c_str(), axis->value());
+      RCLCPP_INFO(logger, C_INPUT "  %s\t%f", axis->get_name().c_str(), axis.value());
     }
   }
   for (const auto & button : inputs_.get_buttons()) {
     if (!button) {
       continue;
     }
-    RCLCPP_DEBUG(logger, C_INPUT "  %s\t%d", button->get_name().c_str(), button->value());
+    RCLCPP_DEBUG(logger, C_INPUT "  %s\t%d", button->get_name().c_str(), button.value());
 
     if (button->changed()) {
-      RCLCPP_INFO(logger, C_INPUT "  %s\t%d", button->get_name().c_str(), button->value());
+      RCLCPP_INFO(logger, C_INPUT "  %s\t%d", button->get_name().c_str(), button.value());
     }
   }
   for (auto & event : events_.get_events()) {
@@ -116,7 +116,7 @@ void TeleopNode::log_existing_inputs()
     log << C_INPUT "\tAxes:\n" C_RESET;
 
     for (const auto & axis : inputs_.get_axes()) {
-      log << C_INPUT "\t  " << axis->get_name() << "\t" << axis->value() << "\n" C_RESET;
+      log << C_INPUT "\t  " << axis->get_name() << "\t" << axis.value() << "\n" C_RESET;
     }
   }
 
@@ -124,7 +124,7 @@ void TeleopNode::log_existing_inputs()
     log << C_INPUT "\tButtons:\n" C_RESET;
 
     for (const auto & button : inputs_.get_buttons()) {
-      log << C_INPUT "\t  " << button->get_name() << "\t" << button->value() << "\n" C_RESET;
+      log << C_INPUT "\t  " << button->get_name() << "\t" << button.value() << "\n" C_RESET;
     }
   }
 

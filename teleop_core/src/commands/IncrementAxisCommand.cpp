@@ -89,7 +89,7 @@ void IncrementAxisCommand::execute(CommandDelegate & context, const rclcpp::Time
     if (params_.log) {
       RCLCPP_INFO(
         logger, C_INPUT "  %s\t%.2f\t" C_QUIET "(state, limit reached!)" C_RESET,
-        params_.name.c_str(), axis->value());
+        params_.name.c_str(), axis.value());
     }
     return;
   }
@@ -104,7 +104,7 @@ void IncrementAxisCommand::execute(CommandDelegate & context, const rclcpp::Time
   if (params_.log) {
     RCLCPP_INFO(
       logger, C_INPUT "  %s\t%.2f\t" C_QUIET "(state)" C_RESET, params_.name.c_str(),
-      axis->value());
+      axis.value());
   }
 }
 

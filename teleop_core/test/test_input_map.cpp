@@ -46,43 +46,43 @@ protected:
 
 TEST_F(InputTest, MapButtonSimple)
 {
-  EXPECT_FALSE(inputs.get_buttons()["test_button"]->value());
+  EXPECT_FALSE(inputs.get_buttons()["test_button"].value());
 
   uint8_t value = false;
   props.button_builder.declare_aggregate("test_button", &value);
   inputs.init(props);
 
   inputs.update(rclcpp::Time());
-  EXPECT_FALSE(inputs.get_buttons()["test_button"]->value());
+  EXPECT_FALSE(inputs.get_buttons()["test_button"].value());
 
   value = true;
   inputs.update(rclcpp::Time());
-  EXPECT_TRUE(inputs.get_buttons()["test_button"]->value());
+  EXPECT_TRUE(inputs.get_buttons()["test_button"].value());
 }
 
 TEST_F(InputTest, MapAxisSimple)
 {
-  EXPECT_NEAR(inputs.get_axes()["test_axis"]->value(), 0.0, 1e-10);
+  EXPECT_NEAR(inputs.get_axes()["test_axis"].value(), 0.0, 1e-10);
 
   float value = 1.0f;
   props.axis_builder.declare_aggregate("test_axis", &value);
   inputs.init(props);
 
   inputs.update(rclcpp::Time());
-  EXPECT_NEAR(inputs.get_axes()["test_axis"]->value(), 1.0, 1e-10);
+  EXPECT_NEAR(inputs.get_axes()["test_axis"].value(), 1.0, 1e-10);
 
   value = 0.0;
   inputs.update(rclcpp::Time());
-  EXPECT_NEAR(inputs.get_axes()["test_axis"]->value(), 0.0, 1e-10);
+  EXPECT_NEAR(inputs.get_axes()["test_axis"].value(), 0.0, 1e-10);
 
   value = 0.5;
   inputs.update(rclcpp::Time());
-  EXPECT_NEAR(inputs.get_axes()["test_axis"]->value(), 0.5, 1e-10);
+  EXPECT_NEAR(inputs.get_axes()["test_axis"].value(), 0.5, 1e-10);
 }
 
 TEST_F(InputTest, MapAxisDependencyAccumulation)
 {
-  EXPECT_NEAR(inputs.get_axes()["test_axis"]->value(), 0.0, 1e-10);
+  EXPECT_NEAR(inputs.get_axes()["test_axis"].value(), 0.0, 1e-10);
 
   float value = 1.0;
   props.axis_builder.declare_aggregate("test_axis", &value);
@@ -92,7 +92,7 @@ TEST_F(InputTest, MapAxisDependencyAccumulation)
       << "test_axis doesn't point directly to &value when only one value is defined";
 
   inputs.update(rclcpp::Time());
-  EXPECT_NEAR(inputs.get_axes()["test_axis"]->value(), 1.0, 1e-10);
+  EXPECT_NEAR(inputs.get_axes()["test_axis"].value(), 1.0, 1e-10);
 
   float value2 = 10.0;
   props.axis_builder.declare_aggregate("test_axis", &value2);
@@ -104,17 +104,17 @@ TEST_F(InputTest, MapAxisDependencyAccumulation)
             << "test_axis points directly to &value2 when it should point to some intermediate memory for aggregation";
 
   inputs.update(rclcpp::Time());
-  EXPECT_NEAR(inputs.get_axes()["test_axis"]->value(), 11.0, 1e-10);
+  EXPECT_NEAR(inputs.get_axes()["test_axis"].value(), 11.0, 1e-10);
 
   value = 3.0;
   value2 = 10.0;
   inputs.update(rclcpp::Time());
-  EXPECT_NEAR(inputs.get_axes()["test_axis"]->value(), 13.0, 1e-10);
+  EXPECT_NEAR(inputs.get_axes()["test_axis"].value(), 13.0, 1e-10);
 
   value = 3.0;
   value2 = 30.0;
   inputs.update(rclcpp::Time());
-  EXPECT_NEAR(inputs.get_axes()["test_axis"]->value(), 33.0, 1e-10);
+  EXPECT_NEAR(inputs.get_axes()["test_axis"].value(), 33.0, 1e-10);
 
   value = 1.0;
   value2 = 10.0;
@@ -130,25 +130,25 @@ TEST_F(InputTest, MapAxisDependencyAccumulation)
             << "test_axis points directly to &value3 when it should point to some intermediate memory for aggregation";
 
   inputs.update(rclcpp::Time());
-  EXPECT_NEAR(inputs.get_axes()["test_axis"]->value(), 111.0, 1e-10);
+  EXPECT_NEAR(inputs.get_axes()["test_axis"].value(), 111.0, 1e-10);
 
   value = 3.0;
   value2 = 30.0;
   value3 = 100.0;
   inputs.update(rclcpp::Time());
-  EXPECT_NEAR(inputs.get_axes()["test_axis"]->value(), 133.0, 1e-10);
+  EXPECT_NEAR(inputs.get_axes()["test_axis"].value(), 133.0, 1e-10);
 
   value = 1.0;
   value2 = 10.0;
   value3 = 300.0;
   inputs.update(rclcpp::Time());
-  EXPECT_NEAR(inputs.get_axes()["test_axis"]->value(), 311.0, 1e-10);
+  EXPECT_NEAR(inputs.get_axes()["test_axis"].value(), 311.0, 1e-10);
 
   value = 3.0;
   value2 = 30.0;
   value3 = 300.0;
   inputs.update(rclcpp::Time());
-  EXPECT_NEAR(inputs.get_axes()["test_axis"]->value(), 333.0, 1e-10);
+  EXPECT_NEAR(inputs.get_axes()["test_axis"].value(), 333.0, 1e-10);
 
   value = 1.0;
   value2 = 10.0;
@@ -158,12 +158,12 @@ TEST_F(InputTest, MapAxisDependencyAccumulation)
   inputs.init(props);
 
   inputs.update(rclcpp::Time());
-  EXPECT_NEAR(inputs.get_axes()["test_axis"]->value(), 1111.0, 1e-10);
+  EXPECT_NEAR(inputs.get_axes()["test_axis"].value(), 1111.0, 1e-10);
 }
 
 TEST_F(InputTest, MapButtonDependencyAccumulation)
 {
-  EXPECT_FALSE(inputs.get_buttons()["test_button"]->value());
+  EXPECT_FALSE(inputs.get_buttons()["test_button"].value());
 
   uint8_t value = false;
   props.button_builder.declare_aggregate("test_button", &value);
@@ -173,11 +173,11 @@ TEST_F(InputTest, MapButtonDependencyAccumulation)
       << "test_button doesn't point directly to &value when only one value is defined";
 
   inputs.update(rclcpp::Time());
-  EXPECT_FALSE(inputs.get_buttons()["test_button"]->value());
+  EXPECT_FALSE(inputs.get_buttons()["test_button"].value());
 
   value = true;
   inputs.update(rclcpp::Time());
-  EXPECT_TRUE(inputs.get_buttons()["test_button"]->value());
+  EXPECT_TRUE(inputs.get_buttons()["test_button"].value());
 
   value = false;
   uint8_t value2 = false;
@@ -190,26 +190,26 @@ TEST_F(InputTest, MapButtonDependencyAccumulation)
       << "test_axis points directly to &value2 when it should point to some intermediate memory for aggregation";
 
   inputs.update(rclcpp::Time());
-  EXPECT_FALSE(inputs.get_buttons()["test_button"]->value());
+  EXPECT_FALSE(inputs.get_buttons()["test_button"].value());
 
   value = true;
   value2 = false;
   inputs.update(rclcpp::Time());
-  EXPECT_TRUE(inputs.get_buttons()["test_button"]->value());
+  EXPECT_TRUE(inputs.get_buttons()["test_button"].value());
 
   value = false;
   value2 = true;
   inputs.update(rclcpp::Time());
-  EXPECT_TRUE(inputs.get_buttons()["test_button"]->value());
+  EXPECT_TRUE(inputs.get_buttons()["test_button"].value());
 
   value = true;
   value2 = true;
   inputs.update(rclcpp::Time());
-  EXPECT_TRUE(inputs.get_buttons()["test_button"]->value());
+  EXPECT_TRUE(inputs.get_buttons()["test_button"].value());
 
   value = false;
   value2 = false;
   inputs.update(rclcpp::Time());
-  EXPECT_FALSE(inputs.get_buttons()["test_button"]->value());
+  EXPECT_FALSE(inputs.get_buttons()["test_button"].value());
 }
 

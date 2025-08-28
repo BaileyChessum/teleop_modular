@@ -102,19 +102,19 @@ protected:
    * All boolean inputs referenced by an input source or control mode. This collection only holds weak references, and
    * allows Events to be dropped.
    */
-  InputCollection<Button> buttons_{};
+  InputCollection<uint8_t, Button> buttons_{};
   /// Stores a string -> T* map, along with additional memory for aggregation
   InputMap<uint8_t> button_map_ = InputMap<uint8_t>(0, {}, {});
-  std::vector<Button::SharedPtr> keep_alive_buttons_{};    /// < Prevents shared pointers from input sources from dying
+  std::vector<Button> keep_alive_buttons_{};    /// < Prevents shared pointers from input sources from dying
 
   /**
    * All float inputs referenced by an input source or control mode. This collection only holds weak references, and
    * allows Events to be dropped.
    */
-  InputCollection<Axis> axes_{};
+  InputCollection<float, Axis> axes_{};
   /// Stores a string -> T* map, along with additional memory for aggregation
   InputMap<float> axis_map_ = InputMap<float>(0, {}, {});
-  std::vector<Axis::SharedPtr> keep_alive_axes_{};         /// < Prevents shared pointers from input sources from dying
+  std::vector<Axis> keep_alive_axes_{};         /// < Prevents shared pointers from input sources from dying
 };
 
 }  // namespace teleop

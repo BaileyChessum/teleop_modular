@@ -64,6 +64,17 @@ public:
   constexpr const_iterator cbegin() const noexcept { return map_.begin(); }
   constexpr const_iterator cend() const noexcept { return map_.end(); }
 
+  /**
+   * Finds the id an input with some name (if it has been defined so far, returns 0 (a safe and valid value) otherwise).
+   */
+  inline T* find_ptr(const std::string& name) noexcept {
+    auto it = map_.find(name);
+
+    if (it == map_.end())
+      return nullptr;
+    return it->second;
+  }
+
 private:
   /// This should never change size
   std::vector<T> inputs_{};
