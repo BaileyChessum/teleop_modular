@@ -12,6 +12,9 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   msg/InputNames.msg
   msg/InputValues.msg
   msg/ControlModeState.msg
+  msg/InvokedEvents.msg
+  msg/CombinedInputs.msg
+  msg/CombinedInputValues.msg
 
   DEPENDENCIES std_msgs
 )

@@ -9,6 +9,7 @@
 , teleop-modular-node
 , teleop-modular-msgs
 , teleop-modular-srvs
+, teleop-modular-python-utils
 }:
 
 buildRosPackage {
@@ -38,6 +39,7 @@ buildRosPackage {
     teleop-modular-node
     teleop-modular-msgs
     teleop-modular-srvs
+    teleop-modular-python-utils
   ];
 
   meta = {
