@@ -18,14 +18,28 @@
 #include <map>
 #include <variant>
 #include "teleop_core/inputs/InputAggregator.hpp"
+#include "control_mode/input_collection.hpp"
 
 namespace teleop
 {
 
-template <typename T>
-class InputMap
+template <typename T, typename InputT>
+class InputMap : public control_mode::InputCollection<InputT>
 {
 public:
+  virtual ~InputMap() = default;
+
+  /*
+  InputMap(const InputMap<T, InputT> & other)
+  {
+    map_ = other.map_;
+    inputs_ = other.inputs_;
+
+    aggregators_ = aggregators_;
+
+  };
+  */
+
   InputMap(size_t size, const std::vector<typename InputAggregator<T>::Props>& aggregates, const std::map<std::string, std::variant<size_t, T*>>& input_map) {
     inputs_.resize(size, 0);
 
@@ -74,6 +88,26 @@ public:
       return nullptr;
     return it->second;
   }
+
+  /**
+   * @brief Gets or constructs an input with the indexed name.
+   *
+   * The collection doesn't hold strong ownership of the inputs it returns.
+   * As a result, if all external shared pointers to a particular input are dropped, the input object may be destroyed.
+   *
+   * The collection may create a new input object if none exists for the given name.
+   *
+   * Names of returned inputs may be remapped, such that (*this)[name]->get_name() may not equal name.
+   */
+  virtual InputT operator[](const std::string & name) override {
+    auto it = map_.find(name);
+
+    if (it == map_.end())
+      return InputT();  // return the default pointer, which points to a common sink value
+
+    return InputT();
+  }
+
 
 private:
   /// This should never change size

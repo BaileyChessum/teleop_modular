@@ -28,19 +28,14 @@ void InputManager::update(const rclcpp::Time & now)
 }
 
 void InputManager::init(const InputManager::Props& props) {
-  keep_alive_buttons_.clear();
-  keep_alive_axes_.clear();
-
   button_map_ = props.button_builder.construct();
   axis_map_ = props.axis_builder.construct();
 
   for (auto& [name, input] : button_map_) {
-    keep_alive_buttons_.emplace_back(buttons_[name]);
     buttons_[name]->add_definition(input);
   }
 
   for (auto& [name, input] : axis_map_) {
-    keep_alive_axes_.emplace_back(axes_[name]);
     axes_[name]->add_definition(input);
   }
 }

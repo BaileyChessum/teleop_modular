@@ -41,7 +41,6 @@ add_library(${PROJECT_NAME} SHARED
   src/inputs/InputManager.cpp
   src/events/EventCollection.cpp
   src/events/EventListenerQueue.cpp
-  src/inputs/InputCollection.cpp
 
   # State
   src/inputs/state/StateManager.cpp

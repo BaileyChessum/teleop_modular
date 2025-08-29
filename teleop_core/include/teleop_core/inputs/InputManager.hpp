@@ -18,8 +18,8 @@
 
 #include "teleop_core/inputs/Button.hpp"
 #include "teleop_core/inputs/Axis.hpp"
-#include "InputCollection.hpp"
 #include "teleop_core/inputs/InputDefinition.hpp"
+#include "control_mode/input_collection.hpp"
 #include "InputMap.hpp"
 #include "InputMapBuilder.hpp"
 #include <vector>
@@ -69,20 +69,20 @@ public:
   InputManager & operator=(const InputManager &) = delete;
 
   // Accessors
-  [[nodiscard]] InputCollection<Button> & get_buttons()
+  [[nodiscard]] control_mode::InputCollection<Button> & get_buttons()
   {
     return buttons_;
   }
-  [[nodiscard]] InputCollection<Axis> & get_axes()
+  [[nodiscard]] control_mode::InputCollection<Axis> & get_axes()
   {
     return axes_;
   }
 
-  [[nodiscard]] const InputCollection<Button> & get_buttons() const
+  [[nodiscard]] const control_mode::InputCollection<Button> & get_buttons() const
   {
     return buttons_;
   }
-  [[nodiscard]] const InputCollection<Axis> & get_axes() const
+  [[nodiscard]] const control_mode::InputCollection<Axis> & get_axes() const
   {
     return axes_;
   }
@@ -97,24 +97,13 @@ public:
    */
   void update(const rclcpp::Time & now);
 
-protected:
-  /**
-   * All boolean inputs referenced by an input source or control mode. This collection only holds weak references, and
-   * allows Events to be dropped.
-   */
-  InputCollection<uint8_t, Button> buttons_{};
-  /// Stores a string -> T* map, along with additional memory for aggregation
-  InputMap<uint8_t> button_map_ = InputMap<uint8_t>(0, {}, {});
-  std::vector<Button> keep_alive_buttons_{};    /// < Prevents shared pointers from input sources from dying
 
-  /**
-   * All float inputs referenced by an input source or control mode. This collection only holds weak references, and
-   * allows Events to be dropped.
-   */
-  InputCollection<float, Axis> axes_{};
+protected:
   /// Stores a string -> T* map, along with additional memory for aggregation
-  InputMap<float> axis_map_ = InputMap<float>(0, {}, {});
-  std::vector<Axis> keep_alive_axes_{};         /// < Prevents shared pointers from input sources from dying
+  InputMap<uint8_t, control_mode::Button> button_map_ = InputMap<uint8_t>(0, {}, {});
+
+  /// Stores a string -> T* map, along with additional memory for aggregation
+  InputMap<float, control_mode::Axis> axis_map_ = InputMap<float>(0, {}, {});
 };
 
 }  // namespace teleop
