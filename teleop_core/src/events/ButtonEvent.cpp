@@ -20,7 +20,7 @@ namespace teleop::internal
 
 ButtonEvent::ButtonEvent(
   std::string name, std::weak_ptr<EventListenerQueue> listener_queue,
-  bool down, InputCollection<Button> & buttons)
+  bool down, control_mode::InputCollection<control_mode::Button> & buttons)
 : Event(std::move(name), std::move(listener_queue)), down_(down)
 {
   // To get the name of the button to use, we need to remove the suffix beginning with a /, such as "/down" or "/up"
@@ -40,17 +40,19 @@ ButtonEvent::ButtonEvent(
 
 void ButtonEvent::on_update(const rclcpp::Time & now)
 {
-  if (button_->changed()) {
+  if (previous_value_ != *button_) {
     if (down_) {
-      if (button_.value()) {
+      if (*button_) {
         invoke();
       }
     } else {
-      if (!button_.value()) {
+      if (!*button_) {
         invoke();
       }
     }
   }
+
+  previous_value_ = *button_;
 }
 
 }  // namespace teleop::internal

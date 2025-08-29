@@ -15,8 +15,8 @@
 #define TELEOP_MODULAR_BUTTONEVENT_HPP
 
 #include "Event.hpp"
-#include "teleop_core/inputs/Button.hpp"
-#include "teleop_core/inputs/InputCollection.hpp"
+#include "control_mode/input_ptr.hpp"
+#include "control_mode/input_collection.hpp"
 
 namespace teleop::internal
 {
@@ -31,14 +31,15 @@ public:
    */
   ButtonEvent(
     std::string name, std::weak_ptr<EventListenerQueue> listener_queue, bool down,
-    InputCollection<Button> & buttons);
+    control_mode::InputCollection<control_mode::Button> & buttons);
 
 protected:
   void on_update(const rclcpp::Time & now) override;
 
 private:
   /// The button to listen to
-  Button button_;
+  control_mode::Button button_;
+  uint8_t previous_value_ = 0;
 
   /// When true, the event will be invoked when the button is pressed. When false, the event will be invoked when the
   /// event is released.
