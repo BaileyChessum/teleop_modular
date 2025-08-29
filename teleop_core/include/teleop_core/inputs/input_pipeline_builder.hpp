@@ -18,9 +18,16 @@ namespace teleop {
 class InputPipelineBuilder
 {
 public:
+  /**
+   * Something that contributes to building the input pipeline, such as input sources.
+   */
   class Element {
     /**
      * Add inputs to the builder.
+     * \param[in] previous The result of the previous InputPipelineBuilder::Element, to use as a basis for populating
+     * next.
+     * \param[in,out] next The result of this Element. Always stores the previous result from this Element.
+     *
      */
     virtual void link_inputs(const InputManager::Props& previous, InputManager::Props& next) = 0;
   };
