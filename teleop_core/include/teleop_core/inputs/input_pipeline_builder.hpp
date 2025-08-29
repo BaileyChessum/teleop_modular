@@ -19,19 +19,16 @@ class InputPipelineBuilder
 {
 public:
   class Element {
-
     /**
      * Add inputs to the builder.
      */
     virtual void link_inputs(const InputManager::Props& previous, InputManager::Props& next) = 0;
-
   };
 
   InputPipelineBuilder(const std::vector<std::reference_wrapper<Element>>& elements) {
-    for (auto& element : elements) {
-
+    this->elements.reserve(elements.size());
+    for (auto& element : elements)
       this->elements.emplace_back(element, InputManager::Props{});
-    }
   }
 
 private:
