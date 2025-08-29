@@ -56,7 +56,14 @@ public:
 
   /// Resets the InputPtr to a known safe 'null' value
   void reset() {
-    *this = InputPtr(); 
+    *this = nullptr;
+  }
+
+  /**
+   * Like a shared_ptr's get method, returns the underlying T* pointer.
+   */
+  constexpr inline const T* get() const noexcept {
+    return ptr_;
   }
 
   /// This is left over from before the input class used to represent a pointer

@@ -92,10 +92,8 @@ public:
   /**
    * @brief Gets or constructs an input with the indexed name.
    *
-   * The collection doesn't hold strong ownership of the inputs it returns.
-   * As a result, if all external shared pointers to a particular input are dropped, the input object may be destroyed.
-   *
-   * The collection may create a new input object if none exists for the given name.
+   * The collection may create a new input object if none exists for the given name (or will give you a 'dud' null
+   * input, which is still valid to use, but will always be 0).
    *
    * Names of returned inputs may be remapped, such that (*this)[name]->get_name() may not equal name.
    */
@@ -103,11 +101,10 @@ public:
     auto it = map_.find(name);
 
     if (it == map_.end())
-      return InputT();  // return the default pointer, which points to a common sink value
+      return nullptr;  // return the default pointer, which points to a common sink value
 
     return InputT();
   }
-
 
 private:
   /// This should never change size

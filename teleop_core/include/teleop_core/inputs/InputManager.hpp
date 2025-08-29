@@ -32,6 +32,9 @@ namespace teleop
  */
 class InputManager
 {
+  using Button = control_mode::Button;
+  using Axis = control_mode::Axis;
+
 public:
   /**
    * Everything you need to initialize the input manager
@@ -71,20 +74,20 @@ public:
   // Accessors
   [[nodiscard]] control_mode::InputCollection<Button> & get_buttons()
   {
-    return buttons_;
+    return button_map_;
   }
   [[nodiscard]] control_mode::InputCollection<Axis> & get_axes()
   {
-    return axes_;
+    return axis_map_;
   }
 
   [[nodiscard]] const control_mode::InputCollection<Button> & get_buttons() const
   {
-    return buttons_;
+    return button_map_;
   }
   [[nodiscard]] const control_mode::InputCollection<Axis> & get_axes() const
   {
-    return axes_;
+    return axis_map_;
   }
 
   void init(const Props & props);
@@ -100,10 +103,10 @@ public:
 
 protected:
   /// Stores a string -> T* map, along with additional memory for aggregation
-  InputMap<uint8_t, control_mode::Button> button_map_ = InputMap<uint8_t>(0, {}, {});
+  InputMap<uint8_t, Button> button_map_ = InputMap<uint8_t, Button>(0, {}, {});
 
   /// Stores a string -> T* map, along with additional memory for aggregation
-  InputMap<float, control_mode::Axis> axis_map_ = InputMap<float>(0, {}, {});
+  InputMap<float, Axis> axis_map_ = InputMap<float, Axis>(0, {}, {});
 };
 
 }  // namespace teleop
