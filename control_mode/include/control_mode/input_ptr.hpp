@@ -87,7 +87,6 @@ public:
     return *this;
   }
 
-protected:
   explicit InputPtr(std::shared_ptr<std::string> name, T* ptr)
   : name_(std::move(name)), ptr_(ptr)
   {
