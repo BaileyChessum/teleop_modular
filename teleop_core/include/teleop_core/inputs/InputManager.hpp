@@ -60,8 +60,8 @@ public:
 
   // Add move constructor
   InputManager(InputManager && other) noexcept
-  : buttons_(std::move(other.button_map_))
-    , axes_(std::move(other.axis_map_))
+  : button_map_(std::move(other.button_map_))
+    , axis_map_(std::move(other.axis_map_))
   {
   }
 

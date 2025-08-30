@@ -45,7 +45,6 @@ public:
      * \param[in] previous The result of the previous InputPipelineBuilder::Element, to use as a basis for populating
      * next.
      * \param[in,out] next The result of this Element. Always stores the previous result from this Element.
-     *
      */
     virtual void link_inputs(const InputManager::Props& previous, InputManager::Props& next, const std::set<std::string>& declared_names) = 0;
 
@@ -58,7 +57,7 @@ public:
     /**
      * Callback ran when hardened inputs are available.
      */
-    virtual void on_inputs_available(InputManager& inputs) = 0;
+    virtual void on_inputs_available(InputManager::Hardened& inputs) = 0;
   };
 
   /**
@@ -99,6 +98,9 @@ public:
     // Harden the inputs
     const auto hardened = target_.init(elements_[elements_.size() - 1].next);
 
+    for (size_t i = index; i < elements_.size(); i++) {
+      elements_[i].element.get().on_inputs_available(hardened);
+    }
   }
 
   /**

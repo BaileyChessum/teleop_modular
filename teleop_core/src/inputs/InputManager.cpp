@@ -27,7 +27,7 @@ void InputManager::update(const rclcpp::Time & now)
     axis->debounce(now);
 }
 
-void InputManager::init(const InputManager::Props& props) {
+InputManager::Hardened InputManager::init(const InputManager::Props& props) {
   button_map_ = props.button_builder.construct();
   axis_map_ = props.axis_builder.construct();
 
@@ -38,6 +38,8 @@ void InputManager::init(const InputManager::Props& props) {
   for (auto& [name, input] : axis_map_) {
     axes_[name]->add_definition(input);
   }
+
+  return {button_map_, axis_map_};
 }
 
 }  // namespace teleop
