@@ -110,16 +110,12 @@ public:
 
   }
 
+  using iterator = std::map<std::string, typename State<T>::SharedPtr>
+
 private:
-  struct StateHandle
-  {
-    typename State<T>::SharedPtr state;
-    /// We need to hold a shared pointer to keep the input alive
-    std::shared_ptr<InputT> input;
-  };
 
   std::reference_wrapper<InputCollection<InputT>> inputs_;
-  std::map<std::string, StateHandle> items_{};
+  std::map<std::string, typename State<T>::SharedPtr> items_{};
 };
 
 }  // namespace teleop::state

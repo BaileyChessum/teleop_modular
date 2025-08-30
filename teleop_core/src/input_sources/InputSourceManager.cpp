@@ -161,7 +161,6 @@ bool InputSourceManager::create_input_source(const std::string & input_source_na
 void InputSourceManager::setup_input_sources()
 {
   const auto logger = node_->get_logger();
-  const auto & inputs = inputs_.get();
 
   // Declare and get parameter for control modes to spawn by default
   node_->declare_parameter("input_sources.names", rclcpp::ParameterType::PARAMETER_STRING_ARRAY);
@@ -171,8 +170,7 @@ void InputSourceManager::setup_input_sources()
   // Pluginlib for loading control modes dynamically
   source_loader_ = std::make_unique<pluginlib::ClassLoader<input_source::InputSource>>(
     "teleop_modular",
-    "input_source::"
-    "InputSource");
+    "input_source::InputSource");
 
   // List available input source plugins
   try {
@@ -207,14 +205,16 @@ void InputSourceManager::setup_input_sources()
     registered_sources_log.str().c_str());
 }
 
-void InputSourceManager::link_inputs(InputManager::Props& props)
+void InputSourceManager::link_inputs(const InputManager::Props& previous, InputManager::Props& next, const std::set<std::string>& declared_names)
 {
+  next = previous;
+
   // Declare all declarations for all input sources
   for (auto& handle : sources_) {
     for (auto definition : handle.button_definitions)
-      props.button_builder.declare_aggregate(definition.name, definition.reference);
+      next.button_builder.declare_aggregate(definition.name, definition.reference);
     for (auto definition : handle.axis_definitions)
-      props.axis_builder.declare_aggregate(definition.name, definition.reference);
+      next.axis_builder.declare_aggregate(definition.name, definition.reference);
   }
 }
 

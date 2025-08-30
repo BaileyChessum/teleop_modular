@@ -19,17 +19,19 @@
 #include <pluginlib/class_loader.hpp>
 #include <rclcpp/executor.hpp>
 #include <rclcpp/node.hpp>
-
 #include "input_source/input_source.hpp"
 #include "input_source/update_delegate.hpp"
 #include "teleop_core/utilities/SpawnableLog.hpp"
 #include "InputSourceHandle.hpp"
+#include "teleop_core/inputs/input_pipeline_builder.hpp"
+#include <set>
+#include "teleop_core/inputs/InputManager.hpp"
 
 namespace teleop::internal
 {
 
 class InputSourceManager final : public input_source::UpdateDelegate,
-  public std::enable_shared_from_this<input_source::UpdateDelegate>
+  public std::enable_shared_from_this<input_source::UpdateDelegate>, public InputPipelineBuilder::Element
 {
 public:
   InputSourceManager() = default;
@@ -67,9 +69,20 @@ public:
 
   /**
    * Declares all input definitions from all input sources in the given props.
+   * Add inputs to the builder.
+   * \param[in] previous The result of the previous InputPipelineBuilder::Element, to use as a basis for populating
+   * next.
+   * \param[in,out] next The result of this Element. Always stores the previous result from this Element.
    * \param[out] props the input manager properties to append definitions to.
    */
-  void link_inputs(InputManager::Props& props);
+  virtual void link_inputs(const InputManager::Props& previous, InputManager::Props& next, const std::set<std::string>& declared_names) override;
+
+  /**
+     * Callback ran when hardened inputs are available.
+   */
+  virtual void on_inputs_available(InputManager::Hardened& inputs) override {
+    // I think this doesn't need to do anything
+  }
 
 private:
   struct Params
@@ -78,7 +91,6 @@ private:
   };
 
   void setup_input_sources();
-
 
   /// The owning teleop_modular ROS2 node.
   std::shared_ptr<rclcpp::Node> node_;

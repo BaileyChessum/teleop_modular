@@ -46,6 +46,7 @@ public:
 
   void declare_and_link_inputs();
 
+
   std::vector<InputDefinition<uint8_t>> button_definitions{};
   std::vector<InputDefinition<float>> axis_definitions{};
 

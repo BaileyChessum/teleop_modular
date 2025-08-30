@@ -15,6 +15,9 @@
 #define STATEMANAGER_HPP
 
 #include "StateCollection.hpp"
+#include "teleop_core/inputs/input_pipeline_builder.hpp"
+#include <set>
+#include "teleop_core/inputs/InputManager.hpp"
 
 namespace teleop::state
 {
@@ -22,7 +25,7 @@ namespace teleop::state
 /**
  * A class to manage input values that don't originate from an input source. This could be from ROS2, or commands
  */
-class StateManager
+class StateManager : public InputPipelineBuilder::Element
 {
 public:
   explicit StateManager(InputManager & inputs)
@@ -38,6 +41,27 @@ public:
   [[nodiscard]] StateCollection<float, Axis> & get_axes()
   {
     return axes_;
+  }
+
+  /**
+     * Add inputs to the builder.
+     * \param[in] previous The result of the previous InputPipelineBuilder::Element, to use as a basis for populating
+     * next.
+     * \param[in,out] next The result of this Element. Always stores the previous result from this Element.
+   */
+  virtual void link_inputs(const InputManager::Props& previous, InputManager::Props& next, const std::set<std::string>& declared_names) {
+    next = previous;
+
+    for (auto& [name, state] : buttons_) {
+
+    }
+  }
+
+  /**
+     * Callback ran when hardened inputs are available.
+   */
+  virtual void on_inputs_available(InputManager::Hardened& inputs) {
+
   }
 
 private:
