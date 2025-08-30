@@ -44,16 +44,24 @@ public:
     InputMapBuilder<float> axis_builder;
   };
 
+  /**
+   * Like props, but with the builders hardened into input maps
+   */
+  struct Hardened {
+    InputMap<uint8_t, Button>& buttons;
+    InputMap<float, Axis>& axes;
+  };
+
   InputManager()
-  : buttons_()
-    , axes_()
+  : button_map_()
+    , axis_map_()
   {
   }
 
   // Add move constructor
   InputManager(InputManager && other) noexcept
-  : buttons_(std::move(other.buttons_))
-    , axes_(std::move(other.axes_))
+  : buttons_(std::move(other.button_map_))
+    , axes_(std::move(other.axis_map_))
   {
   }
 
@@ -61,8 +69,8 @@ public:
   InputManager & operator=(InputManager && other) noexcept
   {
     if (this != &other) {
-      buttons_ = std::move(other.buttons_);
-      axes_ = std::move(other.axes_);
+      button_map_ = std::move(other.button_map_);
+      axis_map_ = std::move(other.axis_map_);
     }
     return *this;
   }
@@ -90,7 +98,7 @@ public:
     return axis_map_;
   }
 
-  void init(const Props & props);
+  Hardened init(const Props & props);
 
   /**
    * @brief polls the current input state and propagates changes:
@@ -99,7 +107,6 @@ public:
    *   - Services all registered event listeners
    */
   void update(const rclcpp::Time & now);
-
 
 protected:
   /// Stores a string -> T* map, along with additional memory for aggregation

@@ -1,3 +1,12 @@
+// Copyright 2025 Bailey Chessum
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
 //
 // Created by Bailey Chessum on 29/8/25.
 //
@@ -18,7 +27,6 @@ class InputPipelineElementDelegate {
 public:
   virtual void relink() = 0;
 };
-
 
 /**
  * Manages multiple things that add stuff to InputMapBuilders for InputManager::Props, but which might need to retrigger
@@ -43,8 +51,14 @@ public:
 
     /**
      * Allows an element to declare that it wants some
+     * \param[in, out] names the set accumulating all declared input names. Add names to declare to this set.
      */
-    virtual void declare_input_names(std::set<std::string>& names);
+    virtual void declare_input_names(std::set<std::string>& names) {};
+
+    /**
+     * Callback ran when hardened inputs are available.
+     */
+    virtual void on_inputs_available(InputManager& inputs) = 0;
   };
 
   /**
@@ -81,6 +95,10 @@ public:
     }
 
     previously_linked_ = true;
+
+    // Harden the inputs
+    const auto hardened = target_.init(elements_[elements_.size() - 1].next);
+
   }
 
   /**
@@ -121,12 +139,12 @@ public:
   /**
    * Creates a new pipeline without any elements
    */
-  InputPipelineBuilder() = default;
+  InputPipelineBuilder(InputManager& target) : target_(target) {}
 
   /**
    * Creates a new pipeline from a vector of pipeline elements
    */
-  InputPipelineBuilder(const std::vector<std::reference_wrapper<Element>>& elements) {
+  InputPipelineBuilder(const std::vector<std::reference_wrapper<Element>>& elements, InputManager& target) : target_(target) {
     elements_.reserve(elements.size());
     for (size_t i = 0; i < elements.size(); i++) {
       auto& element = elements[i];
@@ -153,6 +171,8 @@ private:
     ElementHandle(std::reference_wrapper<Element> element, InputManager::Props next, std::function<void()> callback)
       : element(element), next(next), relink_callback(callback) {}
   };
+
+  InputManager& target_;
 
   std::vector<ElementHandle> elements_{};
   std::set<std::string> declared_names_{};

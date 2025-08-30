@@ -28,6 +28,8 @@ class InputMap : public control_mode::InputCollection<InputT>
 {
 public:
   virtual ~InputMap() = default;
+  InputMap(InputMap<T, InputT>&) = default;
+  InputMap(InputMap<T, InputT>&&) = default;
 
   /*
   InputMap(const InputMap<T, InputT> & other)
