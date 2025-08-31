@@ -174,6 +174,17 @@ public:
   InputPipelineBuilder(InputManager& target) : target_(target) {}
 
   /**
+   * Used for unit tests. Removes all elements. Does not relink after clearing.
+   */
+  void clear() {
+    elements_.clear();
+    declared_names_.clear();
+    previously_linked_ = false;
+    previously_declared_names_ = false;
+    target_.init(InputManager::Props());
+  }
+
+  /**
    * Creates a new pipeline from a vector of pipeline elements
    */
   InputPipelineBuilder(const std::vector<std::reference_wrapper<Element>>& elements, InputManager& target) : target_(target) {

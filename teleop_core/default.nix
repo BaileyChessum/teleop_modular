@@ -63,7 +63,7 @@ buildRosPackage {
   ];
 
   # Enable running tests during build
-#  doCheck = true;
+  doCheck = true;
 
   # Added to debug a crazy segfault
   # dontStrip = true;

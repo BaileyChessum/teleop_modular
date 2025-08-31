@@ -40,8 +40,8 @@ public:
    * Everything you need to initialize the input manager
    */
   struct Props {
-    InputMapBuilder<uint8_t> button_builder;
-    InputMapBuilder<float> axis_builder;
+    InputMapBuilder<uint8_t> button_builder{};
+    InputMapBuilder<float> axis_builder{};
   };
 
   /**

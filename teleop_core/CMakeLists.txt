@@ -82,10 +82,15 @@ install(FILES plugins.xml
 #  find_package(ament_lint_auto REQUIRED)
 
   # Add tests
-  ament_add_gtest(test_inputs
+
+  set(TEST_INPUTS_SOURCE_FILES
     test/test_inputs.cpp
     test/test_state.cpp
     test/test_input_map.cpp
+    test/test_input_pipeline.cpp
+  )
+  ament_add_gtest(test_inputs
+    ${TEST_INPUTS_SOURCE_FILES}
   )
   target_link_libraries(test_inputs
     ${PROJECT_NAME}
@@ -131,9 +136,7 @@ find_package(GTest REQUIRED)
 find_package(Threads REQUIRED)
 # At the bottom of your CMakeLists.txt
 add_executable(test_inputs_manual
-  test/test_inputs.cpp
-  test/test_state.cpp
-  test/test_input_map.cpp
+  ${TEST_INPUTS_SOURCE_FILES}
 )
 target_link_libraries(test_inputs_manual
   ${PROJECT_NAME}
