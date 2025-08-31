@@ -114,21 +114,21 @@ void TeleopNode::log_existing_inputs()
 {
   std::stringstream log;
 
-  if (inputs_.get_axes().size() > 0) {
-    log << C_INPUT "\tAxes:\n" C_RESET;
-
-    for (const auto & axis : inputs_.get_axes()) {
-      log << C_INPUT "\t  " << axis->get_name() << "\t" << axis.value() << "\n" C_RESET;
-    }
-  }
-
-  if (inputs_.get_buttons().size() > 0) {
-    log << C_INPUT "\tButtons:\n" C_RESET;
-
-    for (const auto & button : inputs_.get_buttons()) {
-      log << C_INPUT "\t  " << button->get_name() << "\t" << button.value() << "\n" C_RESET;
-    }
-  }
+  // if (inputs_.get_axes().size() > 0) {
+  //   log << C_INPUT "\tAxes:\n" C_RESET;
+  //
+  //   for (const auto & axis : inputs_.get_axes()) {
+  //     log << C_INPUT "\t  " << axis->get_name() << "\t" << axis.value() << "\n" C_RESET;
+  //   }
+  // }
+  //
+  // if (inputs_.get_buttons().size() > 0) {
+  //   log << C_INPUT "\tButtons:\n" C_RESET;
+  //
+  //   for (const auto & button : inputs_.get_buttons()) {
+  //     log << C_INPUT "\t  " << button->get_name() << "\t" << button.value() << "\n" C_RESET;
+  //   }
+  // }
 
   RCLCPP_DEBUG(
     get_node()->get_logger(), C_TITLE "Registered inputs:\n" C_RESET "%s\n",

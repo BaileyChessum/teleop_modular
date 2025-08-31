@@ -19,6 +19,7 @@
 #include <variant>
 #include "teleop_core/inputs/InputAggregator.hpp"
 #include "control_mode/input_collection.hpp"
+#include <iostream>
 
 namespace teleop
 {
@@ -29,6 +30,7 @@ class InputMap : public control_mode::InputCollection<InputT>
 public:
   virtual ~InputMap() = default;
   InputMap(InputMap<T, InputT>& other) {
+    std::cerr << "copy assignment InputMap";
     inputs_ = other.inputs_;
     aggregators_ = other.aggregators_;
     map_ = other.map_;
@@ -92,7 +94,7 @@ public:
     auto it = map_.find(name);
 
     if (it == map_.end())
-      return nullptr;
+      return InputT();
     return it->second;
   }
 
@@ -108,7 +110,7 @@ public:
     auto it = map_.find(name);
 
     if (it == map_.end())
-      return nullptr;  // return the default pointer, which points to a common sink value
+      return InputT();  // return the default pointer, which points to a common sink value
 
     // TODO: Stop allocating duplicate strings to the heap!!
     return InputT(std::make_shared<std::string>(name), it->second);
