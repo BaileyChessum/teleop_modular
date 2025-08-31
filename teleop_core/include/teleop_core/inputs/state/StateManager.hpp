@@ -25,11 +25,11 @@ namespace teleop::state
 /**
  * A class to manage input values that don't originate from an input source. This could be from ROS2, or commands
  */
-class StateManager : public InputPipelineBuilder::Element
+class StateManager : public InputPipelineBuilder::Element, public InputPipelineElementDelegate
 {
 public:
   explicit StateManager(InputManager & inputs)
-  : buttons_(inputs.get_buttons()), axes_(inputs.get_axes())
+  : buttons_(*this), axes_(*this)
   {
   }
 
@@ -52,16 +52,22 @@ public:
   virtual void link_inputs(const InputManager::Props& previous, InputManager::Props& next, const std::set<std::string>& declared_names) {
     next = previous;
 
-    for (auto& [name, state] : buttons_) {
+    for (auto& [name, state] : buttons_)
+      next.button_builder.declare_aggregate(name, state->reference);
 
-    }
+    for (auto& [name, state] : axes_)
+      next.axis_builder.declare_aggregate(name, state->reference);
   }
 
   /**
-     * Callback ran when hardened inputs are available.
+   * Callback ran when hardened inputs are available.
    */
   virtual void on_inputs_available(InputManager::Hardened& inputs) {
+    // I don't think we do anything with hardened inputs?
+  }
 
+  virtual void relink() override {
+    relink_pipeline();
   }
 
 private:

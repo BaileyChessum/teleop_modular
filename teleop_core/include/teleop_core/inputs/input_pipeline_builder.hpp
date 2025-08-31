@@ -48,8 +48,10 @@ public:
      */
     virtual void link_inputs(const InputManager::Props& previous, InputManager::Props& next, const std::set<std::string>& declared_names) = 0;
 
+    // TODO: Rename to make clear that these are the inputs we want to consume, not provide
     /**
-     * Allows an element to declare that it wants some
+     * Allows an element to declare what inputs it CONSUMES, not provides. This is useful for any dynamic remapping of
+     * any previous elements in the pipeline.
      * \param[in, out] names the set accumulating all declared input names. Add names to declare to this set.
      */
     virtual void declare_input_names(std::set<std::string>& names) {};
@@ -58,6 +60,34 @@ public:
      * Callback ran when hardened inputs are available.
      */
     virtual void on_inputs_available(InputManager::Hardened& inputs) = 0;
+
+    void set_pipeline_delegate(InputPipelineElementDelegate& delegate) {
+      delegate_ = &delegate;
+    }
+
+  protected:
+    /**
+     * Initiates a new build of the pipeline, calling link_inputs again from this pipeline element onwards.
+     * Call this whenever the previous outcome of link_inputs becomes obsolete, and you want to run it again.
+     * Should be called as part of the main thread, as it will completely reorganise data used by the main input
+     * pipeline.
+     */
+    void relink_pipeline() {
+      if (!delegate_.has_value()) {
+        RCLCPP_ERROR(rclcpp::get_logger("input_pipeline_builder"),
+                     "InputPipelineBuilder::Element tried to relink_pipeline(), but the delegate used to do so was "
+                     "never set.");
+        return;
+      }
+
+      // TODO: integrate some kind of scheduling/sync mechanism with the main thread to ensure safety. For currest use
+      //  cases, we can assume it is already delegated by the main thread as part of event queues
+
+      delegate_.value()->relink();
+    }
+
+  private:
+    std::optional<InputPipelineElementDelegate*> delegate_ = std::nullopt;
   };
 
   /**
