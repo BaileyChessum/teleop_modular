@@ -20,24 +20,11 @@ void InputManager::update(const rclcpp::Time & now)
 {
   button_map_.update();
   axis_map_.update();
-
-  for (const auto& button: buttons_)
-    button->debounce(now);
-  for (const auto& axis: axes_)
-    axis->debounce(now);
 }
 
 InputManager::Hardened InputManager::init(const InputManager::Props& props) {
   button_map_ = props.button_builder.construct();
   axis_map_ = props.axis_builder.construct();
-
-  for (auto& [name, input] : button_map_) {
-    buttons_[name]->add_definition(input);
-  }
-
-  for (auto& [name, input] : axis_map_) {
-    axes_[name]->add_definition(input);
-  }
 
   return {button_map_, axis_map_};
 }

@@ -61,7 +61,7 @@ public:
     std::shared_ptr<State<T>> ptr = nullptr;
 
     if (it != items_.end()) {
-      ptr = it->second.state;
+      ptr = it->second;
     }
 
     return ptr;
@@ -81,7 +81,7 @@ public:
 
     // Make and register a new state
     const auto state = std::make_shared<State<T>>(name, value);
-    items_[name] = value;
+    items_[name] = state;
 
     delegate_.relink();
   }

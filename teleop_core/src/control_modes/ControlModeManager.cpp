@@ -152,8 +152,8 @@ void ControlModeManager::configure(InputManager & inputs)
   RCLCPP_INFO(logger, C_TITLE "Control Modes:" C_RESET "%s\n", registered_modes_log.str().c_str());
 
   // Configure each control mode
-  auto buttons = inputs.get_buttons().get_control_mode_compat();
-  auto axes = inputs.get_axes().get_control_mode_compat();
+  auto& buttons = inputs.get_buttons();
+  auto& axes = inputs.get_axes();
 
   control_mode::Inputs control_mode_inputs{
     buttons,

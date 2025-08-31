@@ -47,10 +47,12 @@ protected:
 TEST_F(InputTest, MapButtonSimple)
 {
   EXPECT_FALSE(inputs.get_buttons()["test_button"].value());
+  EXPECT_EQ(inputs.get_buttons()["test_button"].get(), Button().get());
 
   uint8_t value = false;
   props.button_builder.declare_aggregate("test_button", &value);
   inputs.init(props);
+  EXPECT_NE(inputs.get_buttons()["test_button"].get(), Button().get()) << "Still nullptr after assignment";
 
   inputs.update(rclcpp::Time());
   EXPECT_FALSE(inputs.get_buttons()["test_button"].value());
@@ -88,20 +90,12 @@ TEST_F(InputTest, MapAxisDependencyAccumulation)
   props.axis_builder.declare_aggregate("test_axis", &value);
   inputs.init(props);
 
-  EXPECT_EQ(&value, inputs.get_axes()["test_axis"]->definition)
-      << "test_axis doesn't point directly to &value when only one value is defined";
-
   inputs.update(rclcpp::Time());
   EXPECT_NEAR(inputs.get_axes()["test_axis"].value(), 1.0, 1e-10);
 
   float value2 = 10.0;
   props.axis_builder.declare_aggregate("test_axis", &value2);
   inputs.init(props);
-
-  EXPECT_NE(&value, inputs.get_axes()["test_axis"]->definition)
-            << "test_axis points directly to &value when it should point to some intermediate memory for aggregation";
-  EXPECT_NE(&value2, inputs.get_axes()["test_axis"]->definition)
-            << "test_axis points directly to &value2 when it should point to some intermediate memory for aggregation";
 
   inputs.update(rclcpp::Time());
   EXPECT_NEAR(inputs.get_axes()["test_axis"].value(), 11.0, 1e-10);
@@ -121,13 +115,6 @@ TEST_F(InputTest, MapAxisDependencyAccumulation)
   float value3 = 100.0;
   props.axis_builder.declare_aggregate("test_axis", &value3);
   inputs.init(props);
-
-  EXPECT_NE(&value, inputs.get_axes()["test_axis"]->definition)
-            << "test_axis points directly to &value when it should point to some intermediate memory for aggregation";
-  EXPECT_NE(&value2, inputs.get_axes()["test_axis"]->definition)
-            << "test_axis points directly to &value2 when it should point to some intermediate memory for aggregation";
-  EXPECT_NE(&value3, inputs.get_axes()["test_axis"]->definition)
-            << "test_axis points directly to &value3 when it should point to some intermediate memory for aggregation";
 
   inputs.update(rclcpp::Time());
   EXPECT_NEAR(inputs.get_axes()["test_axis"].value(), 111.0, 1e-10);
@@ -169,9 +156,6 @@ TEST_F(InputTest, MapButtonDependencyAccumulation)
   props.button_builder.declare_aggregate("test_button", &value);
   inputs.init(props);
 
-  EXPECT_EQ(&value, inputs.get_buttons()["test_button"]->definition)
-      << "test_button doesn't point directly to &value when only one value is defined";
-
   inputs.update(rclcpp::Time());
   EXPECT_FALSE(inputs.get_buttons()["test_button"].value());
 
@@ -183,11 +167,6 @@ TEST_F(InputTest, MapButtonDependencyAccumulation)
   uint8_t value2 = false;
   props.button_builder.declare_aggregate("test_button", &value2);
   inputs.init(props);
-
-  EXPECT_NE(&value, inputs.get_buttons()["test_button"]->definition)
-      << "test_axis points directly to &value when it should point to some intermediate memory for aggregation";
-  EXPECT_NE(&value2, inputs.get_buttons()["test_button"]->definition)
-      << "test_axis points directly to &value2 when it should point to some intermediate memory for aggregation";
 
   inputs.update(rclcpp::Time());
   EXPECT_FALSE(inputs.get_buttons()["test_button"].value());

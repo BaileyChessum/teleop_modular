@@ -28,8 +28,13 @@ class InputMap : public control_mode::InputCollection<InputT>
 {
 public:
   virtual ~InputMap() = default;
-  InputMap(InputMap<T, InputT>&) = default;
-  InputMap(InputMap<T, InputT>&&) = default;
+  InputMap(InputMap<T, InputT>& other) {
+    inputs_ = other.inputs_;
+    aggregators_ = other.aggregators_;
+    map_ = other.map_;
+  }
+
+  // InputMap(InputMap<T, InputT>&&) = default;
 
   /*
   InputMap(const InputMap<T, InputT> & other)
@@ -105,7 +110,8 @@ public:
     if (it == map_.end())
       return nullptr;  // return the default pointer, which points to a common sink value
 
-    return InputT();
+    // TODO: Stop allocating duplicate strings to the heap!!
+    return InputT(std::make_shared<std::string>(name), it->second);
   }
 
 private:

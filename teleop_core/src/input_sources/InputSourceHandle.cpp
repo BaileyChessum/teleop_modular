@@ -183,14 +183,14 @@ InputSourceHandle::RemapParams InputSourceHandle::get_remap_params()
   RemapParams remap_params;
   auto & inputs = inputs_.get();
 
-  for (const auto & button : inputs.get_buttons()) {
-    if (auto params = get_remap_button_params(button->get_name()); params.has_value()) {
+  for (const auto & [name, button] : inputs.get_buttons()) {
+    if (auto params = get_remap_button_params(name); params.has_value()) {
       remap_params.buttons.emplace_back(*params);
     }
   }
 
-  for (const auto & axis : inputs.get_axes()) {
-    if (auto params = get_remap_axis_params(axis->get_name()); params.has_value()) {
+  for (const auto & [name, axis] : inputs.get_axes()) {
+    if (auto params = get_remap_axis_params(name); params.has_value()) {
       remap_params.axes.emplace_back(*params);
     }
   }

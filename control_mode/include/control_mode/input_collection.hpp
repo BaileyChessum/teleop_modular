@@ -48,10 +48,10 @@ protected:
   ~InputCollection() = default;
 
   // Prevent copy/move by default
-  InputCollection(const InputCollection &) = delete;
-  InputCollection(InputCollection &&) = delete;
-  InputCollection & operator=(const InputCollection &) = delete;
-  InputCollection & operator=(InputCollection &&) = delete;
+  // InputCollection(const InputCollection &) = delete;
+  // InputCollection(InputCollection &&) = delete;
+  // InputCollection & operator=(const InputCollection &) = delete;
+  // InputCollection & operator=(InputCollection &&) = delete;
 };
 
 /// A set to acquire shared pointers to boolean inputs

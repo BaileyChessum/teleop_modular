@@ -76,24 +76,24 @@ public:
 //  }
 
   // Delete copy constructor and assignment
-  InputManager(const InputManager &) = delete;
-  InputManager & operator=(const InputManager &) = delete;
+  // InputManager(const InputManager &) = delete;
+  // InputManager & operator=(const InputManager &) = delete;
 
   // Accessors
-  [[nodiscard]] control_mode::InputCollection<Button> & get_buttons()
+  [[nodiscard]] InputMap<uint8_t, Button> & get_buttons()
   {
     return button_map_;
   }
-  [[nodiscard]] control_mode::InputCollection<Axis> & get_axes()
+  [[nodiscard]] InputMap<float, Axis> & get_axes()
   {
     return axis_map_;
   }
 
-  [[nodiscard]] const control_mode::InputCollection<Button> & get_buttons() const
+  [[nodiscard]] const InputMap<uint8_t, Button> & get_buttons() const
   {
     return button_map_;
   }
-  [[nodiscard]] const control_mode::InputCollection<Axis> & get_axes() const
+  [[nodiscard]] const InputMap<float, Axis> & get_axes() const
   {
     return axis_map_;
   }
