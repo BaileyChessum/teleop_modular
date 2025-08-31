@@ -126,7 +126,7 @@ public:
     previously_linked_ = true;
 
     // Harden the inputs
-    const auto hardened = target_.init(elements_[elements_.size() - 1].next);
+    auto hardened = target_.init(elements_[elements_.size() - 1].next);
 
     for (size_t i = index; i < elements_.size(); i++) {
       elements_[i].element.get().on_inputs_available(hardened);

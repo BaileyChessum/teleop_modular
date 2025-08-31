@@ -34,9 +34,9 @@ template<typename T, typename InputT>
 class StateCollection
 {
 public:
-  static_assert(
-    std::is_base_of_v<InputCommon<T>, InputT>,
-    "InputT must be an input type inheriting from InputCommon (Button, Axis).");
+//  static_assert(
+//    std::is_base_of_v<InputCommon<T>, InputT>,
+//    "InputT must be an input type inheriting from InputCommon (Button, Axis).");
 
   explicit StateCollection(InputPipelineElementDelegate& delegate)
     : delegate_(delegate)
@@ -83,8 +83,7 @@ public:
     const auto state = std::make_shared<State<T>>(name, value);
     items_[name] = value;
 
-
-    ;
+    delegate_.relink();
   }
 
   /**
@@ -115,7 +114,7 @@ public:
 
 private:
   std::map<std::string, typename State<T>::SharedPtr> items_{};
-  InputPipelineElementDelegate& delegate_:
+  InputPipelineElementDelegate& delegate_;
 };
 
 }  // namespace teleop::state

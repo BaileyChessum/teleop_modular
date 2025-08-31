@@ -22,6 +22,7 @@
 #include "teleop_core/inputs/InputAggregator.hpp"
 #include "teleop_core/inputs/InputMap.hpp"
 #include "teleop_core/inputs/InputDefinition.hpp"
+#include "control_mode/input_ptr.hpp"
 
 namespace teleop
 {
@@ -138,13 +139,13 @@ public:
   /**
    * Gets an input vector with the right size to store all input values in. Use this to crystallize inputs
    */
-  [[nodiscard]] InputMap<T> construct() const {
+  [[nodiscard]] InputMap<T, control_mode::InputPtr<T>> construct() const {
     std::vector<typename InputAggregator<T>::Props> aggregates_vector{};
     aggregates_vector.reserve(aggregates_.size());
     for (auto [name, aggregate] : aggregates_)
       aggregates_vector.push_back(aggregate);
 
-    auto inputs = InputMap<T>(display_names_.size(), aggregates_vector, map_);
+    auto inputs = InputMap<T, control_mode::InputPtr<T>>(display_names_.size(), aggregates_vector, map_);
     return inputs;
   }
 

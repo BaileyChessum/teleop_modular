@@ -33,7 +33,6 @@ add_library(${PROJECT_NAME} SHARED
   src/commands/SetButtonCommand.cpp
 
   # These are also need to do unit tests
-  src/inputs/InputCommonSpecializations.cpp
   src/inputs/Button.cpp
   src/inputs/Axis.cpp
   src/commands/Command.cpp

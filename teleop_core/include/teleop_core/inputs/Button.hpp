@@ -8,14 +8,13 @@
 //     http://www.apache.org/licenses/LICENSE-2.0
 //
 //
-// Created by nova on 7/1/25.
+// Created by Bailey Chessum on 1/7/25.
 //
 
 #ifndef TELEOP_MODULAR_BUTTON_HPP
 #define TELEOP_MODULAR_BUTTON_HPP
 
 #include <utility>
-#include "InputCommon.hpp"
 #include "control_mode/input_ptr.hpp"
 
 namespace teleop

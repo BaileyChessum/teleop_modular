@@ -53,27 +53,27 @@ public:
   };
 
   InputManager()
-  : button_map_()
-    , axis_map_()
+  : button_map_(0, {}, {})
+    , axis_map_(0, {}, {})
   {
   }
 
   // Add move constructor
-  InputManager(InputManager && other) noexcept
-  : button_map_(std::move(other.button_map_))
-    , axis_map_(std::move(other.axis_map_))
-  {
-  }
+//  InputManager(InputManager && other) noexcept
+//  : button_map_(std::move(other.button_map_))
+//    , axis_map_(std::move(other.axis_map_))
+//  {
+//  }
 
   // Add move assignment
-  InputManager & operator=(InputManager && other) noexcept
-  {
-    if (this != &other) {
-      button_map_ = std::move(other.button_map_);
-      axis_map_ = std::move(other.axis_map_);
-    }
-    return *this;
-  }
+//  InputManager & operator=(InputManager && other) noexcept
+//  {
+//    if (this != &other) {
+//      button_map_ = std::move(other.button_map_);
+//      axis_map_ = std::move(other.axis_map_);
+//    }
+//    return *this;
+//  }
 
   // Delete copy constructor and assignment
   InputManager(const InputManager &) = delete;
