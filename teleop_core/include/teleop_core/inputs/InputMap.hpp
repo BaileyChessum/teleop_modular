@@ -19,7 +19,6 @@
 #include <variant>
 #include "teleop_core/inputs/InputAggregator.hpp"
 #include "control_mode/input_collection.hpp"
-#include <iostream>
 
 namespace teleop
 {
@@ -47,7 +46,6 @@ public:
   }
 
   void harden(size_t size, const std::vector<typename InputAggregator<T>::Props>& aggregates, const std::map<std::string, std::variant<size_t, T*>>& input_map) {
-    std::cout << "InputMap constructor!\n";
     inputs_.resize(size, 0);
 
     // Populate map_, resolving size_t to T*

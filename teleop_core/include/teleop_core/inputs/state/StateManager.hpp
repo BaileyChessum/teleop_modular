@@ -28,7 +28,7 @@ namespace teleop::state
 class StateManager : public InputPipelineBuilder::Element, public InputPipelineElementDelegate
 {
 public:
-  explicit StateManager(InputManager & inputs)
+  explicit StateManager()
   : buttons_(*this), axes_(*this)
   {
   }
@@ -44,20 +44,12 @@ public:
   }
 
   /**
-     * Add inputs to the builder.
-     * \param[in] previous The result of the previous InputPipelineBuilder::Element, to use as a basis for populating
-     * next.
-     * \param[in,out] next The result of this Element. Always stores the previous result from this Element.
+   * Add inputs to the builder.
+   * \param[in] previous The result of the previous InputPipelineBuilder::Element, to use as a basis for populating
+   * next.
+   * \param[in,out] next The result of this Element. Always stores the previous result from this Element.
    */
-  virtual void link_inputs(const InputManager::Props& previous, InputManager::Props& next, const std::set<std::string>& declared_names) {
-    next = previous;
-
-    for (auto& [name, state] : buttons_)
-      next.button_builder.declare_aggregate(name, state->reference);
-
-    for (auto& [name, state] : axes_)
-      next.axis_builder.declare_aggregate(name, state->reference);
-  }
+  void link_inputs(const InputManager::Props& previous, InputManager::Props& next, const std::set<std::string>& declared_names) override;
 
   /**
    * Callback ran when hardened inputs are available.

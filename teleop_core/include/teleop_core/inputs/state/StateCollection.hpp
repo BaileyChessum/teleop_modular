@@ -82,7 +82,6 @@ public:
     // Make and register a new state
     const auto state = std::make_shared<State<T>>(name, value);
     items_[name] = state;
-
     delegate_.relink();
   }
 

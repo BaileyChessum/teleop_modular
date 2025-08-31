@@ -15,4 +15,17 @@
 
 namespace teleop::state
 {
+
+void StateManager::link_inputs(const InputManager::Props& previous, InputManager::Props& next,
+                               const std::set<std::string>& declared_names)
+{
+  next = previous;
+
+  for (auto& [name, state] : buttons_)
+    next.button_builder.declare_aggregate(name, state->reference);
+
+  for (auto& [name, state] : axes_)
+    next.axis_builder.declare_aggregate(name, state->reference);
+}
+
 }  // namespace teleop::state

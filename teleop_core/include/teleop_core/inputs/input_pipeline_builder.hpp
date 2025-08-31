@@ -121,6 +121,7 @@ public:
         element.next = previous_inputs;
 
       element.element.get().link_inputs(previous_inputs, element.next, declared_names_);
+      previous_inputs = element.next;
     }
 
     previously_linked_ = true;
@@ -157,7 +158,9 @@ public:
    */
   void push_back(Element& element) {
     const auto index = elements_.size();
-    elements_.emplace_back(element, InputManager::Props{}, [index, this](){
+    auto previous_inputs = index > 0 ? elements_[index - 1].next : InputManager::Props();
+
+    elements_.emplace_back(element, previous_inputs, [index, this](){
       this->relink_from(index);
     });
 
@@ -212,7 +215,9 @@ private:
     }
 
     ElementHandle(std::reference_wrapper<Element> element, InputManager::Props next, std::function<void()> callback)
-      : element(element), next(next), relink_callback(callback) {}
+      : element(element), next(next), relink_callback(callback) {
+      element.get().set_pipeline_delegate(*this);
+    }
   };
 
   InputManager& target_;

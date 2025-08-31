@@ -20,7 +20,7 @@ namespace teleop
 {
 
 TeleopNode::TeleopNode(const std::shared_ptr<rclcpp::Node> & node)
-: node_(node), states_(inputs_), events_(inputs_)
+: node_(node), states_(), events_(inputs_)
 {
   auto parameters = node->get_node_parameters_interface();
 
