@@ -29,14 +29,7 @@ class InputMap : public control_mode::InputCollection<InputT>
 {
 public:
   virtual ~InputMap() = default;
-  InputMap(InputMap<T, InputT>& other) {
-    std::cerr << "copy assignment InputMap";
-    inputs_ = other.inputs_;
-    aggregators_ = other.aggregators_;
-    map_ = other.map_;
-  }
-
-  // InputMap(InputMap<T, InputT>&&) = default;
+  InputMap(InputMap<T, InputT>&) = delete;
 
   /*
   InputMap(const InputMap<T, InputT> & other)
@@ -49,7 +42,12 @@ public:
   };
   */
 
-  InputMap(size_t size, const std::vector<typename InputAggregator<T>::Props>& aggregates, const std::map<std::string, std::variant<size_t, T*>>& input_map) {
+  InputMap() {
+    harden(1, {}, {});
+  }
+
+  void harden(size_t size, const std::vector<typename InputAggregator<T>::Props>& aggregates, const std::map<std::string, std::variant<size_t, T*>>& input_map) {
+    std::cout << "InputMap constructor!\n";
     inputs_.resize(size, 0);
 
     // Populate map_, resolving size_t to T*
@@ -67,7 +65,8 @@ public:
     }
 
     // Construct InputAggregators
-    for (auto aggregate : aggregates)
+    aggregators_.reserve(aggregates.size());
+    for (const auto& aggregate : aggregates)
       aggregators_.emplace_back(inputs_, aggregate);
   }
 

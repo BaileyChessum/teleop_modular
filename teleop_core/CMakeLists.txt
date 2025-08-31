@@ -126,11 +126,36 @@ install(TARGETS ${PROJECT_NAME}
 ament_export_libraries(
   ${PROJECT_NAME}
 )
+
+find_package(GTest REQUIRED)
+find_package(Threads REQUIRED)
+# At the bottom of your CMakeLists.txt
+add_executable(test_inputs_manual
+  test/test_inputs.cpp
+  test/test_state.cpp
+  test/test_input_map.cpp
+)
+target_link_libraries(test_inputs_manual
+  ${PROJECT_NAME}
+  GTest::gtest_main
+  Threads::Threads
+)
+target_include_directories(test_inputs_manual PUBLIC
+  include
+)
+install(TARGETS
+  test_inputs_manual
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+
 ament_export_targets(
-#  ${PROJECT_NAME}Targets
+  #  ${PROJECT_NAME}Targets
   export_${PROJECT_NAME}
   HAS_LIBRARY_TARGET
 )
+
+
 
 ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 ament_package()

@@ -53,8 +53,8 @@ public:
   };
 
   InputManager()
-  : button_map_(0, {}, {})
-    , axis_map_(0, {}, {})
+  : button_map_()
+    , axis_map_()
   {
   }
 
@@ -110,10 +110,10 @@ public:
 
 protected:
   /// Stores a string -> T* map, along with additional memory for aggregation
-  InputMap<uint8_t, Button> button_map_ = InputMap<uint8_t, Button>(0, {}, {});
+  InputMap<uint8_t, Button> button_map_ = InputMap<uint8_t, Button>();
 
   /// Stores a string -> T* map, along with additional memory for aggregation
-  InputMap<float, Axis> axis_map_ = InputMap<float, Axis>(0, {}, {});
+  InputMap<float, Axis> axis_map_ = InputMap<float, Axis>();
 };
 
 }  // namespace teleop

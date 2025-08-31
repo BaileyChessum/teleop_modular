@@ -111,7 +111,7 @@ TEST_F(InputTest, AxisSpamInit)
   inputs.update(rclcpp::Time());
   EXPECT_NEAR(inputs.get_axes()["test_axis"].value(), 11.0, 1e-10);
 
-  float value3 = 10.0;
+  float value3 = 100.0;
   props.axis_builder.declare_aggregate("test_axis", &value3);
   std::cerr << "3.1\n";
   inputs.init(props);
@@ -121,7 +121,7 @@ TEST_F(InputTest, AxisSpamInit)
   inputs.init(props);
   std::cerr << "3.4\n";
   inputs.update(rclcpp::Time());
-  EXPECT_NEAR(inputs.get_axes()["test_axis"].value(), 11.0, 1e-10);
+  EXPECT_NEAR(inputs.get_axes()["test_axis"].value(), 111.0, 1e-10);
 }
 
 TEST_F(InputTest, MapAxisDependencyAccumulationDirect)

@@ -38,7 +38,7 @@ public:
     size_t target_id;
   };
 
-  InputAggregator(std::vector<T>& inputs, Props props) {
+  InputAggregator(std::vector<T>& inputs, const Props& props) {
     if (inputs.empty())
       throw std::invalid_argument("Inputs cannot have a length of zero. It is missing the null value at id 0.");
     if (props.source_ids.empty())
@@ -47,10 +47,18 @@ public:
     // Assign members from props
     sources_.reserve(props.source_ids.size());
     for (auto source_id : props.source_ids) {
-      if (std::holds_alternative<size_t>(source_id))
-        sources_.push_back(&inputs[std::get<size_t>(source_id)]);
-      else
-        sources_.push_back(std::get<T*>(source_id));
+      if (std::holds_alternative<size_t>(source_id)) {
+        size_t idx = std::get<size_t>(source_id);
+        if (idx >= inputs.size())
+          throw std::out_of_range("source_id out of bounds");
+        sources_.push_back(&inputs.at(idx));
+      }
+      else {
+        T* ptr = std::get<T*>(source_id);
+        if (!ptr)
+          throw std::invalid_argument("source pointer is null");
+        sources_.push_back(ptr);
+      }
     }
 
     target_ = &inputs[props.target_id];

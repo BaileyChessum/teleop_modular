@@ -23,8 +23,8 @@ void InputManager::update(const rclcpp::Time & now)
 }
 
 InputManager::Hardened InputManager::init(const InputManager::Props& props) {
-  button_map_ = props.button_builder.construct();
-  axis_map_ = props.axis_builder.construct();
+  props.button_builder.construct(button_map_);
+  props.axis_builder.construct(axis_map_);
 
   return {button_map_, axis_map_};
 }

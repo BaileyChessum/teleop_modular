@@ -61,7 +61,7 @@ void TeleopNode::initialize(const std::weak_ptr<rclcpp::Executor> & executor)
   input_source_manager_->configure(inputs_);
 
   InputManager::Props input_props{};
-  input_source_manager_->link_inputs(input_props);
+//  input_source_manager_->link_inputs(input_props);
   inputs_.init(input_props);
 
   RCLCPP_DEBUG(logger, "TeleopNode::init(): Starting...");
