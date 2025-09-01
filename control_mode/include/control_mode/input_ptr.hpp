@@ -70,6 +70,8 @@ public:
   using SharedPtr [[deprecated("Shared pointers are no longer used for input memory management. The input class now acts as the pointer.")]] = InputPtr<T>*;
 
   InputPtr(InputPtr<T>& other) : ptr_(other.ptr_), name_(other.name_) {}
+  InputPtr(InputPtr<T>&& other) : ptr_(other.ptr_), name_(std::move(other.name_)) {}
+  ~InputPtr() = default;
   
   /// Creates a null input
   InputPtr() {
@@ -81,9 +83,14 @@ public:
     name_ = default_name();
   }
 
-  InputPtr& operator=(std::nullptr_t) noexcept {
+  InputPtr& operator=(const std::nullptr_t) noexcept {
     ptr_ = &default_value();
     name_ = default_name();
+    return *this;
+  }
+  InputPtr& operator=(const InputPtr& other) noexcept {
+    ptr_ = other.ptr_;
+    name_ = other.name_;
     return *this;
   }
 

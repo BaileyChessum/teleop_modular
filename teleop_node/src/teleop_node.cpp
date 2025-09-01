@@ -43,8 +43,8 @@ void TeleopNode::initialize(const std::weak_ptr<rclcpp::Executor> & executor)
   RCLCPP_DEBUG(logger, "TeleopNode::init(): Creating inputs");
 
   RCLCPP_DEBUG(logger, "TeleopNode::init(): Creating control modes.");
-  control_mode_manager_ = std::make_shared<internal::ControlModeManager>(get_node(), executor);
-  control_mode_manager_->configure(inputs_);
+  control_mode_manager_ = std::make_shared<internal::ControlModeManager>(get_node(), executor, events_.get_events());
+  control_mode_manager_->configure();
 
   RCLCPP_DEBUG(logger, "TeleopNode::init(): Creating commands.");
   commands_ = std::make_shared<internal::CommandManager>(get_node(), shared_from_this());
