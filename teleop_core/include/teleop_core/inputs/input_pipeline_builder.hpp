@@ -48,6 +48,8 @@ public:
    */
   class Element {
   public:
+    using DeclaredNames = InputPipelineBuilder::DeclaredNames;
+
     /**
      * Add inputs to the builder.
      * \param[in] previous The result of the previous InputPipelineBuilder::Element, to use as a basis for populating

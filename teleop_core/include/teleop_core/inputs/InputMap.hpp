@@ -105,7 +105,7 @@ public:
    *
    * Names of returned inputs may be remapped, such that (*this)[name]->get_name() may not equal name.
    */
-  virtual InputT operator[](const std::string & name) override {
+  InputT operator[](const std::string & name) override {
     auto it = map_.find(name);
 
     if (it == map_.end())
@@ -113,6 +113,16 @@ public:
 
     // TODO: Stop allocating duplicate strings to the heap!!
     return InputT(std::make_shared<std::string>(name), it->second);
+  }
+
+  /**
+   * Allows you to harden any unhardened reference you might have previously held.
+   */
+  T* operator[](size_t id) {
+    if (id >= inputs_.size())
+      throw std::range_error("Tried to access a hardened InputMap value from un unhardened id greater than the number "
+          "of elements.");
+    return &inputs_[id];
   }
 
 private:

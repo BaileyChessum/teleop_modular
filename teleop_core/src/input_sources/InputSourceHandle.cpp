@@ -29,19 +29,16 @@ using utils::get_parameter_or_default;
 
 InputSourceHandle::InputSourceHandle(
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & parameters,
-  InputManager & inputs, const std::shared_ptr<InputSource> & source)
-: inputs_(std::ref(inputs)), parameters_(parameters), source_(source)
+  const std::shared_ptr<InputSource> & source)
+: parameters_(parameters), source_(source)
 {
-  declare_and_link_inputs();
 }
 
 InputSourceHandle::InputSourceHandle(
-  InputManager & inputs,
   const std::shared_ptr<InputSource> & source)
-: inputs_(std::ref(inputs)), source_(source),
+: source_(source),
   parameters_(source->get_node()->get_node_parameters_interface())
 {
-  declare_and_link_inputs();
 }
 
 template<>
@@ -150,46 +147,29 @@ void InputSourceHandle::update(const rclcpp::Time & now)
   }
 }
 
-void InputSourceHandle::add_definitions_to_inputs() const
-{
-//  // Add declarations to inputs
-//  for (auto & button : button_definitions) {
-//    for (auto & definition : button.references) {
-//      button.input->add_definition(definition);
-//    }
-//  }
-//
-//  for (auto & axis : axis_definitions_) {
-//    for (auto & definition : axis.references) {
-//      axis.input->add_definition(definition);
-//    }
-//  }
-}
-
-void InputSourceHandle::declare_and_link_inputs()
+void InputSourceHandle::declare_and_link_inputs(const InputPipelineBuilder::DeclaredNames& names)
 {
   const auto logger = source_->get_node()->get_logger();
   // TODO(BaileyChessum): Check if inputs are already linked, and unlink them
 
   auto declarations = source_->export_inputs();
-  const auto remap_params = get_remap_params();
+  const auto remap_params = get_remap_params(names);
   remap(declarations, remap_params);
 
   // add_definitions_to_inputs();
 }
 
-InputSourceHandle::RemapParams InputSourceHandle::get_remap_params()
+InputSourceHandle::RemapParams InputSourceHandle::get_remap_params(const InputPipelineBuilder::DeclaredNames& names)
 {
   RemapParams remap_params;
-  auto & inputs = inputs_.get();
 
-  for (const auto & [name, button] : inputs.get_buttons()) {
+  for (const auto & name : names.button_names) {
     if (auto params = get_remap_button_params(name); params.has_value()) {
       remap_params.buttons.emplace_back(*params);
     }
   }
 
-  for (const auto & [name, axis] : inputs.get_axes()) {
+  for (const auto & name : names.axis_names) {
     if (auto params = get_remap_axis_params(name); params.has_value()) {
       remap_params.axes.emplace_back(*params);
     }
@@ -367,7 +347,6 @@ void InputSourceHandle::remap(
   RemapParams remap_params)
 {
   const auto logger = source_->get_node()->get_logger();
-  auto & inputs = inputs_.get();
 
   // Stores, for each exported button, whether the button is remapped
   std::vector<bool> is_button_remapped(declarations.button_names.size(), false);
@@ -382,7 +361,7 @@ void InputSourceHandle::remap(
   transformed_buttons_deferred_registration.reserve(remap_params.buttons.size());
 
   // Create definitions for each remapped input, marking which ones have been remapped
-  auto & buttons = inputs.get_buttons();
+//  const auto & buttons = names.button_names;
   for (auto & [name, from, transform, from_axis] : remap_params.buttons) {
     // Find if there is a direct renaming
     std::optional<uint8_t*> reference = std::nullopt;
@@ -462,7 +441,7 @@ void InputSourceHandle::remap(
   transformed_axes_deferred_registration.reserve(remap_params.axes.size());
 
   // Create definitions for each remapped input, marking which ones have been remapped
-  auto & axes = inputs.get_axes();
+//  auto & axes = inputs.get_axes();
   for (auto & [name, from, transform, from_buttons] : remap_params.axes) {
     // Find if there is a direct renaming
     std::optional<float*> reference = std::nullopt;

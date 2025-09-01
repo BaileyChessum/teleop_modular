@@ -73,7 +73,7 @@ void TeleopNode::initialize(const std::weak_ptr<rclcpp::Executor> & executor)
   pipeline_.push_back(*control_mode_manager_);
   if (input_change_listener_.has_value())
     pipeline_.push_back(input_change_listener_.value());
-
+  pipeline_.push_back(events_.get_events());
   pipeline_.link_inputs();
 
   RCLCPP_DEBUG(logger, "TeleopNode::init(): Starting...");

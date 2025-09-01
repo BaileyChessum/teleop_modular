@@ -37,7 +37,7 @@ void InputChangeListener::on_inputs_available(InputManager::Hardened& inputs)
   buttons_.reserve(inputs.buttons.size());
   previous_buttons_.reserve(inputs.buttons.size());
   size_t max_button_name_size = 8;
-  log << C_RESET << "\tButtons:\n" << C_RESET;
+  log << C_RESET << "Buttons:\n" << C_RESET;
   RCLCPP_DEBUG(logger_, C_TITLE "Registered Buttons:" C_RESET);
 
   for (auto& [name, button] : inputs.buttons) {
@@ -48,7 +48,7 @@ void InputChangeListener::on_inputs_available(InputManager::Hardened& inputs)
     if (name.size() > max_button_name_size)
       max_button_name_size = name.size();
 
-    log << "\t  - " << C_INPUT;
+    log << "  - " << C_INPUT;
     log.write(name.data(), static_cast<std::streamsize>(name.size()));
     log << C_RESET << "\n";
     RCLCPP_DEBUG(logger_, C_INPUT "\t%s" C_RESET, name.c_str());
@@ -58,7 +58,7 @@ void InputChangeListener::on_inputs_available(InputManager::Hardened& inputs)
   axes_.reserve(inputs.axes.size());
   previous_axes_.reserve(inputs.axes.size());
   size_t max_axis_name_size = 8;
-  log << C_RESET << "\tAxes:\n" << C_RESET;
+  log << C_RESET << "Axes:\n" << C_RESET;
   RCLCPP_DEBUG(logger_, C_TITLE "Registered Axes:" C_RESET);
 
   for (auto& [name, axis] : inputs.axes) {
@@ -69,10 +69,10 @@ void InputChangeListener::on_inputs_available(InputManager::Hardened& inputs)
     if (name.size() > max_axis_name_size)
       max_axis_name_size = name.size();
 
-    log << "\t  - " << C_INPUT;
+    log << "  - " << C_INPUT;
     log.write(name.data(), static_cast<std::streamsize>(name.size()));
     log << C_RESET << "\n";
-    RCLCPP_DEBUG(logger_, C_INPUT "\t%s" C_RESET, name.c_str());
+    RCLCPP_DEBUG(logger_, C_INPUT "%s" C_RESET, name.c_str());
   }
 
   std::string log_str = log.str();
@@ -132,7 +132,7 @@ void InputChangeListener::update()
       continue;
 
     if (event->is_invoked()) {
-      RCLCPP_INFO(logger_, C_QUIET "  %-8s\tinvoked", event->get_name().c_str());
+      RCLCPP_INFO(logger_, C_QUIET "%-8s\tinvoked", event->get_name().c_str());
     }
   }
 }

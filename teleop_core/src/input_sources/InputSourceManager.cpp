@@ -147,7 +147,7 @@ bool InputSourceManager::create_input_source(const std::string & input_source_na
   input_source_class->init(input_source_node, input_source_name, shared_from_this());
 
   // Export the inputs
-  sources_.emplace_back(inputs_.get(), input_source_class);
+  sources_.emplace_back(input_source_class);
 
   if (const auto executor = executor_.lock()) {
     executor->add_node(input_source_class->get_node());
@@ -208,7 +208,24 @@ void InputSourceManager::setup_input_sources()
 void InputSourceManager::link_inputs(const InputManager::Props& previous, InputManager::Props& next,
                                      const InputPipelineBuilder::DeclaredNames& names)
 {
+  const auto logger = node_->get_logger();
   next = previous;
+
+  // Log names used for remapping
+  RCLCPP_DEBUG(logger, C_TITLE "Declared Names for Input Source Remapping:" C_RESET);
+  RCLCPP_DEBUG(logger, C_RESET "Buttons:");
+  for (const auto& name : names.button_names) {
+    RCLCPP_DEBUG(logger, "  - " C_INPUT "%s" C_RESET, name.c_str());
+  }
+  RCLCPP_DEBUG(logger, C_RESET "Axes:");
+  for (const auto& name : names.axis_names) {
+    RCLCPP_DEBUG(logger, "  - " C_INPUT "%s" C_RESET, name.c_str());
+  }
+
+  // Do all remapping
+  for (auto& handle : sources_) {
+    handle.declare_and_link_inputs(names);
+  }
 
   // Declare all declarations for all input sources
   for (auto& handle : sources_) {

@@ -22,6 +22,7 @@
 #include "teleop_core/utilities/WeakMapIterator.hpp"
 #include "teleop_core/inputs/InputManager.hpp"
 #include "control_mode/event/event_collection.hpp"
+#include "teleop_core/inputs/input_pipeline_builder.hpp"
 
 namespace teleop
 {
@@ -29,7 +30,8 @@ namespace teleop
 /**
  * A container of Events, where events that don't yet exist are created when an attempt is made to retrieve them.
  */
-class EventCollection : public control_mode::EventCollection
+class EventCollection : public control_mode::EventCollection, public InputPipelineBuilder::Element,
+                        public InputPipelineElementDelegate
 {
   using Event = control_mode::Event;
 public:
@@ -76,7 +78,28 @@ public:
 
   static bool ends_with(const std::string & str, const std::string & suffix);
 
+  void link_inputs(const InputManager::Props& previous, InputManager::Props& next, const DeclaredNames& names) override {};
+
+  // TODO: Rename to make clear that these are the inputs we want to consume, not provide
+  /**
+   * Allows an element to declare what inputs it CONSUMES, not provides. This is useful for any dynamic remapping of
+   * any previous elements in the pipeline.
+   * \param[in, out] names the set accumulating all declared input names. Add names to declare to this set.
+   */
+  void declare_input_names(DeclaredNames& names) override;;
+
+  /**
+     * Callback ran when hardened inputs are available.
+   */
+  void on_inputs_available(InputManager::Hardened& inputs) override;;
+
+  void relink() override;
+
 private:
+  void add_child_element(const std::shared_ptr<InputPipelineBuilder::Element>& element);
+
+  void clear_invalid_child_elements();
+
   /**
    * Parses the given event name in creating an event, and creates the appropriate event based on that name. For
    * example, events ending in "/down" or "/up" will be events for buttons being pressed down or released.
@@ -87,11 +110,17 @@ private:
   std::map<std::string, std::weak_ptr<Event>> items_{};
   std::weak_ptr<control_mode::internal::EventListenerQueue> listener_queue_;
 
-  using FactoryFunc = std::function<std::shared_ptr<Event>(const std::string &,
-      const std::weak_ptr<control_mode::internal::EventListenerQueue> &)>;
+  using FactoryFunc = std::function<std::shared_ptr<Event>(
+      const std::string &,
+      const std::weak_ptr<control_mode::internal::EventListenerQueue> &,
+      EventCollection &)>;
 
   /// Used to create special subclasses of Event for various different suffixes
   const std::unordered_map<std::string, FactoryFunc> factory_;
+  std::vector<std::weak_ptr<InputPipelineBuilder::Element>> child_elements_;
+
+  rclcpp::Logger logger_ = rclcpp::get_logger("event_collection");
+  bool pipeline_previously_linked_ = false;
 };
 
 }  // namespace teleop

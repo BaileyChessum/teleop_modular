@@ -22,6 +22,7 @@
 #include "teleop_core/utilities/better_multimap.hpp"
 #include "teleop_core/inputs/InputManager.hpp"
 #include "teleop_core/inputs/InputDefinition.hpp"
+#include "teleop_core/inputs/input_pipeline_builder.hpp"
 
 namespace teleop::internal
 {
@@ -33,19 +34,15 @@ class InputSourceHandle
 
 public:
   explicit InputSourceHandle(
-    const ParameterInterface::SharedPtr & parameters, InputManager & inputs,
+    const ParameterInterface::SharedPtr & parameters,
     const std::shared_ptr<input_source::InputSource> & source);
 
   explicit InputSourceHandle(
-    InputManager & inputs,
     const std::shared_ptr<input_source::InputSource> & source);
 
   void update(const rclcpp::Time & now);
 
-  void add_definitions_to_inputs() const;
-
-  void declare_and_link_inputs();
-
+  void declare_and_link_inputs(const InputPipelineBuilder::DeclaredNames& names);
 
   std::vector<InputDefinition<uint8_t>> button_definitions{};
   std::vector<InputDefinition<float>> axis_definitions{};
@@ -136,7 +133,7 @@ private:
 
 
   void remap(input_source::InputDeclarationSpans declarations, RemapParams remap_params);
-  RemapParams get_remap_params();
+  RemapParams get_remap_params(const InputPipelineBuilder::DeclaredNames& names);
 
   std::optional<RemapButtonParams> get_remap_button_params(const std::string & name);
   std::optional<ButtonTransformParams> get_button_transform_params(const std::string & name);
@@ -149,7 +146,6 @@ private:
   std::vector<TransformedRemapAxis> transformed_axes_;
 
   std::shared_ptr<input_source::InputSource> source_;
-  std::reference_wrapper<InputManager> inputs_;
   ParameterInterface::SharedPtr parameters_;
 };
 
