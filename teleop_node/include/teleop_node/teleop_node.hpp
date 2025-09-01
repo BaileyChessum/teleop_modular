@@ -7,6 +7,7 @@
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
 //
+
 #ifndef TELEOP_MODULAR_HPP
 #define TELEOP_MODULAR_HPP
 
@@ -18,6 +19,7 @@
 #include "teleop_core/inputs/state/StateManager.hpp"
 #include "teleop_core/events/EventManager.hpp"
 #include "teleop_core/inputs/input_pipeline_builder.hpp"
+#include "input_change_listener.hpp"
 
 namespace teleop
 {
@@ -38,7 +40,6 @@ public:
   ~TeleopNode() override;
 
   void initialize(const std::weak_ptr<rclcpp::Executor> & executor);
-  void log_all_inputs();
   void log_existing_inputs();
 
   /**
@@ -77,6 +78,9 @@ private:
 
   std::shared_ptr<internal::ControlModeManager> control_mode_manager_ = nullptr;
   std::shared_ptr<internal::InputSourceManager> input_source_manager_ = nullptr;
+
+  /// Prints changes to inputs when log_inputs:=true
+  std::optional<InputChangeListener> input_change_listener_ = std::nullopt;
 
   std::atomic<bool> program_running_ = true;
 };

@@ -84,6 +84,8 @@ public:
   constexpr const_iterator cbegin() const noexcept { return map_.begin(); }
   constexpr const_iterator cend() const noexcept { return map_.end(); }
 
+  constexpr size_t size() const noexcept { return map_.size(); }
+
   /**
    * Finds the id an input with some name (if it has been defined so far, returns 0 (a safe and valid value) otherwise).
    */

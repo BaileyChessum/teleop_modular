@@ -35,6 +35,11 @@ TeleopNode::TeleopNode(const std::shared_ptr<rclcpp::Node> & node)
     "Leaving this unset makes the max update rate "
     "unlimited.",
     0.0);
+
+  if (params_.log_inputs)
+  {
+    input_change_listener_ = InputChangeListener(node->get_logger(), events_.get_events(), 2);
+  }
 }
 
 void TeleopNode::initialize(const std::weak_ptr<rclcpp::Executor> & executor)
@@ -60,15 +65,16 @@ void TeleopNode::initialize(const std::weak_ptr<rclcpp::Executor> & executor)
     inputs_);
   input_source_manager_->configure(inputs_);
 
-
   // Set up the input pipeline
   pipeline_.clear();
 
   pipeline_.push_back(*input_source_manager_);
   pipeline_.push_back(states_);
   pipeline_.push_back(*control_mode_manager_);
-  pipeline_.link_inputs();
+  if (input_change_listener_.has_value())
+    pipeline_.push_back(input_change_listener_.value());
 
+  pipeline_.link_inputs();
 
   RCLCPP_DEBUG(logger, "TeleopNode::init(): Starting...");
   control_mode_manager_->activate_initial_control_mode();
@@ -77,43 +83,6 @@ void TeleopNode::initialize(const std::weak_ptr<rclcpp::Executor> & executor)
   events_.get_events()["start"]->invoke();
   events_.update(now);
   RCLCPP_DEBUG(logger, "TeleopNode::init(): Fully initialized!");
-}
-
-void TeleopNode::log_all_inputs()
-{
-  const auto logger = get_node()->get_logger();
-
-/*
-  for (const auto & axis : inputs_.get_axes()) {
-    if (!axis) {
-      continue;
-    }
-    RCLCPP_DEBUG(logger, C_INPUT "  %s\t%f", axis.get_name().c_str(), axis.value());
-
-    if (axis->changed()) {
-      RCLCPP_INFO(logger, C_INPUT "  %s\t%f", axis.get_name().c_str(), axis.value());
-    }
-  }
-  for (const auto & button : inputs_.get_buttons()) {
-    if (!button) {
-      continue;
-    }
-    RCLCPP_DEBUG(logger, C_INPUT "  %s\t%d", button.get_name().c_str(), button.value());
-
-    if (button->changed()) {
-      RCLCPP_INFO(logger, C_INPUT "  %s\t%d", button.get_name().c_str(), button.value());
-    }
-  }
-  for (auto & event : events_.get_events()) {
-    if (!event) {
-      continue;
-    }
-
-    if (event->is_invoked()) {
-      RCLCPP_INFO(logger, C_QUIET "  %s invoked!", event->get_name().c_str());
-    }
-  }
-  */
 }
 
 void TeleopNode::log_existing_inputs()
@@ -160,8 +129,8 @@ void TeleopNode::service_input_updates()
     events_.update(now);
 
     // Log inputs
-    if (params_.log_inputs) {
-      log_all_inputs();
+    if (input_change_listener_.has_value()) {
+      input_change_listener_.value().update();
     }
 
     control_mode_manager_->update(now, period);
