@@ -65,12 +65,12 @@ private:
   std::vector<std::string> button_names_{};
   std::vector<uint8_t*> buttons_{};
   std::vector<uint8_t> previous_buttons_{};
-  size_t max_button_name_size_ = 8;
+  int max_button_name_size_ = 8;
 
   std::vector<std::string> axis_names_{};
   std::vector<float*> axes_{};
   std::vector<float> previous_axes_{};
-  size_t max_axis_name_size_ = 8;
+  int max_axis_name_size_ = 8;
 };
 
 }  // namespace teleop

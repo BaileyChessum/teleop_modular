@@ -36,6 +36,7 @@ void InputChangeListener::on_inputs_available(InputManager::Hardened& inputs)
   button_names_.reserve(inputs.buttons.size());
   buttons_.reserve(inputs.buttons.size());
   previous_buttons_.reserve(inputs.buttons.size());
+  size_t max_button_name_size = 8;
   log << C_RESET << "\tButtons:\n" << C_RESET;
   RCLCPP_DEBUG(logger_, C_TITLE "Registered Buttons:" C_RESET);
 
@@ -44,8 +45,8 @@ void InputChangeListener::on_inputs_available(InputManager::Hardened& inputs)
     buttons_.emplace_back(button);
     previous_buttons_.emplace_back(*button);
 
-    if (name.size() > max_button_name_size_)
-      max_button_name_size_ = name.size();
+    if (name.size() > max_button_name_size)
+      max_button_name_size = name.size();
 
     log << "\t  - " << C_INPUT;
     log.write(name.data(), static_cast<std::streamsize>(name.size()));
@@ -56,6 +57,7 @@ void InputChangeListener::on_inputs_available(InputManager::Hardened& inputs)
   axis_names_.reserve(inputs.axes.size());
   axes_.reserve(inputs.axes.size());
   previous_axes_.reserve(inputs.axes.size());
+  size_t max_axis_name_size = 8;
   log << C_RESET << "\tAxes:\n" << C_RESET;
   RCLCPP_DEBUG(logger_, C_TITLE "Registered Axes:" C_RESET);
 
@@ -64,8 +66,8 @@ void InputChangeListener::on_inputs_available(InputManager::Hardened& inputs)
     axes_.emplace_back(axis);
     previous_axes_.emplace_back(*axis);
 
-    if (name.size() > max_axis_name_size_)
-      max_axis_name_size_ = name.size();
+    if (name.size() > max_axis_name_size)
+      max_axis_name_size = name.size();
 
     log << "\t  - " << C_INPUT;
     log.write(name.data(), static_cast<std::streamsize>(name.size()));
@@ -77,6 +79,14 @@ void InputChangeListener::on_inputs_available(InputManager::Hardened& inputs)
   RCLCPP_INFO(
       logger_, C_TITLE "Registered inputs:" C_RESET "\n%.*s",
       static_cast<int>(log_str.size()), log_str.data());
+
+  // Prevent axes and buttons from barely misaligning
+  max_button_name_size_ = static_cast<int>(max_button_name_size);
+  max_axis_name_size_ = static_cast<int>(max_axis_name_size);
+  if (std::abs(max_axis_name_size_ - max_button_name_size_) <= 1) {
+    const auto common_size = std::max(max_button_name_size_, max_axis_name_size_);
+    max_button_name_size_ = max_axis_name_size_ = common_size;
+  }
 }
 
 void InputChangeListener::update()
@@ -92,8 +102,8 @@ void InputChangeListener::update()
 
     // Log if the value has changed enough
     if (std::abs(new_value - previous_value) >= epsilon_) {
-      RCLCPP_INFO(logger_, C_INPUT "%-*s\t" C_QUIET "|" C_INPUT " % .*f" C_RESET,
-                  static_cast<int>(max_axis_name_size_), axis_names_[i].c_str(), significant_figures_, new_value);
+      RCLCPP_INFO(logger_, C_INPUT "%-*s " C_QUIET "|" C_INPUT " % .*f" C_RESET,
+                  max_axis_name_size_, axis_names_[i].c_str(), significant_figures_, new_value);
       previous_value = new_value;
     }
   }
@@ -109,7 +119,7 @@ void InputChangeListener::update()
 
     if (previous_value != *button) {
       RCLCPP_INFO(logger_, C_INPUT "%-*s " C_QUIET "|" C_INPUT " %d" C_RESET,
-                  static_cast<int>(max_button_name_size_), button_names_[i].c_str(), *button);
+                  max_button_name_size_, button_names_[i].c_str(), *button);
       previous_value = *button;
     }
   }
