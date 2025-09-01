@@ -75,12 +75,13 @@ public:
    * \param[in,out] next The result of this Element. Always stores the previous result from this Element.
    * \param[out] props the input manager properties to append definitions to.
    */
-  virtual void link_inputs(const InputManager::Props& previous, InputManager::Props& next, const std::set<std::string>& declared_names) override;
+  void link_inputs(const InputManager::Props& previous, InputManager::Props& next,
+                   const InputPipelineBuilder::DeclaredNames& names) override;
 
   /**
      * Callback ran when hardened inputs are available.
    */
-  virtual void on_inputs_available(InputManager::Hardened& inputs) override {
+  void on_inputs_available(InputManager::Hardened& inputs) override {
     // I think this doesn't need to do anything
   }
 

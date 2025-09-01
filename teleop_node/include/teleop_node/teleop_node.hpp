@@ -17,6 +17,7 @@
 #include "teleop_core/commands/CommandManager.hpp"
 #include "teleop_core/inputs/state/StateManager.hpp"
 #include "teleop_core/events/EventManager.hpp"
+#include "teleop_core/inputs/input_pipeline_builder.hpp"
 
 namespace teleop
 {
@@ -69,11 +70,13 @@ private:
 
   InputManager inputs_;
   state::StateManager states_;
+  InputPipelineBuilder pipeline_ = InputPipelineBuilder(inputs_);
+
   internal::EventManager events_;
+  std::shared_ptr<internal::CommandManager> commands_ = nullptr;
 
   std::shared_ptr<internal::ControlModeManager> control_mode_manager_ = nullptr;
   std::shared_ptr<internal::InputSourceManager> input_source_manager_ = nullptr;
-  std::shared_ptr<internal::CommandManager> commands_ = nullptr;
 
   std::atomic<bool> program_running_ = true;
 };

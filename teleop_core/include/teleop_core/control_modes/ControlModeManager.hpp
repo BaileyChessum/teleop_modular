@@ -22,6 +22,7 @@
 #include <rclcpp/executor.hpp>
 #include "control_mode/control_mode.hpp"
 #include "teleop_core/inputs/InputManager.hpp"
+#include "teleop_core/inputs/input_pipeline_builder.hpp"
 
 namespace teleop::internal
 {
@@ -29,7 +30,7 @@ namespace teleop::internal
 /**
  * Class responsible for managing the registered control modes, the current control mode, and switching between them.
  */
-class ControlModeManager final
+class ControlModeManager final : public InputPipelineBuilder::Element
 {
 public:
   explicit ControlModeManager(
@@ -84,6 +85,27 @@ public:
   void add(const std::string & key, const std::shared_ptr<control_mode::ControlMode> & value);
 
   void activate_initial_control_mode();
+
+  /**
+     * Add inputs to the builder.
+     * \param[in] previous The result of the previous InputPipelineBuilder::Element, to use as a basis for populating
+     * next.
+     * \param[in,out] next The result of this Element. Always stores the previous result from this Element.
+   */
+  void link_inputs(const InputManager::Props& previous, InputManager::Props& next, const InputPipelineBuilder::DeclaredNames& names) override;
+
+  // TODO: Rename to make clear that these are the inputs we want to consume, not provide
+  /**
+     * Allows an element to declare what inputs it CONSUMES, not provides. This is useful for any dynamic remapping of
+     * any previous elements in the pipeline.
+     * \param[in, out] names the set accumulating all declared input names. Add names to declare to this set.
+   */
+  void declare_input_names(InputPipelineBuilder::DeclaredNames& names) override;
+
+  /**
+     * Callback ran when hardened inputs are available.
+   */
+  void on_inputs_available(InputManager::Hardened& inputs) override;
 
 private:
   /**

@@ -23,6 +23,7 @@
 #include "InputMap.hpp"
 #include "InputMapBuilder.hpp"
 #include <vector>
+#include <set>
 
 namespace teleop
 {

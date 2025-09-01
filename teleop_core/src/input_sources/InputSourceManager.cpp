@@ -205,7 +205,8 @@ void InputSourceManager::setup_input_sources()
     registered_sources_log.str().c_str());
 }
 
-void InputSourceManager::link_inputs(const InputManager::Props& previous, InputManager::Props& next, const std::set<std::string>& declared_names)
+void InputSourceManager::link_inputs(const InputManager::Props& previous, InputManager::Props& next,
+                                     const InputPipelineBuilder::DeclaredNames& names)
 {
   next = previous;
 

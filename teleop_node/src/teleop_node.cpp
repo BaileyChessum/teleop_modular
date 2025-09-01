@@ -60,9 +60,15 @@ void TeleopNode::initialize(const std::weak_ptr<rclcpp::Executor> & executor)
     inputs_);
   input_source_manager_->configure(inputs_);
 
-  InputManager::Props input_props{};
-//  input_source_manager_->link_inputs(input_props);
-  inputs_.init(input_props);
+
+  // Set up the input pipeline
+  pipeline_.clear();
+
+  pipeline_.push_back(input_source_manager_);
+  pipeline_.push_back(states_);
+  pipeline_.push_back(control_mode_manager_);
+  pipeline_.link_inputs();
+
 
   RCLCPP_DEBUG(logger, "TeleopNode::init(): Starting...");
   control_mode_manager_->activate_initial_control_mode();

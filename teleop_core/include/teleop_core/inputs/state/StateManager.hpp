@@ -49,12 +49,13 @@ public:
    * next.
    * \param[in,out] next The result of this Element. Always stores the previous result from this Element.
    */
-  void link_inputs(const InputManager::Props& previous, InputManager::Props& next, const std::set<std::string>& declared_names) override;
+  void link_inputs(const InputManager::Props& previous, InputManager::Props& next,
+                   const InputPipelineBuilder::DeclaredNames& names) override;
 
   /**
    * Callback ran when hardened inputs are available.
    */
-  virtual void on_inputs_available(InputManager::Hardened& inputs) {
+  void on_inputs_available(InputManager::Hardened& inputs) override {
     // I don't think we do anything with hardened inputs?
   }
 

@@ -7,6 +7,7 @@
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
 //
+
 #include "teleop_core/control_modes/ControlModeManager.hpp"
 
 #include <controller_manager_msgs/srv/detail/switch_controller__struct.hpp>
@@ -15,6 +16,7 @@
 #include "teleop_core/utilities/utils.hpp"
 #include "rclcpp_lifecycle/state.hpp"
 #include "teleop_core/utilities/get_parameter.hpp"
+#include "fake_input_collection.hpp"
 
 namespace teleop::internal
 {
@@ -370,6 +372,41 @@ bool ControlModeManager::get_type_for_control_mode(
     control_mode_type = param.as_string();
   }
   return result;
+}
+
+void ControlModeManager::link_inputs(const InputManager::Props& previous, InputManager::Props& next, const InputPipelineBuilder::DeclaredNames& declared_names) {
+  // No inputs to provide!
+
+}
+
+void ControlModeManager::declare_input_names(InputPipelineBuilder::DeclaredNames& names)
+{
+  auto fake_buttons = FakeInputCollection<control_mode::Button>();
+  auto fake_axes = FakeInputCollection<control_mode::Axis>();
+
+  control_mode::Inputs control_mode_inputs {
+    fake_buttons,
+    fake_axes
+  };
+
+  for (auto& [name, mode] : control_modes_) {
+    mode->configure_inputs(control_mode_inputs);
+  }
+
+  names.button_names.insert(fake_buttons.get_names().begin(), fake_buttons.get_names().end());
+  names.axis_names.insert(fake_axes.get_names().begin(), fake_axes.get_names().end());
+}
+
+void ControlModeManager::on_inputs_available(InputManager::Hardened& inputs)
+{
+  auto control_mode_inputs = control_mode::Inputs {
+    inputs.buttons,
+    inputs.axes
+  };
+
+  for (auto& [name, mode] : control_modes_) {
+    mode->configure_inputs(control_mode_inputs);
+  }
 }
 
 }  // namespace teleop::internal

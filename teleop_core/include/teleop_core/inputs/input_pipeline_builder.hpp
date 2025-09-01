@@ -36,6 +36,14 @@ class InputPipelineBuilder
 {
 public:
   /**
+   * Stores a set of names for button and axis
+   */
+  struct DeclaredNames {
+    std::set<std::string> axis_names{};
+    std::set<std::string> button_names{};
+  };
+
+  /**
    * Something that contributes to building the input pipeline, such as input sources.
    */
   class Element {
@@ -46,7 +54,7 @@ public:
      * next.
      * \param[in,out] next The result of this Element. Always stores the previous result from this Element.
      */
-    virtual void link_inputs(const InputManager::Props& previous, InputManager::Props& next, const std::set<std::string>& declared_names) = 0;
+    virtual void link_inputs(const InputManager::Props& previous, InputManager::Props& next, const DeclaredNames& names) = 0;
 
     // TODO: Rename to make clear that these are the inputs we want to consume, not provide
     /**
@@ -54,13 +62,16 @@ public:
      * any previous elements in the pipeline.
      * \param[in, out] names the set accumulating all declared input names. Add names to declare to this set.
      */
-    virtual void declare_input_names(std::set<std::string>& names) {};
+    virtual void declare_input_names(DeclaredNames& names) {};
 
     /**
      * Callback ran when hardened inputs are available.
      */
     virtual void on_inputs_available(InputManager::Hardened& inputs) = 0;
 
+    /**
+     * Internal method used to set up callbacks for when you call relink_pipeline()
+     */
     void set_pipeline_delegate(InputPipelineElementDelegate& delegate) {
       delegate_ = &delegate;
     }
@@ -120,7 +131,7 @@ public:
       if (!previously_linked_)
         element.next = previous_inputs;
 
-      element.element.get().link_inputs(previous_inputs, element.next, declared_names_);
+      element.element.get().link_inputs(previous_inputs, element.next, names_);
       previous_inputs = element.next;
     }
 
@@ -139,9 +150,9 @@ public:
    */
   void declare_names() {
     // Iterate backwards over elements_ calling declare_input_names
-    declared_names_.clear();
+    names_ = DeclaredNames();
     for (size_t i = elements_.size(); i > 0; i--) {
-      elements_[i - 1].element.get().declare_input_names(declared_names_);
+      elements_[i - 1].element.get().declare_input_names(names_);
     }
     previously_declared_names_ = true;
   }
@@ -181,7 +192,7 @@ public:
    */
   void clear() {
     elements_.clear();
-    declared_names_.clear();
+    names_ = DeclaredNames();
     previously_linked_ = false;
     previously_declared_names_ = false;
     target_.init(InputManager::Props());
@@ -223,7 +234,7 @@ private:
   InputManager& target_;
 
   std::vector<ElementHandle> elements_{};
-  std::set<std::string> declared_names_{};
+  DeclaredNames names_{};
 
   bool previously_linked_ = false;
   bool previously_declared_names_ = false;

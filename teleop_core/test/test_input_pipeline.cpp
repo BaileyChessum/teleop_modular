@@ -54,7 +54,7 @@ protected:
     // Cleanup code that will be called after each test
   }
 
-  void link_inputs(const InputManager::Props &previous, InputManager::Props &next, const std::set<std::string> &declared_names) override {
+  void link_inputs(const InputManager::Props &previous, InputManager::Props &next, const InputPipelineBuilder::DeclaredNames& names) override {
     next = props;
   }
 

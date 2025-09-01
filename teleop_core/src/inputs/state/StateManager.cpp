@@ -17,7 +17,7 @@ namespace teleop::state
 {
 
 void StateManager::link_inputs(const InputManager::Props& previous, InputManager::Props& next,
-                               const std::set<std::string>& declared_names)
+                               const InputPipelineBuilder::DeclaredNames& names)
 {
   next = previous;
 
