@@ -11,10 +11,10 @@
 // Created by nova on 1/3/70.
 //
 
-#include "teleop_core/events/EventListenerQueue.hpp"
+#include "control_mode/event/event_listener_queue.hpp"
 #include <rclcpp/logging.hpp>
 
-namespace teleop::internal
+namespace control_mode::internal
 {
 void EventListenerQueue::service(const rclcpp::Time & now)
 {
@@ -37,4 +37,4 @@ void EventListenerQueue::enqueue(const EventListener::WeakPtr & listener)
 {
   queue_.push(listener);
 }
-}  // namespace teleop::internal
+}  // namespace control_mode::internal

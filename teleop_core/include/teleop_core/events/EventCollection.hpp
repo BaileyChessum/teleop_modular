@@ -30,15 +30,16 @@ namespace teleop
  */
 class EventCollection
 {
+  using Event = control_mode::Event;
 public:
   explicit EventCollection(
-    std::weak_ptr<internal::EventListenerQueue> listener_queue,
+    std::weak_ptr<control_mode::internal::EventListenerQueue> listener_queue,
     InputManager & inputs);
 
   using iterator = utils::WeakMapIterator<Event, false>;
   using const_iterator = utils::WeakMapIterator<Event, true>;
 
-  Event::SharedPtr operator[](const std::string & index);
+  control_mode::Event::SharedPtr operator[](const std::string & index);
 
   iterator begin()
   {
@@ -78,13 +79,13 @@ private:
    * example, events ending in "/down" or "/up" will be events for buttons being pressed down or released.
    * @param[in] name    The name of the event to create. This will also inform the type of event created.
    */
-  Event::SharedPtr create_event_for_name(const std::string & name);
+  control_mode::Event::SharedPtr create_event_for_name(const std::string & name);
 
   std::map<std::string, std::weak_ptr<Event>> items_{};
-  std::weak_ptr<internal::EventListenerQueue> listener_queue_;
+  std::weak_ptr<control_mode::internal::EventListenerQueue> listener_queue_;
 
   using FactoryFunc = std::function<std::shared_ptr<Event>(const std::string &,
-      const std::weak_ptr<internal::EventListenerQueue> &)>;
+      const std::weak_ptr<control_mode::internal::EventListenerQueue> &)>;
 
   /// Used to create special subclasses of Event for various different suffixes
   const std::unordered_map<std::string, FactoryFunc> factory_;

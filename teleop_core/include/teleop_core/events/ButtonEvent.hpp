@@ -21,7 +21,7 @@
 namespace teleop::internal
 {
 
-class ButtonEvent : public Event
+class ButtonEvent : public control_mode::Event
 {
 public:
   /**
@@ -30,7 +30,7 @@ public:
    * when the event is released.
    */
   ButtonEvent(
-    std::string name, std::weak_ptr<EventListenerQueue> listener_queue, bool down,
+    std::string name, std::weak_ptr<control_mode::internal::EventListenerQueue> listener_queue, bool down,
     control_mode::InputCollection<control_mode::Button> & buttons);
 
 protected:

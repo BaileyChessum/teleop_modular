@@ -39,7 +39,6 @@ add_library(${PROJECT_NAME} SHARED
   src/control_modes/ControlModeManager.cpp
   src/inputs/InputManager.cpp
   src/events/EventCollection.cpp
-  src/events/EventListenerQueue.cpp
 
   # State
   src/inputs/state/StateManager.cpp
@@ -48,7 +47,6 @@ add_library(${PROJECT_NAME} SHARED
 
   src/input_sources/InputSourceHandle.cpp
   src/events/ButtonEvent.cpp
-  src/events/Event.cpp
   src/events/EventManager.cpp
 
   src/input_sources/InputSourceManager.cpp

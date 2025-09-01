@@ -18,17 +18,17 @@ namespace teleop
 {
 
 EventCollection::EventCollection(
-  std::weak_ptr<internal::EventListenerQueue> listener_queue,
+  std::weak_ptr<control_mode::internal::EventListenerQueue> listener_queue,
   InputManager & inputs)
 : listener_queue_(std::move(listener_queue))
   , factory_{{"/down",
       [&inputs](const std::string & name,
-      const std::weak_ptr<internal::EventListenerQueue> & queue) {
+      const std::weak_ptr<control_mode::internal::EventListenerQueue> & queue) {
         return std::make_shared<internal::ButtonEvent>(name, queue, true, inputs.get_buttons());
       }},
     {"/up",
       [&inputs](const std::string & name,
-      const std::weak_ptr<internal::EventListenerQueue> & queue) {
+      const std::weak_ptr<control_mode::internal::EventListenerQueue> & queue) {
         return std::make_shared<internal::ButtonEvent>(name, queue, false, inputs.get_buttons());
       }}}
 {
@@ -56,7 +56,7 @@ size_t EventCollection::size() const
   return count;
 }
 
-Event::SharedPtr EventCollection::operator[](const std::string & index)
+control_mode::Event::SharedPtr EventCollection::operator[](const std::string & index)
 {
   auto it = items_.find(index);
   Event::SharedPtr ptr;
@@ -84,7 +84,7 @@ bool ends_with(const std::string & str, const std::string & suffix)
     suffix) == 0;
 }
 
-Event::SharedPtr EventCollection::create_event_for_name(const std::string & name)
+control_mode::Event::SharedPtr EventCollection::create_event_for_name(const std::string & name)
 {
   // Check if any special suffixes are included
   auto it =
