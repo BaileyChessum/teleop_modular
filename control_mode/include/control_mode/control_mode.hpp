@@ -24,6 +24,7 @@
 #include "visibility_control.h"
 #include "input_ptr.hpp"
 #include "input_collection.hpp"
+#include "event/event_collection.hpp"
 
 namespace control_mode
 {
@@ -54,6 +55,8 @@ struct CONTROL_MODE_PUBLIC_TYPE Inputs
 {
   ButtonCollection & buttons;
   AxisCollection & axes;
+
+  EventCollection & events;
 };
 
 /**

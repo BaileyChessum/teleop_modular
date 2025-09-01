@@ -64,9 +64,9 @@ void TeleopNode::initialize(const std::weak_ptr<rclcpp::Executor> & executor)
   // Set up the input pipeline
   pipeline_.clear();
 
-  pipeline_.push_back(input_source_manager_);
+  pipeline_.push_back(*input_source_manager_);
   pipeline_.push_back(states_);
-  pipeline_.push_back(control_mode_manager_);
+  pipeline_.push_back(*control_mode_manager_);
   pipeline_.link_inputs();
 
 

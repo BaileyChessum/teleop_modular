@@ -77,7 +77,7 @@ control_mode::Event::SharedPtr EventCollection::operator[](const std::string & i
 }
 
 /// Used with create_event_for_name
-bool ends_with(const std::string & str, const std::string & suffix)
+bool EventCollection::ends_with(const std::string & str, const std::string & suffix)
 {
   return str.size() >= suffix.size() && str.compare(
     str.size() - suffix.size(), suffix.size(),

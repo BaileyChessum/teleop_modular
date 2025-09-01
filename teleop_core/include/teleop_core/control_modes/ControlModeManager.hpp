@@ -23,6 +23,7 @@
 #include "control_mode/control_mode.hpp"
 #include "teleop_core/inputs/InputManager.hpp"
 #include "teleop_core/inputs/input_pipeline_builder.hpp"
+#include "control_mode/event/event_collection.hpp"
 
 namespace teleop::internal
 {
@@ -35,15 +36,16 @@ class ControlModeManager final : public InputPipelineBuilder::Element
 public:
   explicit ControlModeManager(
     const std::shared_ptr<rclcpp::Node> & node,
-    const std::weak_ptr<rclcpp::Executor> & executor)
-  : node_(node), executor_(executor)
+    const std::weak_ptr<rclcpp::Executor> & executor,
+    control_mode::EventCollection & events)
+  : node_(node), executor_(executor), events_(events)
   {
   }
 
   /**
    * Populates the control_modes_ from the params in node_.
    */
-  void configure(InputManager & inputs);
+  void configure();
 
   /**
    * @brief Attempts to activate a control mode.
@@ -136,6 +138,8 @@ private:
   std::shared_ptr<rclcpp::Node> node_;
   /// Add spawned nodes to this to get them to spin
   std::weak_ptr<rclcpp::Executor> executor_;
+  /// Used to get events from when configuring inputs
+  control_mode::EventCollection& events_;
 
   // Control modes
   /// Loads the control modes, and needs to stay alive during the whole lifecycle of the control modes.

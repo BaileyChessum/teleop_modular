@@ -46,7 +46,7 @@ public:
   /**
    * Gets the set of all input names requested from the collection.
    */
-  const std::set<std::string>& get_names() const
+  [[nodiscard]] std::set<std::string>& get_names()
   {
     return names_;
   }

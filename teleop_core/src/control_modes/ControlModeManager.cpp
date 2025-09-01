@@ -16,7 +16,8 @@
 #include "teleop_core/utilities/utils.hpp"
 #include "rclcpp_lifecycle/state.hpp"
 #include "teleop_core/utilities/get_parameter.hpp"
-#include "fake_input_collection.hpp"
+#include "teleop_core/control_modes/fake_input_collection.hpp"
+#include "teleop_core/control_modes/fake_event_collection.hpp"
 
 namespace teleop::internal
 {
@@ -28,7 +29,7 @@ using utils::get_parameter;
 using utils::get_parameter_or_default;
 }  // namespace
 
-void ControlModeManager::configure(InputManager & inputs)
+void ControlModeManager::configure()
 {
   const auto logger = node_->get_logger();
 
@@ -154,21 +155,13 @@ void ControlModeManager::configure(InputManager & inputs)
   RCLCPP_INFO(logger, C_TITLE "Control Modes:" C_RESET "%s\n", registered_modes_log.str().c_str());
 
   // Configure each control mode
-  auto& buttons = inputs.get_buttons();
-  auto& axes = inputs.get_axes();
-
-  control_mode::Inputs control_mode_inputs{
-    buttons,
-    axes
-  };
-
   for (const auto & [name, control_mode] : control_modes_) {
     if (!control_mode) {
       continue;
     }
 
     control_mode->get_node()->configure();
-    control_mode->configure_inputs(control_mode_inputs);
+    // TODO: Configure inputs if they are available
   }
 }
 
@@ -376,7 +369,6 @@ bool ControlModeManager::get_type_for_control_mode(
 
 void ControlModeManager::link_inputs(const InputManager::Props& previous, InputManager::Props& next, const InputPipelineBuilder::DeclaredNames& declared_names) {
   // No inputs to provide!
-
 }
 
 void ControlModeManager::declare_input_names(InputPipelineBuilder::DeclaredNames& names)
@@ -384,12 +376,17 @@ void ControlModeManager::declare_input_names(InputPipelineBuilder::DeclaredNames
   auto fake_buttons = FakeInputCollection<control_mode::Button>();
   auto fake_axes = FakeInputCollection<control_mode::Axis>();
 
+  auto fake_events = FakeEventCollection(fake_buttons);
+
   control_mode::Inputs control_mode_inputs {
     fake_buttons,
-    fake_axes
+    fake_axes,
+    fake_events
   };
 
+  // Provide fake inputs to the control mode in order to extract the input names they want to use
   for (auto& [name, mode] : control_modes_) {
+    // TODO: Make sure we don't try configure any errored out modes
     mode->configure_inputs(control_mode_inputs);
   }
 
@@ -401,9 +398,11 @@ void ControlModeManager::on_inputs_available(InputManager::Hardened& inputs)
 {
   auto control_mode_inputs = control_mode::Inputs {
     inputs.buttons,
-    inputs.axes
+    inputs.axes,
+    events_
   };
 
+  // Provide the real inputs after supplying fake inputs in declare_input_names()
   for (auto& [name, mode] : control_modes_) {
     mode->configure_inputs(control_mode_inputs);
   }

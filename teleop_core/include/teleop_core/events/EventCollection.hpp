@@ -21,6 +21,7 @@
 #include "teleop_core/events/Event.hpp"
 #include "teleop_core/utilities/WeakMapIterator.hpp"
 #include "teleop_core/inputs/InputManager.hpp"
+#include "control_mode/event/event_collection.hpp"
 
 namespace teleop
 {
@@ -28,7 +29,7 @@ namespace teleop
 /**
  * A container of Events, where events that don't yet exist are created when an attempt is made to retrieve them.
  */
-class EventCollection
+class EventCollection : public control_mode::EventCollection
 {
   using Event = control_mode::Event;
 public:
@@ -39,7 +40,7 @@ public:
   using iterator = utils::WeakMapIterator<Event, false>;
   using const_iterator = utils::WeakMapIterator<Event, true>;
 
-  control_mode::Event::SharedPtr operator[](const std::string & index);
+  control_mode::Event::SharedPtr operator[](const std::string & index) override;
 
   iterator begin()
   {
@@ -72,6 +73,8 @@ public:
    * Gets the number of non-expired inputs
    */
   [[nodiscard]] size_t size() const;
+
+  static bool ends_with(const std::string & str, const std::string & suffix);
 
 private:
   /**
