@@ -19,6 +19,7 @@
 #include <variant>
 #include "teleop_core/inputs/InputAggregator.hpp"
 #include "control_mode/input_collection.hpp"
+#include <iostream>
 
 namespace teleop
 {
@@ -42,10 +43,12 @@ public:
   */
 
   InputMap() {
+    std::cerr << "InputMap constructor\n";
     harden(1, {}, {});
   }
 
   void harden(size_t size, const std::vector<typename InputAggregator<T>::Props>& aggregates, const std::map<std::string, std::variant<size_t, T*>>& input_map) {
+    std::cerr << "harden\n";
     inputs_.resize(size, 0);
 
     // Populate map_, resolving size_t to T*
@@ -66,6 +69,8 @@ public:
     aggregators_.reserve(aggregates.size());
     for (const auto& aggregate : aggregates)
       aggregators_.emplace_back(inputs_, aggregate);
+
+    std::cerr << "end harden\n";
   }
 
   /**
@@ -106,11 +111,18 @@ public:
    * Names of returned inputs may be remapped, such that (*this)[name]->get_name() may not equal name.
    */
   InputT operator[](const std::string & name) override {
+    std::cerr << "InputMap[]\n";
     auto it = map_.find(name);
 
-    if (it == map_.end())
+    std::cerr << "InputMap[] 1\n";
+    if (it == map_.end()) {
+      std::cerr << "InputMap[] item not found, returning default pointer..\n";
       return InputT();  // return the default pointer, which points to a common sink value
-
+    }
+      
+    std::cerr << "InputMap[] item found, making ptr.. \n";
+    it->second;
+    std::cerr << "ah..\n";
     // TODO: Stop allocating duplicate strings to the heap!!
     return InputT(std::make_shared<std::string>(name), it->second);
   }

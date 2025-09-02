@@ -92,6 +92,7 @@ install(FILES plugins.xml
   )
   target_link_libraries(test_inputs
     ${PROJECT_NAME}
+    ${THIS_PACKAGE_INCLUDE_DEPENDS}
   )
   target_include_directories(test_inputs PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

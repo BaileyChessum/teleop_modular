@@ -16,6 +16,8 @@
 #include "teleop_core/inputs/Axis.hpp"
 #include "teleop_core/inputs/InputManager.hpp"
 #include "teleop_core/events/EventManager.hpp"
+#include <iostream>
+#include "control_mode/event/event.hpp"
 
 using teleop::Axis;
 using teleop::Button;
@@ -27,8 +29,8 @@ using teleop::InputMapBuilder;
 class InputTest : public ::testing::Test
 {
 public:
-  InputManager inputs;
-  InputManager::Props props;
+  InputManager inputs = InputManager();
+  InputManager::Props props = InputManager::Props();
 
 protected:
   void SetUp() override
@@ -46,20 +48,43 @@ protected:
 
 TEST_F(InputTest, MapButtonSimple)
 {
+  std::cerr << "0\n";
+  control_mode::Event("test_event", std::shared_ptr<control_mode::internal::EventListenerQueue>(nullptr));
+  std::cerr << "1\n";
+  inputs;
+  std::cerr << "1.1\n";
+  inputs.get_buttons();
+  std::cerr << "1.2\n";
+  inputs.get_buttons()["test_button"];
+  std::cerr << "1.3\n";
+  inputs.get_buttons()["test_button"].value();
+  std::cerr << "1.4\n";
   EXPECT_FALSE(inputs.get_buttons()["test_button"].value());
+  std::cerr << "2\n";
   EXPECT_EQ(inputs.get_buttons()["test_button"].get(), Button().get());
+  std::cerr << "3\n";
 
   uint8_t value = false;
+  std::cerr << "4\n";
   props.button_builder.declare_aggregate("test_button", &value);
+  std::cerr << "5\n";
   inputs.init(props);
+  std::cerr << "6\n";
   EXPECT_NE(inputs.get_buttons()["test_button"].get(), Button().get()) << "Still nullptr after assignment";
+  std::cerr << "7\n";
 
+  std::cerr << "8\n";
   inputs.update(rclcpp::Time());
+  std::cerr << "9\n";
   EXPECT_FALSE(inputs.get_buttons()["test_button"].value());
+  std::cerr << "10\n";
 
   value = true;
+  std::cerr << "11\n";
   inputs.update(rclcpp::Time());
+  std::cerr << "12\n";
   EXPECT_TRUE(inputs.get_buttons()["test_button"].value());
+  std::cerr << "13\n";
 }
 
 TEST_F(InputTest, MapAxisSimple)

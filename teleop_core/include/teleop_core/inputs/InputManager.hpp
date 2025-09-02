@@ -24,6 +24,7 @@
 #include "InputMapBuilder.hpp"
 #include <vector>
 #include <set>
+#include <iostream>
 
 namespace teleop
 {
@@ -92,6 +93,7 @@ public:
 
   [[nodiscard]] const InputMap<uint8_t, Button> & get_buttons() const
   {
+    std::cerr << "get_buttons()\n";
     return button_map_;
   }
   [[nodiscard]] const InputMap<float, Axis> & get_axes() const
