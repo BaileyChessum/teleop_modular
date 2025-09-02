@@ -39,7 +39,20 @@ jobs:
           ROS_DISTRO: ${{ matrix.ROS_DISTRO }}
           ROS_REPO: ${{ matrix.ROS_REPO }}
           ADDITIONAL_DEBS: "ros-${{ matrix.ROS_DISTRO }}-controller-manager-msgs ros-${{ matrix.ROS_DISTRO }}-ros-base"
+          BEFORE_RUN_TARGET_TEST: |
+            echo "=== RUNNING THE BEFORE_RUN_TARGET_TEST ==="
+            sudo apt-get update
+            sudo apt-get install -y gdb
+            sudo chmod a+x /root/target_ws/build/test_inputs
+            gdb -ex "run" -ex "bt" -ex "quit" --args /root/target_ws/build/test_inputs
+          BEFORE_TEST: |
+            echo "=== RUNNING THE BEFORE_TEST ==="
+            sudo apt-get update
+            sudo apt-get install -y gdb
+            sudo chmod a+x /root/target_ws/build/test_inputs
+            gdb -ex "run" -ex "bt" -ex "quit" --args /root/target_ws/build/test_inputs
           AFTER_SCRIPT: |
+            echo "=== RUNNING THE AFTER_SCRIPT ==="
             sudo apt-get update
             sudo apt-get install -y gdb
             sudo chmod a+x /root/target_ws/build/test_inputs
@@ -47,21 +60,16 @@ jobs:
           ARTIFACTS: |
             /root/target_ws
 
-      - name: Run teleop_core tests with gdb on failure
+      - name: Upload workspace on failure
         if: failure()
-        run: | 
-          sudo apt-get update
-          sudo apt-get install -y gdb
-          sudo chmod a+x /root/target_ws/build/test_inputs
-          sudo gdb -ex "run" -ex "bt" -ex "quit" --args /root/target_ws/build/test_inputs
-
-      - name: List all files in workspace on failure
-        if: failure()
-        run: find . -type f
+        uses: actions/upload-artifact@v4
+        with:
+          name: "ws-${{ matrix.ROS_DISTRO }}-failure"
+          path: target_ws
 
       - name: Upload workspace
         uses: actions/upload-artifact@v4
         with:
-          name: target_ws
+          name: "ws-${{ matrix.ROS_DISTRO }}"
           path: target_ws
 
