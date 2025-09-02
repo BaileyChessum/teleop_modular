@@ -12,7 +12,7 @@
 # Created by Bailey Chessum on 2/8/25.
 #
 from typing import Dict, Iterator, Tuple
-from teleop_python_utils.Event import Event
+from .Event import Event
 
 
 class EventCollection:

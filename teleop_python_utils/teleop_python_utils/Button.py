@@ -11,7 +11,7 @@
 #
 # Created by Bailey Chessum on 2/8/25.
 #
-from teleop_python_utils.EventCollection import EventCollection
+from .EventCollection import EventCollection
 
 
 class Button:
