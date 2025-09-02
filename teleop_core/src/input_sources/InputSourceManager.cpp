@@ -147,7 +147,7 @@ bool InputSourceManager::create_input_source(const std::string & input_source_na
   input_source_class->init(input_source_node, input_source_name, shared_from_this());
 
   // Export the inputs
-  sources_.emplace_back(inputs_.get(), input_source_class);
+  sources_.emplace_back(input_source_class);
 
   if (const auto executor = executor_.lock()) {
     executor->add_node(input_source_class->get_node());
@@ -161,7 +161,6 @@ bool InputSourceManager::create_input_source(const std::string & input_source_na
 void InputSourceManager::setup_input_sources()
 {
   const auto logger = node_->get_logger();
-  const auto & inputs = inputs_.get();
 
   // Declare and get parameter for control modes to spawn by default
   node_->declare_parameter("input_sources.names", rclcpp::ParameterType::PARAMETER_STRING_ARRAY);
@@ -171,8 +170,7 @@ void InputSourceManager::setup_input_sources()
   // Pluginlib for loading control modes dynamically
   source_loader_ = std::make_unique<pluginlib::ClassLoader<input_source::InputSource>>(
     "teleop_modular",
-    "input_source::"
-    "InputSource");
+    "input_source::InputSource");
 
   // List available input source plugins
   try {
@@ -205,6 +203,37 @@ void InputSourceManager::setup_input_sources()
   RCLCPP_INFO(
     logger, C_TITLE "Input Sources:" C_RESET "%s\n",
     registered_sources_log.str().c_str());
+}
+
+void InputSourceManager::link_inputs(const InputManager::Props& previous, InputManager::Props& next,
+                                     const InputPipelineBuilder::DeclaredNames& names)
+{
+  const auto logger = node_->get_logger();
+  next = previous;
+
+  // Log names used for remapping
+  RCLCPP_DEBUG(logger, C_TITLE "Declared Names for Input Source Remapping:" C_RESET);
+  RCLCPP_DEBUG(logger, C_RESET "Buttons:");
+  for (const auto& name : names.button_names) {
+    RCLCPP_DEBUG(logger, "  - " C_INPUT "%s" C_RESET, name.c_str());
+  }
+  RCLCPP_DEBUG(logger, C_RESET "Axes:");
+  for (const auto& name : names.axis_names) {
+    RCLCPP_DEBUG(logger, "  - " C_INPUT "%s" C_RESET, name.c_str());
+  }
+
+  // Do all remapping
+  for (auto& handle : sources_) {
+    handle.declare_and_link_inputs(names);
+  }
+
+  // Declare all declarations for all input sources
+  for (auto& handle : sources_) {
+    for (auto definition : handle.button_definitions)
+      next.button_builder.declare_aggregate(definition.name, definition.reference);
+    for (auto definition : handle.axis_definitions)
+      next.axis_builder.declare_aggregate(definition.name, definition.reference);
+  }
 }
 
 }  // namespace teleop::internal

@@ -25,7 +25,7 @@ namespace teleop
 /**
  * Abstract base class for a generic invokable action (by an Event) that would change something in teleop_modular
  */
-class Command : public EventListener, public std::enable_shared_from_this<Command>
+class Command : public control_mode::EventListener, public std::enable_shared_from_this<Command>
 {
 public:
   using LoggingInterface = rclcpp::node_interfaces::NodeLoggingInterface;

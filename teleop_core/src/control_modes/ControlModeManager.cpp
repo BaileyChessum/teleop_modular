@@ -7,6 +7,7 @@
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
 //
+
 #include "teleop_core/control_modes/ControlModeManager.hpp"
 
 #include <controller_manager_msgs/srv/detail/switch_controller__struct.hpp>
@@ -15,6 +16,8 @@
 #include "teleop_core/utilities/utils.hpp"
 #include "rclcpp_lifecycle/state.hpp"
 #include "teleop_core/utilities/get_parameter.hpp"
+#include "teleop_core/control_modes/fake_input_collection.hpp"
+#include "teleop_core/control_modes/fake_event_collection.hpp"
 
 namespace teleop::internal
 {
@@ -26,7 +29,7 @@ using utils::get_parameter;
 using utils::get_parameter_or_default;
 }  // namespace
 
-void ControlModeManager::configure(InputManager & inputs)
+void ControlModeManager::configure()
 {
   const auto logger = node_->get_logger();
 
@@ -152,21 +155,13 @@ void ControlModeManager::configure(InputManager & inputs)
   RCLCPP_INFO(logger, C_TITLE "Control Modes:" C_RESET "%s\n", registered_modes_log.str().c_str());
 
   // Configure each control mode
-  auto buttons = inputs.get_buttons().get_control_mode_compat();
-  auto axes = inputs.get_axes().get_control_mode_compat();
-
-  control_mode::Inputs control_mode_inputs{
-    buttons,
-    axes
-  };
-
   for (const auto & [name, control_mode] : control_modes_) {
     if (!control_mode) {
       continue;
     }
 
     control_mode->get_node()->configure();
-    control_mode->configure_inputs(control_mode_inputs);
+    // TODO: Configure inputs if they are available
   }
 }
 
@@ -370,6 +365,47 @@ bool ControlModeManager::get_type_for_control_mode(
     control_mode_type = param.as_string();
   }
   return result;
+}
+
+void ControlModeManager::link_inputs(const InputManager::Props& previous, InputManager::Props& next, const InputPipelineBuilder::DeclaredNames& declared_names) {
+  // No inputs to provide!
+}
+
+void ControlModeManager::declare_input_names(InputPipelineBuilder::DeclaredNames& names)
+{
+  auto fake_buttons = FakeInputCollection<control_mode::Button>();
+  auto fake_axes = FakeInputCollection<control_mode::Axis>();
+
+  auto fake_events = FakeEventCollection(fake_buttons);
+
+  control_mode::Inputs control_mode_inputs {
+    fake_buttons,
+    fake_axes,
+    fake_events
+  };
+
+  // Provide fake inputs to the control mode in order to extract the input names they want to use
+  for (auto& [name, mode] : control_modes_) {
+    // TODO: Make sure we don't try configure any errored out modes
+    mode->configure_inputs(control_mode_inputs);
+  }
+
+  names.button_names.insert(fake_buttons.get_names().begin(), fake_buttons.get_names().end());
+  names.axis_names.insert(fake_axes.get_names().begin(), fake_axes.get_names().end());
+}
+
+void ControlModeManager::on_inputs_available(InputManager::Hardened& inputs)
+{
+  auto control_mode_inputs = control_mode::Inputs {
+    inputs.buttons,
+    inputs.axes,
+    events_
+  };
+
+  // Provide the real inputs after supplying fake inputs in declare_input_names()
+  for (auto& [name, mode] : control_modes_) {
+    mode->configure_inputs(control_mode_inputs);
+  }
 }
 
 }  // namespace teleop::internal

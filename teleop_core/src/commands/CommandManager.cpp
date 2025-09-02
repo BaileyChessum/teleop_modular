@@ -21,6 +21,7 @@ void CommandManager::create_command(const std::string & name, EventCollection & 
 {
   // TODO: Ensure the name not already defined
   const auto logger = node_->get_logger();
+  RCLCPP_DEBUG(logger, "Creating command for name %s", name.c_str());
 
   std::string type;
   std::vector<std::string> invocation_event_names;
@@ -141,6 +142,17 @@ bool CommandManager::get_type_for_command(
   }
   if (on.has_value()) {
     invocation_event_names.emplace_back(on.value());
+  }
+
+  if (!type_result) {
+    const auto logger = node_->get_logger();
+    RCLCPP_ERROR(logger, "Command \"%s\" has no type defined. Set commands.%s.type in your parameter file",
+                 name.c_str(), name.c_str());
+  }
+  if (invocation_event_names.empty()) {
+    const auto logger = node_->get_logger();
+    RCLCPP_ERROR(logger, "Command \"%s\" has no invocation events defined. Set either commands.%s.on or "
+                 "command.%s.on_any in your parameter file.", name.c_str(), name.c_str(), name.c_str());
   }
 
   return type_result && !invocation_event_names.empty();

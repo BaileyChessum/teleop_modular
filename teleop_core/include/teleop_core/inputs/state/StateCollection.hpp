@@ -19,6 +19,8 @@
 
 #include "State.hpp"
 #include "teleop_core/inputs/InputManager.hpp"
+#include "teleop_core/inputs/InputMapBuilder.hpp"
+#include "teleop_core/inputs/input_pipeline_builder.hpp"
 
 namespace teleop::state
 {
@@ -32,12 +34,12 @@ template<typename T, typename InputT>
 class StateCollection
 {
 public:
-  static_assert(
-    std::is_base_of_v<InputCommon<T>, InputT>,
-    "InputT must be an input type inheriting from InputCommon (Button, Axis).");
+//  static_assert(
+//    std::is_base_of_v<InputCommon<T>, InputT>,
+//    "InputT must be an input type inheriting from InputCommon (Button, Axis).");
 
-  explicit StateCollection(InputCollection<InputT> & inputs)
-  : inputs_(std::ref(inputs))
+  explicit StateCollection(InputPipelineElementDelegate& delegate)
+    : delegate_(delegate)
   {
   }
 
@@ -59,7 +61,7 @@ public:
     std::shared_ptr<State<T>> ptr = nullptr;
 
     if (it != items_.end()) {
-      ptr = it->second.state;
+      ptr = it->second;
     }
 
     return ptr;
@@ -79,13 +81,8 @@ public:
 
     // Make and register a new state
     const auto state = std::make_shared<State<T>>(name, value);
-    const auto & input = inputs_.get()[name];
-
-    StateHandle handle{state, input};
-
-    input->add_definition(handle.state->reference);
-
-    items_.insert({name, handle});
+    items_[name] = state;
+    delegate_.relink();
   }
 
   /**
@@ -95,27 +92,28 @@ public:
   void clear(const std::string & name)
   {
     // Find the element
-    auto it = items_.find(name);
+    // auto it = items_.find(name);
 
-    if (it == items_.end()) {
-      // Do nothing, as its already undefined
-      return;
-    }
+    // if (it == items_.end()) {
+    //   // Do nothing, as its already undefined
+    //   return;
+    // }
 
-    it->second.input->remove_definition(it->second.state->reference);
-    items_.erase(name);
+    // it->second.input->remove_definition(it->second.state->reference);
+    // items_.erase(name);
   }
 
-private:
-  struct StateHandle
-  {
-    typename State<T>::SharedPtr state;
-    /// We need to hold a shared pointer to keep the input alive
-    std::shared_ptr<InputT> input;
-  };
+  // Make the collection iterable
+  using iterator = typename std::map<std::string, typename State<T>::SharedPtr>::iterator;
+  using const_iterator = typename std::map<std::string, typename State<T>::SharedPtr>::const_iterator;
+  iterator begin() { return items_.begin(); }
+  const_iterator cbegin() { return items_.cbegin(); }
+  iterator end() { return items_.end(); }
+  const_iterator cend() { return items_.cend(); }
 
-  std::reference_wrapper<InputCollection<InputT>> inputs_;
-  std::map<std::string, StateHandle> items_{};
+private:
+  std::map<std::string, typename State<T>::SharedPtr> items_{};
+  InputPipelineElementDelegate& delegate_;
 };
 
 }  // namespace teleop::state

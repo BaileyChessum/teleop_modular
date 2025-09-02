@@ -8,7 +8,7 @@
 //     http://www.apache.org/licenses/LICENSE-2.0
 //
 //
-// Created by Bailey Chessum on 6/9/25.
+// Created by Bailey Chessum on 9/6/25.
 //
 
 #ifndef TELEOP_MODULAR_INPUTMANAGER_HPP
@@ -18,7 +18,13 @@
 
 #include "teleop_core/inputs/Button.hpp"
 #include "teleop_core/inputs/Axis.hpp"
-#include "InputCollection.hpp"
+#include "teleop_core/inputs/InputDefinition.hpp"
+#include "control_mode/input_collection.hpp"
+#include "InputMap.hpp"
+#include "InputMapBuilder.hpp"
+#include <vector>
+#include <set>
+#include <iostream>
 
 namespace teleop
 {
@@ -28,52 +34,74 @@ namespace teleop
  */
 class InputManager
 {
+  using Button = control_mode::Button;
+  using Axis = control_mode::Axis;
+
 public:
+  /**
+   * Everything you need to initialize the input manager
+   */
+  struct Props {
+    InputMapBuilder<uint8_t> button_builder{};
+    InputMapBuilder<float> axis_builder{};
+  };
+
+  /**
+   * Like props, but with the builders hardened into input maps
+   */
+  struct Hardened {
+    InputMap<uint8_t, Button>& buttons;
+    InputMap<float, Axis>& axes;
+  };
+
   InputManager()
-  : buttons_()
-    , axes_()
+  : button_map_()
+    , axis_map_()
   {
   }
 
   // Add move constructor
-  InputManager(InputManager && other) noexcept
-  : buttons_(std::move(other.buttons_))
-    , axes_(std::move(other.axes_))
-  {
-  }
+//  InputManager(InputManager && other) noexcept
+//  : button_map_(std::move(other.button_map_))
+//    , axis_map_(std::move(other.axis_map_))
+//  {
+//  }
 
   // Add move assignment
-  InputManager & operator=(InputManager && other) noexcept
-  {
-    if (this != &other) {
-      buttons_ = std::move(other.buttons_);
-      axes_ = std::move(other.axes_);
-    }
-    return *this;
-  }
+//  InputManager & operator=(InputManager && other) noexcept
+//  {
+//    if (this != &other) {
+//      button_map_ = std::move(other.button_map_);
+//      axis_map_ = std::move(other.axis_map_);
+//    }
+//    return *this;
+//  }
 
   // Delete copy constructor and assignment
-  InputManager(const InputManager &) = delete;
-  InputManager & operator=(const InputManager &) = delete;
+  // InputManager(const InputManager &) = delete;
+  // InputManager & operator=(const InputManager &) = delete;
 
   // Accessors
-  [[nodiscard]] InputCollection<Button> & get_buttons()
+  [[nodiscard]] InputMap<uint8_t, Button> & get_buttons()
   {
-    return buttons_;
+    return button_map_;
   }
-  [[nodiscard]] InputCollection<Axis> & get_axes()
+  [[nodiscard]] InputMap<float, Axis> & get_axes()
   {
-    return axes_;
+    return axis_map_;
   }
 
-  [[nodiscard]] const InputCollection<Button> & get_buttons() const
+  [[nodiscard]] const InputMap<uint8_t, Button> & get_buttons() const
   {
-    return buttons_;
+    std::cerr << "get_buttons()\n";
+    return button_map_;
   }
-  [[nodiscard]] const InputCollection<Axis> & get_axes() const
+  [[nodiscard]] const InputMap<float, Axis> & get_axes() const
   {
-    return axes_;
+    return axis_map_;
   }
+
+  Hardened init(const Props & props);
 
   /**
    * @brief polls the current input state and propagates changes:
@@ -84,17 +112,11 @@ public:
   void update(const rclcpp::Time & now);
 
 protected:
-  /**
-   * All boolean inputs referenced by an input source or control mode. This collection only holds weak references, and
-   * allows Events to be dropped.
-   */
-  InputCollection<Button> buttons_{};
+  /// Stores a string -> T* map, along with additional memory for aggregation
+  InputMap<uint8_t, Button> button_map_ = InputMap<uint8_t, Button>();
 
-  /**
-   * All double inputs referenced by an input source or control mode. This collection only holds weak references, and
-   * allows Events to be dropped.
-   */
-  InputCollection<Axis> axes_{};
+  /// Stores a string -> T* map, along with additional memory for aggregation
+  InputMap<float, Axis> axis_map_ = InputMap<float, Axis>();
 };
 
 }  // namespace teleop

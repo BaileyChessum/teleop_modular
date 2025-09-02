@@ -15,14 +15,14 @@
 #define TELEOP_MODULAR_CONTROL_MODE_INPUT_COLLECTION_HPP
 
 #include "visibility_control.h"
-#include "input_interface.hpp"
+#include "input_ptr.hpp"
 #include <string>
 
 namespace control_mode
 {
 
 /**
- * @class An interface for whatever provides InputInterfaces to control modes.
+ * An interface for whatever provides InputInterfaces to control modes.
  *
  * You do not own the lifecycle of the InputCollection. Do not hold a reference to the object. Attempting to use an
  * InputCollection outside of ControlMode::configure_inputs() will cause a segfault.
@@ -41,17 +41,17 @@ public:
    *
    * Names of returned inputs may be remapped, such that (*this)[name]->get_name() may not equal name.
    */
-  virtual typename InputT::SharedPtr operator[](const std::string & name) = 0;
+  virtual InputT operator[](const std::string & name) = 0;
 
 protected:
   InputCollection() = default;
   ~InputCollection() = default;
 
   // Prevent copy/move by default
-  InputCollection(const InputCollection &) = delete;
-  InputCollection(InputCollection &&) = delete;
-  InputCollection & operator=(const InputCollection &) = delete;
-  InputCollection & operator=(InputCollection &&) = delete;
+  // InputCollection(const InputCollection &) = delete;
+  // InputCollection(InputCollection &&) = delete;
+  // InputCollection & operator=(const InputCollection &) = delete;
+  // InputCollection & operator=(InputCollection &&) = delete;
 };
 
 /// A set to acquire shared pointers to boolean inputs

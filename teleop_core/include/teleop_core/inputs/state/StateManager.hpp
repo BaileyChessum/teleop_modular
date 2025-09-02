@@ -15,6 +15,9 @@
 #define STATEMANAGER_HPP
 
 #include "StateCollection.hpp"
+#include "teleop_core/inputs/input_pipeline_builder.hpp"
+#include <set>
+#include "teleop_core/inputs/InputManager.hpp"
 
 namespace teleop::state
 {
@@ -22,11 +25,11 @@ namespace teleop::state
 /**
  * A class to manage input values that don't originate from an input source. This could be from ROS2, or commands
  */
-class StateManager
+class StateManager : public InputPipelineBuilder::Element, public InputPipelineElementDelegate
 {
 public:
-  explicit StateManager(InputManager & inputs)
-  : buttons_(inputs.get_buttons()), axes_(inputs.get_axes())
+  explicit StateManager()
+  : buttons_(*this), axes_(*this)
   {
   }
 
@@ -38,6 +41,26 @@ public:
   [[nodiscard]] StateCollection<float, Axis> & get_axes()
   {
     return axes_;
+  }
+
+  /**
+   * Add inputs to the builder.
+   * \param[in] previous The result of the previous InputPipelineBuilder::Element, to use as a basis for populating
+   * next.
+   * \param[in,out] next The result of this Element. Always stores the previous result from this Element.
+   */
+  void link_inputs(const InputManager::Props& previous, InputManager::Props& next,
+                   const InputPipelineBuilder::DeclaredNames& names) override;
+
+  /**
+   * Callback ran when hardened inputs are available.
+   */
+  void on_inputs_available(InputManager::Hardened& inputs) override {
+    // I don't think we do anything with hardened inputs?
+  }
+
+  virtual void relink() override {
+    relink_pipeline();
   }
 
 private:

@@ -27,6 +27,8 @@ include_directories(
 add_library(${PROJECT_NAME}
   src/control_mode.cpp
   include/control_mode/input_collection.hpp
+  src/event/event.cpp
+  src/event/event_listener_queue.cpp
 )
 
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})

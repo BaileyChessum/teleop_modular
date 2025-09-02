@@ -22,6 +22,8 @@
 #include <rclcpp/executor.hpp>
 #include "control_mode/control_mode.hpp"
 #include "teleop_core/inputs/InputManager.hpp"
+#include "teleop_core/inputs/input_pipeline_builder.hpp"
+#include "control_mode/event/event_collection.hpp"
 
 namespace teleop::internal
 {
@@ -29,20 +31,21 @@ namespace teleop::internal
 /**
  * Class responsible for managing the registered control modes, the current control mode, and switching between them.
  */
-class ControlModeManager final
+class ControlModeManager final : public InputPipelineBuilder::Element
 {
 public:
   explicit ControlModeManager(
     const std::shared_ptr<rclcpp::Node> & node,
-    const std::weak_ptr<rclcpp::Executor> & executor)
-  : node_(node), executor_(executor)
+    const std::weak_ptr<rclcpp::Executor> & executor,
+    control_mode::EventCollection & events)
+  : node_(node), executor_(executor), events_(events)
   {
   }
 
   /**
    * Populates the control_modes_ from the params in node_.
    */
-  void configure(InputManager & inputs);
+  void configure();
 
   /**
    * @brief Attempts to activate a control mode.
@@ -85,6 +88,27 @@ public:
 
   void activate_initial_control_mode();
 
+  /**
+     * Add inputs to the builder.
+     * \param[in] previous The result of the previous InputPipelineBuilder::Element, to use as a basis for populating
+     * next.
+     * \param[in,out] next The result of this Element. Always stores the previous result from this Element.
+   */
+  void link_inputs(const InputManager::Props& previous, InputManager::Props& next, const InputPipelineBuilder::DeclaredNames& names) override;
+
+  // TODO: Rename to make clear that these are the inputs we want to consume, not provide
+  /**
+     * Allows an element to declare what inputs it CONSUMES, not provides. This is useful for any dynamic remapping of
+     * any previous elements in the pipeline.
+     * \param[in, out] names the set accumulating all declared input names. Add names to declare to this set.
+   */
+  void declare_input_names(InputPipelineBuilder::DeclaredNames& names) override;
+
+  /**
+     * Callback ran when hardened inputs are available.
+   */
+  void on_inputs_available(InputManager::Hardened& inputs) override;
+
 private:
   /**
    * Resets everything for the controller manager
@@ -114,6 +138,8 @@ private:
   std::shared_ptr<rclcpp::Node> node_;
   /// Add spawned nodes to this to get them to spin
   std::weak_ptr<rclcpp::Executor> executor_;
+  /// Used to get events from when configuring inputs
+  control_mode::EventCollection& events_;
 
   // Control modes
   /// Loads the control modes, and needs to stay alive during the whole lifecycle of the control modes.
