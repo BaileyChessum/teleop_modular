@@ -39,16 +39,6 @@ jobs:
           ROS_DISTRO: ${{ matrix.ROS_DISTRO }}
           ROS_REPO: ${{ matrix.ROS_REPO }}
           ADDITIONAL_DEBS: "ros-${{ matrix.ROS_DISTRO }}-controller-manager-msgs ros-${{ matrix.ROS_DISTRO }}-ros-base"
-          BEFORE_RUN_TARGET_TEST_EMBED: |
-            echo "=== RUNNING THE BEFORE_RUN_TARGET_TEST ==="
-            sudo apt-get update
-            sudo apt-get install -y gdb
-            sudo chmod a+x /root/target_ws/install/teleop_core/lib/teleop_core/test_inputs_manual
-            cd /root/target_ws
-            source /opt/ros/${{ matrix.ROS_DISTRO }}/setup.bash
-            : "${LD_LIBRARY_PATH:=}"  # default to empty if unset
-            export LD_LIBRARY_PATH=install/teleop_core/lib:$LD_LIBRARY_PATH
-            gdb -ex "run" -ex "bt" -ex "bt full" -ex "quit" --args /root/target_ws/install/teleop_core/lib/teleop_core/test_inputs_manual
           BEFORE_RUN_TARGET_TEST: |
             echo "=== RUNNING THE BEFORE_RUN_TARGET_TEST ==="
             sudo apt-get update
@@ -58,6 +48,7 @@ jobs:
             set +u
             source /opt/ros/${{ matrix.ROS_DISTRO }}/setup.bash
             set -u
+            source install/setup.bash
             : "${LD_LIBRARY_PATH:=}"  # default to empty if unset
             export LD_LIBRARY_PATH=install/teleop_core/lib:$LD_LIBRARY_PATH
             gdb -ex "run" -ex "bt" -ex "bt full" -ex "quit" --args /root/target_ws/install/teleop_core/lib/teleop_core/test_inputs_manual
