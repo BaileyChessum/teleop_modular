@@ -1,9 +1,7 @@
-from .Event import Event
-from .EventCollection import EventCollection
-from .Button import Button
-from .ButtonCollection import ButtonCollection
-
-from .Axis import Axis
-from .AxisCollection import AxisCollection
-
-from .Inputs import Inputs
+from .modules.Event import Event
+from .modules.EventCollection import EventCollection
+from .modules.Button import Button
+from .modules.ButtonCollection import ButtonCollection
+from .modules.Axis import Axis
+from .modules.AxisCollection import AxisCollection
+from .modules.Inputs import Inputs
