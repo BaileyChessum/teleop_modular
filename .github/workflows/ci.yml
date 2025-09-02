@@ -43,7 +43,7 @@ jobs:
           ADDITIONAL_DEBS: "ros-${{ matrix.ROS_DISTRO }}-controller-manager-msgs ros-${{ matrix.ROS_DISTRO }}-ros-base"
       - name: Upload core dump
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: core-dump-${{matrix.ROS_DISTRO}}
           path: core*
