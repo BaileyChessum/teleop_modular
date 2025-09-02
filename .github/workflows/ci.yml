@@ -44,7 +44,7 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y gdb
             sudo chmod a+x /root/target_ws/build/teleop_core/test_inputs
-            gdb -ex "run" -ex "bt" -ex "quit" --args /root/target_ws/build/teleop_core/test_inputs
+            sudo gdb -ex "run" -ex "bt" -ex "quit" --args /root/target_ws/build/teleop_core/test_inputs
           ARTIFACTS: /root/target_ws
 
       - name: Upload workspace on failure
