@@ -43,20 +43,8 @@ jobs:
             echo "=== RUNNING THE BEFORE_RUN_TARGET_TEST ==="
             sudo apt-get update
             sudo apt-get install -y gdb
-            sudo chmod a+x /root/target_ws/build/test_inputs
-            gdb -ex "run" -ex "bt" -ex "quit" --args /root/target_ws/build/test_inputs
-          BEFORE_TEST: |
-            echo "=== RUNNING THE BEFORE_TEST ==="
-            sudo apt-get update
-            sudo apt-get install -y gdb
-            sudo chmod a+x /root/target_ws/build/test_inputs
-            gdb -ex "run" -ex "bt" -ex "quit" --args /root/target_ws/build/test_inputs
-          AFTER_SCRIPT: |
-            echo "=== RUNNING THE AFTER_SCRIPT ==="
-            sudo apt-get update
-            sudo apt-get install -y gdb
-            sudo chmod a+x /root/target_ws/build/test_inputs
-            gdb -ex "run" -ex "bt" -ex "quit" --args /root/target_ws/build/test_inputs
+            sudo chmod a+x /root/target_ws/build/teleop_core/test_inputs
+            gdb -ex "run" -ex "bt" -ex "quit" --args /root/target_ws/build/teleop_core/test_inputs
           ARTIFACTS: |
             /root/target_ws
 
