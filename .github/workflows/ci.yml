@@ -42,6 +42,11 @@ jobs:
           ROS_REPO: ${{ matrix.ROS_REPO }}
           ADDITIONAL_DEBS: "ros-${{ matrix.ROS_DISTRO }}-controller-manager-msgs ros-${{ matrix.ROS_DISTRO }}-ros-base"
 
+      - name: Run teleop_core tests with gdb on failure
+        if: failure()
+        run: |
+          gdb -ex "run" -ex "bt" -ex "quit" --args ./build/test_inputs
+
       - name: List all files in workspace on failure
         if: failure()
         run: find . -type f
