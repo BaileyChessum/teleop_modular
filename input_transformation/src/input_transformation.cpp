@@ -14,7 +14,8 @@ namespace input_transformation
 
 return_type InputTransformation::init(const std::string& name)
 {
-  return return_type::ERROR;
+  name_ = name;
+  return on_configure();
 }
 
 }  // namespace input_transformation
