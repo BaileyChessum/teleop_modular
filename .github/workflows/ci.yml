@@ -43,9 +43,9 @@ jobs:
             echo "=== RUNNING THE BEFORE_RUN_TARGET_TEST ==="
             sudo apt-get update
             sudo apt-get install -y gdb
-            sudo chmod a+x /root/target_ws/build/teleop_core/test_inputs
-            source /root/target_ws/build/teleop_core/colcon_command_prefix_test.sh.env
-            /root/target_ws/build/teleop_core/colcon_command_prefix_test.sh gdb -ex "run" -ex "bt" -ex "quit" --args /root/target_ws/build/teleop_core/test_inputs
+            sudo chmod a+x /root/target_ws/install/teleop_core/lib/teleop_core/test_inputs_manual
+            cd /root/target_ws
+            gdb -ex "run" -ex "bt" -ex "bt full" -ex "quit" --args /root/target_ws/install/teleop_core/lib/teleop_core/test_inputs_manual
           ARTIFACTS: /root/target_ws
 
       - name: Upload workspace on failure
