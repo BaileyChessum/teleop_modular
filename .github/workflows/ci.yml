@@ -47,8 +47,8 @@ jobs:
             cd /root/target_ws
             set +u
             source /opt/ros/${{ matrix.ROS_DISTRO }}/setup.bash
-            set -u
             source install/setup.bash
+            set -u
             : "${LD_LIBRARY_PATH:=}"  # default to empty if unset
             export LD_LIBRARY_PATH=install/teleop_core/lib:$LD_LIBRARY_PATH
             gdb -ex "run" -ex "bt" -ex "bt full" -ex "quit" --args /root/target_ws/install/teleop_core/lib/teleop_core/test_inputs_manual
