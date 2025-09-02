@@ -33,9 +33,17 @@ jobs:
           # and might need some fine-tuning to match the use case
           key: ccache-${{ matrix.ROS_DISTRO }}-${{ matrix.ROS_REPO }}-${{github.run_id}}
           restore-keys: |
-            ccache-${{ matrix.ROS_DISTRO }}-${{ matrix.ROS_REPO }}-      
+            ccache-${{ matrix.ROS_DISTRO }}-${{ matrix.ROS_REPO }}-
+      - name: Enable core dumps
+        run: ulimit -c unlimited
       - uses: 'ros-industrial/industrial_ci@master' # run industrial_ci
         env: # either pass all entries explicitly
           ROS_DISTRO: ${{ matrix.ROS_DISTRO }}
           ROS_REPO: ${{ matrix.ROS_REPO }}
           ADDITIONAL_DEBS: "ros-${{ matrix.ROS_DISTRO }}-controller-manager-msgs ros-${{ matrix.ROS_DISTRO }}-ros-base"
+      - name: Upload core dump
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: core-dump-${{matrix.ROS_DISTRO}}
+          path: core*
