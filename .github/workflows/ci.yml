@@ -44,8 +44,9 @@ jobs:
 
       - name: Run teleop_core tests with gdb on failure
         if: failure()
-        run: |
-          gdb -ex "run" -ex "bt" -ex "quit" --args ./build/test_inputs
+        run: | 
+          sudo apt-get update && sudo apt-get install -y gdb
+          gdb -ex "run" -ex "bt" -ex "quit" --args /root/target_ws/build/test_inputs
 
       - name: List all files in workspace on failure
         if: failure()
