@@ -130,24 +130,27 @@ ament_export_libraries(
   ${PROJECT_NAME}
 )
 
-find_package(GTest REQUIRED)
-find_package(Threads REQUIRED)
-# At the bottom of your CMakeLists.txt
-add_executable(test_inputs_manual
-  ${TEST_INPUTS_SOURCE_FILES}
-)
-target_link_libraries(test_inputs_manual
-  ${PROJECT_NAME}
-  GTest::gtest_main
-  Threads::Threads
-)
-target_include_directories(test_inputs_manual PUBLIC
-  include
-)
-install(TARGETS
-  test_inputs_manual
-  DESTINATION lib/${PROJECT_NAME}
-)
+# This used to export test cases to its own executable -- useful for debugging segfaults
+# However, it might've made the CI pipeline segfault?
+#
+# find_package(GTest REQUIRED)
+# find_package(Threads REQUIRED)
+# # At the bottom of your CMakeLists.txt
+# add_executable(test_inputs_manual
+#   ${TEST_INPUTS_SOURCE_FILES}
+# )
+# target_link_libraries(test_inputs_manual
+#   ${PROJECT_NAME}
+#   GTest::gtest_main
+#   Threads::Threads
+# )
+# target_include_directories(test_inputs_manual PUBLIC
+#   include
+# )
+# install(TARGETS
+#   test_inputs_manual
+#   DESTINATION lib/${PROJECT_NAME}
+# )
 
 
 ament_export_targets(
