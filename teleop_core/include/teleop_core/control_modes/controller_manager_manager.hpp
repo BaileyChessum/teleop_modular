@@ -1,5 +1,14 @@
+// Copyright 2025 Bailey Chessum
+// SPDX-License-Identifier: Apache-2.0
 //
-// Created by nova on 13/09/2025.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+//
+// Created by Bailey Chessum on 13/9/2025.
 //
 
 #ifndef CONTROL_MODE_CONTROLLER_MANAGER_MANAGER_HPP
@@ -12,6 +21,7 @@
 #include "controller_ordering.hpp"
 #include <rclcpp/node.hpp>
 #include <thread>
+#include <controller_manager_msgs/srv/switch_controller.hpp>
 
 namespace teleop
 {
@@ -26,7 +36,12 @@ public:
   ControllerManagerManager(rclcpp::Node::SharedPtr node)
     : node_(std::move(node)), logger_(node_->get_logger().get_child("controller_manager_manager"))
   {
-
+    // Create service clients
+    // TODO: Allow for controller_manager to be specified like with -c args. This would be needed to support multiple
+    //  controller manager manager instances
+    switch_controller_client_ =
+        node_->create_client<controller_manager_msgs::srv::SwitchController>(
+            "/controller_manager/switch_controller");
   }
 
   ~ControllerManagerManager() {
@@ -129,7 +144,7 @@ private:
       activate_names.emplace_back(ordering_[id]);
 
     // TODO: Send message to the controller manager
-
+    switch_controllers(deactivate_names, activate_names);
   }
 
   /**
@@ -168,6 +183,32 @@ private:
     right_difference.insert(r_it, right.end());
   }
 
+  bool switch_controllers(
+      const std::vector<std::string> & controllers_to_deactivate,
+      const std::vector<std::string> & controllers_to_activate)
+  {
+    if (controllers_to_deactivate.empty() && controllers_to_activate.empty()) {
+      return true;
+    }
+
+    if (!switch_controller_client_->service_is_ready()) {
+      RCLCPP_ERROR(node_->get_logger(), "Controller manager service not available.");
+      return false;
+    }
+
+    const auto request = std::make_shared<controller_manager_msgs::srv::SwitchController::Request>();
+    request->deactivate_controllers = controllers_to_deactivate;
+    request->activate_controllers = controllers_to_activate;
+    request->strictness = 2;
+    request->activate_asap = true;
+
+    future_ = switch_controller_client_->async_send_request(request);
+    future_.value().valid();
+
+    // TODO: Error recovery when the controller isn't able to switch the controllers.
+    return true;
+  }
+
   /**
    * Holds a mutex on desired_active_controllers_, then removes controller ids associated with each deactivate_cm_ids
    * entry, and adds controller ids associated with each activate_cm_ids entry.
@@ -199,8 +240,18 @@ private:
       desired_active_controllers_.insert(id);
   }
 
+  void service_future() {
+    if (future_.has_value())
+
+  }
+
+  void service_future_result(controller_manager_msgs::srv::SwitchController::Response response) {
+    // TODO: do something with the future feedback. idk
+
+  }
+
   /**
-   * Blocks until desired_active_controllers_ changes
+   * Blocks until desired_active_controllers_ changes, or until future_ receives a value
    */
   void wait_for_change() {
     std::unique_lock lock(mutex_);
@@ -246,6 +297,13 @@ private:
   /// Lock that waits until should_update_ is true.
   std::condition_variable update_condition_;
   std::atomic<bool> should_update_ = false;
+
+
+  // Service calls
+  /// Client to call the service on the controller manager to change the currently active controllers.
+  rclcpp::Client<controller_manager_msgs::srv::SwitchController>::SharedPtr switch_controller_client_ = nullptr;
+  /// Any previous result from a service call
+  std::optional<rclcpp::Client<controller_manager_msgs::srv::SwitchController>::FutureAndRequestId> future_;
 };
 
 }  // namespace teleop

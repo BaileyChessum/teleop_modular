@@ -34,10 +34,6 @@ void ControlModeManager::configure()
 {
   const auto logger = node_->get_logger();
 
-  // Create service clients
-  switch_controller_client_ =
-    node_->create_client<controller_manager_msgs::srv::SwitchController>(
-    "/controller_manager/switch_controller");
 
   auto names_descriptor = rcl_interfaces::msg::ParameterDescriptor{};
   names_descriptor.name = "control_modes.names";
@@ -414,30 +410,6 @@ void ControlModeManager::reset()
   switch_controller_client_ = nullptr;
 }
 
-bool ControlModeManager::switch_controllers(
-  const std::vector<std::string> & controllers_to_deactivate,
-  const std::vector<std::string> & controllers_to_activate) const
-{
-  if (controllers_to_deactivate.empty() && controllers_to_activate.empty()) {
-    return true;
-  }
-
-  if (!switch_controller_client_->service_is_ready()) {
-    RCLCPP_ERROR(node_->get_logger(), "Controller manager service not available.");
-    return false;
-  }
-
-  const auto request = std::make_shared<controller_manager_msgs::srv::SwitchController::Request>();
-  request->deactivate_controllers = controllers_to_deactivate;
-  request->activate_controllers = controllers_to_activate;
-  request->strictness = 2;
-  request->activate_asap = true;
-
-  auto future = switch_controller_client_->async_send_request(request);
-
-  // TODO: Error recovery when the controller isn't able to switch the controllers.
-  return true;
-}
 
 bool ControlModeManager::get_type_for_control_mode(
   const std::string & name,

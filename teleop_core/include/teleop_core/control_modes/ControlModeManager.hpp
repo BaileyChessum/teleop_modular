@@ -155,13 +155,6 @@ private:
 
   /// Currently loaded control modes.
   std::map<std::string, std::shared_ptr<control_mode::ControlMode>> control_modes_{};
-  /// The currently active control mode.
-  // std::shared_ptr<control_mode::ControlMode> current_control_mode_ = nullptr;
-
-  // Service calls
-  /// Client to call the service on the controller manager to change the currently active controllers.
-  rclcpp::Client<controller_manager_msgs::srv::SwitchController>::SharedPtr
-    switch_controller_client_ = nullptr;
 };
 
 }  // namespace teleop::internal
