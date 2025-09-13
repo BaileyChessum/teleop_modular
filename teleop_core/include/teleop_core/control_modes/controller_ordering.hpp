@@ -72,41 +72,6 @@ public:
 
   }
 
-  /**
-   * Gets the differences of two sets left and right
-   * \param[out] left_difference left - right
-   * \param[out] right_difference right - left
-   */
-  static void set_differences(
-      const std::set<size_t>& left,
-      const std::set<size_t>& right,
-      std::set<size_t>& left_difference,
-      std::set<size_t>& right_difference)
-  {
-    left_difference.clear();
-    right_difference.clear();
-
-    auto l_it = left.begin();
-    auto r_it = right.begin();
-
-    while (l_it != left.end() && r_it != right.end()) {
-      if (*l_it < *r_it) {
-        left_difference.insert(*l_it);
-        ++l_it;
-      } else if (*l_it < *r_it) {
-        right_difference.insert(*r_it);
-        ++r_it;
-      } else {
-        // element is common to both sets, skip both
-        ++l_it;
-        ++r_it;
-      }
-    }
-
-    // Finish inserting elements for the other set when we finish inserting elements for one set
-    left_difference.insert(l_it, left.end());
-    right_difference.insert(r_it, right.end());
-  }
 
   /**
    * Merges left and merges right, then gets the differences of the two merged sets from left and right
