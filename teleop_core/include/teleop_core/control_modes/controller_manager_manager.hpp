@@ -17,7 +17,8 @@ namespace teleop
 {
 
 /**
- * Helper class for managing the ros2_control controller manager
+ * Helper class for managing the ros2_control controller manager.
+ * Spins up its own thread to manage communication with the controller manager.
  */
 class ControllerManagerManager
 {
@@ -33,6 +34,10 @@ public:
       stop_thread();
   }
 
+  /**
+   * For each control mode, declares what the controller names are. This allows the ordering to be calculated.
+   * The service loop thread_ is started as a side effect.
+   */
   void register_controllers_for_ids(const std::vector<std::reference_wrapper<std::vector<std::string>>>& controller_names_for_ids)
   {
     if (thread_running_.load())
@@ -57,8 +62,8 @@ public:
   /**
    * Function run by thread_
    */
-  void main_thread() {
-    RCLCPP_DEBUG(logger_, "Starting main thread loop.");
+  void service_loop() {
+    RCLCPP_DEBUG(logger_, "Starting service loop.");
 
     while (thread_running_.load()) {
       wait_for_change();
@@ -69,7 +74,7 @@ public:
       update_controllers();
     }
 
-    RCLCPP_DEBUG(logger_, "Main thread loop ending.");
+    RCLCPP_DEBUG(logger_, "Service loop ending.");
   }
 
   /**
@@ -80,6 +85,9 @@ public:
     invoke_update();
   }
 
+  /**
+   * Unblocks the service thread to send a new message to the controller manager.
+   */
   void invoke_update() {
     {
       std::lock_guard lock(mutex_);
@@ -90,7 +98,9 @@ public:
   }
 
 private:
-
+  /**
+   * Calculates the difference between current_active_controllers and desired_active_controllers
+   */
   void update_controllers() {
     std::set<size_t> desired_active_controllers;
 
@@ -158,6 +168,10 @@ private:
     right_difference.insert(r_it, right.end());
   }
 
+  /**
+   * Holds a mutex on desired_active_controllers_, then removes controller ids associated with each deactivate_cm_ids
+   * entry, and adds controller ids associated with each activate_cm_ids entry.
+   */
   void mutate_desired_active_controllers(const std::vector<size_t> & activate_cm_ids, const std::vector<size_t> & deactivate_cm_ids) {
     // Get deactivate ids
     std::vector<std::reference_wrapper<std::set<size_t>>> deactivate_id_sets{};
@@ -209,7 +223,7 @@ private:
       stop_thread();
 
     thread_running_ = true;
-    thread_ = std::thread(&teleop::ControllerManagerManager::main_thread, this);
+    thread_ = std::thread(&teleop::ControllerManagerManager::service_loop, this);
   }
 
   std::vector<std::set<size_t>> controllers_for_ids_{};  //< set of controller ids for each control mode id
@@ -232,8 +246,6 @@ private:
   /// Lock that waits until should_update_ is true.
   std::condition_variable update_condition_;
   std::atomic<bool> should_update_ = false;
-
-
 };
 
 }  // namespace teleop
