@@ -61,6 +61,8 @@ add_library(${PROJECT_NAME} SHARED
   src/inputs/input_pipeline_builder.cpp
   include/teleop_core/control_modes/controller_manager_manager.cpp
   include/teleop_core/control_modes/controller_manager_manager.hpp
+  include/teleop_core/control_modes/controller_manager_manager_worker.cpp
+  include/teleop_core/control_modes/controller_manager_manager_worker.hpp
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)  # Require C++17

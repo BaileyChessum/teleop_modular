@@ -15,4 +15,15 @@
 
 namespace teleop
 {
+
+ControllerManagerManager::Context::Context(const rclcpp::Node::SharedPtr& node)
+    : logger_(node->get_logger().get_child("controller_manager_manager")) {
+  // Create service clients
+  // TODO: Allow for controller_manager to be specified like with -c args. This would be needed to support multiple
+  //  controller manager manager instances
+  switch_controller_client_ =
+      node->create_client<controller_manager_msgs::srv::SwitchController>(
+          "/controller_manager/switch_controller");
+}
+
 }  // namespace teleop
