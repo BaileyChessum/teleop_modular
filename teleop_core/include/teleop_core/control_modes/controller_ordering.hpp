@@ -28,7 +28,6 @@ namespace teleop {
 
 class ControllerOrdering {
 public:
-
   /**
    * Add an ordered set of controller dependencies
    * \param controllers controller names in the order they need to be activated
@@ -56,21 +55,19 @@ public:
   /**
    * For a given set of names, gets an ordered set of ids to be activated
    */
-  void names_to_ids(std::vector<std::string> names, std::vector<size_t>& out) {
+  void names_to_ids(const std::vector<std::string> & names, std::set<size_t> & out) {
     out.clear();
-    out.reserve(names.size());
 
     for (const auto& name : names) {
-      out.emplace_back((*this)[name]);
+      out.insert((*this)[name]);
     }
-
-    std::sort(out.begin(), out.end());
   }
 
   void id_sets_to_names(const std::vector<std::reference_wrapper<std::set<size_t>>>& id_set_refs, std::vector<std::string>& out) {
     out.clear();
 
     const auto merged_ids = merge_id_sets(id_set_refs);
+
 
 
   }
@@ -154,23 +151,23 @@ public:
   }
 
   /**
-   * Get the index of a name in the well-ordering
+   * Get the index of a name in the well-ordering_
    */
   size_t operator[](const std::string & name) {
     const auto it = name_to_id_.find(name);
 
     if (it == name_to_id_.end())
-      throw std::out_of_range(name + " is not in the controller ordering.");
+      throw std::out_of_range(name + " is not in the controller ordering_.");
 
     return it->second;
   }
 
   /**
-   * Get the name in the well-ordering at the given index
+   * Get the name in the well-ordering_ at the given index
    */
   const std::string& operator[](const size_t id) {
     if (id > handles_.size())
-      throw std::out_of_range("Requested controller name larger than the number of elements in the well-ordering.");
+      throw std::out_of_range("Requested controller name larger than the number of elements in the well-ordering_.");
 
     return handles_[id].name;
   }
@@ -222,13 +219,13 @@ private:
       in_degrees.emplace_back(handles_[i].dependencies->size());
       if (in_degrees[i] == 0)
       {
-        // This element is a root, so we can safely add it to the ordering
+        // This element is a root, so we can safely add it to the ordering_
         ordering.emplace_back(i);
         ++root_count;
       }
     }
 
-    // Iterate over every element in the ordering to try add its children to the ordering
+    // Iterate over every element in the ordering_ to try add its children to the ordering_
     for (size_t i = 0; i < ordering.size(); ++i)
     {
       const auto id = ordering[i];
@@ -239,7 +236,7 @@ private:
         // decrement the in_degree
         const auto child_in_degree = --in_degrees[child];
 
-        // If we decremented to 0, we can safely add it to the ordering
+        // If we decremented to 0, we can safely add it to the ordering_
         if (child_in_degree == 0)
           ordering.emplace_back(child);
       }
@@ -250,7 +247,7 @@ private:
       // Uh oh! The graph is not acyclic!
       const auto logger = rclcpp::get_logger("controller_ordering");
       RCLCPP_ERROR(logger,
-                   "Failed to create a well-ordering for controller activation! You had a cycle in activation order "
+                   "Failed to create a well-ordering_ for controller activation! You had a cycle in activation order "
                    "that might involve these controller names:");
 
       // Log the names of all handles_ with an in_degree > 0
@@ -278,7 +275,7 @@ private:
       inverse_ordering[ordering[i]] = i;
     }
 
-    // Move handles to match the new ordering
+    // Move handles to match the new ordering_
     std::vector<Handle> new_handles{};
     for (size_t i = 0; i < ordering.size(); ++i) {
       const auto& old_handle = handles_[ordering[i]];
@@ -295,7 +292,7 @@ private:
     }
     handles_ = std::move(new_handles);
 
-    // Update the ids in the name_to_id_ map to match new ordering
+    // Update the ids in the name_to_id_ map to match new ordering_
     for (auto& [_, id] : name_to_id_) {
       id = inverse_ordering[id];
     }
