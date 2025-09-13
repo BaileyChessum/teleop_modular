@@ -49,6 +49,14 @@ public:
 
   /**
    * @brief Attempts to activate a control mode.
+   * @param activate The names of the control modes to activate.
+   * @param deactivate The names of the control modes to deactivate.
+   * @return True if successfully switched to the control modes.
+   */
+  bool switch_control_mode(const std::vector<std::string> & activate, const std::vector<std::string> & deactivate);
+
+  /**
+   * @brief Attempts to activate a control mode.
    * @param name The name of the control mode to load.
    * @return True if successfully switched to the control mode.
    */

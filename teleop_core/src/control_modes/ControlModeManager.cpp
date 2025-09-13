@@ -18,6 +18,7 @@
 #include "teleop_core/utilities/get_parameter.hpp"
 #include "teleop_core/control_modes/fake_input_collection.hpp"
 #include "teleop_core/control_modes/fake_event_collection.hpp"
+#include <algorithm>
 
 namespace teleop::internal
 {
@@ -172,6 +173,97 @@ void ControlModeManager::activate_initial_control_mode()
   }
 }
 
+bool ControlModeManager::switch_control_mode(
+  const std::vector<std::string> & activate,
+  const std::vector<std::string> & deactivate)
+{
+  const auto logger = node_->get_logger();
+
+  // First populate activate_names and deactivate_names to filter any duplicates
+  const std::set<std::string> activate_names(activate.begin(), activate.end());
+  const std::set<std::string> deactivate_names(deactivate.begin(), deactivate.end());
+
+  // for (const auto& name : activate_names) {
+  //   deactivate_names.remove(name);
+  // }
+
+  std::vector<std::string> activate_controllers{};
+  std::vector<std::string> activate_controllers_set{};
+
+  // Get the names of controllers to activate first
+
+
+  std::vector<std::string> deactivate_controllers_reversed{};
+  std::set<std::string> deactivate_controllers_set{};
+  std::set<std::string> common_controllers_set;
+
+  // Deactivate control modes
+  for (const auto& name : deactivate) {
+    // Check if this name is being activated, and ignore if it is
+    if (activate_names.find(name) != activate_names.end()) {
+      RCLCPP_WARN(logger, "Tried to deactivate control mode \"%s\", but it was also in the list to be activated. Skipping...", name.c_str());
+      continue;
+    }
+
+    // Get the control mode to deactivate
+    const auto it = control_modes_.find(name);
+    if (it == control_modes_.end()) {
+      RCLCPP_ERROR(logger, "Unable to find control mode with name \"%s\" to deactivate.", name.c_str());
+      continue;
+    }
+    const auto& mode = it->second;
+
+    // TODO: Check that this control mode isn't also being activated
+
+    if (!mode->is_active()) {
+      continue;
+    }
+
+    mode->get_node()->deactivate();
+
+    // Add controllers to deactivate
+    for (const auto & controller : mode->get_controllers()) {
+      if (deactivate_controllers_set.find(controller) != deactivate_controllers_set.end()) {
+        continue;
+      }
+
+      // TODO: Make sure we dont deactivate controllers also being activated
+
+      const auto insert_result = deactivate_controllers_set.insert(controller);
+
+      // Only add to the list of deactivations if the insertion actually took place
+      // (i.e. this is the first time the control mode has been seen)
+      if (insert_result.second)
+        deactivate_controllers_reversed.push_back(controller);
+    }
+  }
+
+  for (const auto& name : activate_names) {
+    // Get the control mode
+    const auto it = control_modes_.find(name);
+    if (it == control_modes_.end()) {
+      RCLCPP_ERROR(logger, "Unable to find control mode with name \"%s\".", name.c_str());
+      continue;
+    }
+    const auto& mode = *it;
+
+    // Skip anything already active
+    if (mode->is_active()) {
+      RCLCPP_WARN(logger, "Tried to activate control mode with name \"%s\", but it is already activated. Skipping...", name.c_str());
+      continue;
+    }
+
+    mode.
+
+
+
+  }
+
+
+}
+
+
+
 bool ControlModeManager::set_control_mode(const std::string & name)
 {
   const auto logger = node_->get_logger();
@@ -295,13 +387,13 @@ void ControlModeManager::update(const rclcpp::Time & now, const rclcpp::Duration
 
   if (!any_control_mode_updated) {
     const auto logger = node_->get_logger();
-    RCLCPP_WARN(logger, "ControlModeManager::update(): No mode is active!");
+    std::stringstream log;
 
     for (const auto & [name, control_mode] : control_modes_) {
-      RCLCPP_WARN(
-        logger, "  - %s is %s", name.c_str(),
-        control_mode->get_lifecycle_state().label().c_str());
+      log << "\n  - " << name << " is " << control_mode->get_lifecycle_state().label();
     }
+
+    RCLCPP_WARN_THROTTLE(logger, *node_->get_clock(), 2000, "ControlModeManager::update(): No mode is active!%s", );
   }
 }
 
