@@ -49,7 +49,7 @@ public:
    * For each control mode, declares what the controller names are. This allows the ordering to be calculated.
    * The service loop thread_ is started as a side effect.
    */
-  void register_controllers_for_ids(const std::vector<std::reference_wrapper<std::vector<std::string>>> & controller_names_for_ids)
+  void register_controllers_for_ids(const std::vector<std::reference_wrapper<const std::vector<std::string>>> & controller_names_for_ids)
   {
     if (worker_) {
       worker_->end_loop();
@@ -75,8 +75,8 @@ public:
    * \param activate_cm_ids The set of control mode ids being activated
    * \param deactivate_cm_ids The set of control mode ids being deactivated
    */
-  void switch_active(const std::vector<size_t> & activate_cm_ids, const std::vector<size_t> & deactivate_cm_ids) {
-    mutate_desired_active_controllers(activate_cm_ids, deactivate_cm_ids);
+  void switch_active(const std::vector<size_t> & deactivate_cm_ids, const std::vector<size_t> & activate_cm_ids) {
+    mutate_desired_active_controllers(deactivate_cm_ids, activate_cm_ids);
     invoke_update();
   }
 
@@ -104,6 +104,42 @@ public:
     // Start a new worker thread
     worker_ = std::make_shared<Worker>(context_);
     worker_->invoke_update();
+  }
+
+  /**
+   * Gets the differences of two sets left and right
+   * \param[out] left_difference left - right
+   * \param[out] right_difference right - left
+   */
+  static void set_differences(
+      const std::set<size_t> & left,
+      const std::set<size_t> & right,
+      std::set<size_t> & left_difference,
+      std::set<size_t> & right_difference)
+  {
+    left_difference.clear();
+    right_difference.clear();
+
+    auto l_it = left.begin();
+    auto r_it = right.begin();
+
+    while (l_it != left.end() && r_it != right.end()) {
+      if (*l_it < *r_it) {
+        left_difference.insert(*l_it);
+        ++l_it;
+      } else if (*l_it < *r_it) {
+        right_difference.insert(*r_it);
+        ++r_it;
+      } else {
+        // element is common to both sets, skip both
+        ++l_it;
+        ++r_it;
+      }
+    }
+
+    // Finish inserting elements for the other set when we finish inserting elements for one set
+    left_difference.insert(l_it, left.end());
+    right_difference.insert(r_it, right.end());
   }
 
 private:
@@ -422,46 +458,10 @@ private:
   };
 
   /**
-   * Gets the differences of two sets left and right
-   * \param[out] left_difference left - right
-   * \param[out] right_difference right - left
-   */
-  static void set_differences(
-      const std::set<size_t> & left,
-      const std::set<size_t> & right,
-      std::set<size_t> & left_difference,
-      std::set<size_t> & right_difference)
-  {
-    left_difference.clear();
-    right_difference.clear();
-
-    auto l_it = left.begin();
-    auto r_it = right.begin();
-
-    while (l_it != left.end() && r_it != right.end()) {
-      if (*l_it < *r_it) {
-        left_difference.insert(*l_it);
-        ++l_it;
-      } else if (*l_it < *r_it) {
-        right_difference.insert(*r_it);
-        ++r_it;
-      } else {
-        // element is common to both sets, skip both
-        ++l_it;
-        ++r_it;
-      }
-    }
-
-    // Finish inserting elements for the other set when we finish inserting elements for one set
-    left_difference.insert(l_it, left.end());
-    right_difference.insert(r_it, right.end());
-  }
-
-  /**
    * Holds a mutex on desired_active_controllers_, then removes controller ids associated with each deactivate_cm_ids
    * entry, and adds controller ids associated with each activate_cm_ids entry.
    */
-  void mutate_desired_active_controllers(const std::vector<size_t> & activate_cm_ids, const std::vector<size_t> & deactivate_cm_ids) {
+  void mutate_desired_active_controllers(const std::vector<size_t> & deactivate_cm_ids, const std::vector<size_t> & activate_cm_ids) {
     // Get deactivate ids
     std::vector<std::reference_wrapper<std::set<size_t>>> deactivate_id_sets{};
     deactivate_id_sets.reserve(deactivate_cm_ids.size());
@@ -469,19 +469,19 @@ private:
       deactivate_id_sets.emplace_back(std::ref(context_->controllers_for_ids_[cm_id]));
     const auto deactivate_ids = ControllerOrdering::merge_id_sets(deactivate_id_sets);
 
-    // Hold lock
-    std::lock_guard lock(context_->desired_active_controllers_mutex_);
-
-    // Remove from desired ids
-    for (const auto id : deactivate_ids)
-      context_->desired_active_controllers_.erase(id);
-
     // Get activate ids
     std::vector<std::reference_wrapper<std::set<size_t>>> activate_id_sets{};
     activate_id_sets.reserve(activate_cm_ids.size());
     for (const auto cm_id : activate_cm_ids)
       activate_id_sets.emplace_back(std::ref(context_->controllers_for_ids_[cm_id]));
     const auto activate_ids = ControllerOrdering::merge_id_sets(activate_id_sets);
+
+    // Hold lock
+    std::lock_guard lock(context_->desired_active_controllers_mutex_);
+
+    // Remove from desired ids
+    for (const auto id : deactivate_ids)
+      context_->desired_active_controllers_.erase(id);
 
     // Add to desired ids
     for (const auto id : activate_ids)

@@ -24,6 +24,7 @@
 #include "teleop_core/inputs/InputManager.hpp"
 #include "teleop_core/inputs/input_pipeline_builder.hpp"
 #include "control_mode/event/event_collection.hpp"
+#include "teleop_core/control_modes/controller_manager_manager.hpp"
 
 namespace teleop::internal
 {
@@ -149,12 +150,19 @@ private:
   /// Used to get events from when configuring inputs
   control_mode::EventCollection& events_;
 
+  /// Helps with switching controllers in ros2_control, managing separate threads, error recovery and activation order.
+  ControllerManagerManager controllers_ = ControllerManagerManager(node_);
+
   // Control modes
   /// Loads the control modes, and needs to stay alive during the whole lifecycle of the control modes.
   std::unique_ptr<pluginlib::ClassLoader<control_mode::ControlMode>> control_mode_loader_;
 
+  // TODO: Replace with control_modes_by_id_ and name_to_cm_id_
   /// Currently loaded control modes.
   std::map<std::string, std::shared_ptr<control_mode::ControlMode>> control_modes_{};
+
+  std::vector<std::shared_ptr<control_mode::ControlMode>> control_modes_by_id_{};
+  std::map<std::string, size_t> name_to_cm_id_{};
 };
 
 }  // namespace teleop::internal
