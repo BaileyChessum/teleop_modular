@@ -103,6 +103,7 @@ public:
 
     // Start a new worker thread
     worker_ = std::make_shared<Worker>(context_);
+    worker_->start();
     worker_->invoke_update();
   }
 
@@ -149,6 +150,7 @@ private:
   struct Context {
     explicit Context(const rclcpp::Node::SharedPtr & node);
 
+    rclcpp::Node::SharedPtr node;
     /// Client to call the service on the controller manager to change the currently active controllers.
     rclcpp::Client<controller_manager_msgs::srv::SwitchController>::SharedPtr switch_controller_client_ = nullptr;
 
@@ -165,7 +167,7 @@ private:
     /// Mutex to guard desired_active_controllers_ changes
     std::mutex desired_active_controllers_mutex_{};
 
-    rclcpp::Logger logger_;
+    rclcpp::Logger logger;
   };
 
   /**
@@ -175,7 +177,14 @@ private:
   class Worker : public std::enable_shared_from_this<Worker> {
   public:
     explicit Worker(std::shared_ptr<Context> context) : context_(std::move(context)) {
-      start();
+    }
+
+    ~Worker() {
+      if (thread_.joinable()) {
+        RCLCPP_ERROR(context_->logger, "Tried to destruct a worker thread without joining the running thread.");
+        thread_.detach();
+      }
+      thread_ = {};
     }
 
     /**
@@ -199,6 +208,8 @@ private:
     void end_loop() {
       running_.store(false, std::memory_order_release);
       update_condition_.notify_all();
+
+      thread_.detach();
     }
 
     /**
@@ -220,7 +231,7 @@ private:
      */
     void invoke_update() {
       if (!can_invoke_update()) {
-        RCLCPP_ERROR(context_->logger_, "Tried to invoke an update, but can_invoke_update() is false.");
+        RCLCPP_ERROR(context_->logger, "Tried to invoke an update, but can_invoke_update() is false.");
         return;
       }
 
@@ -235,7 +246,7 @@ private:
      * Entry point the the worker thread.
      */
     void main() {
-      RCLCPP_DEBUG(context_->logger_, "Starting service loop.");
+      RCLCPP_DEBUG(context_->logger, "Starting service loop.");
 
       while (running_.load()) {
         wait_for_change();
@@ -251,7 +262,7 @@ private:
         wait_for_future();
       }
 
-      RCLCPP_DEBUG(context_->logger_, "Service loop ending.");
+      RCLCPP_DEBUG(context_->logger, "Service loop ending.");
     }
 
     /**
@@ -304,7 +315,7 @@ private:
           auto result = future_->get(); // consume future
           service_future_result(result);
         } catch (const std::exception& e) {
-           RCLCPP_ERROR(context_->logger_, "Service call failed: %s", e.what());
+           RCLCPP_ERROR(context_->logger, "Service call failed: %s", e.what());
         }
         break;  // done with this request
       }
@@ -367,7 +378,7 @@ private:
       }
 
       if (running() && !result) {
-        RCLCPP_ERROR(context_->logger_, "Controller manager not available after %d attempts. Stopping attempts.",
+        RCLCPP_ERROR(context_->logger, "/controller_manager/switch_controller not available after %d attempts. Stopping attempts.",
                      max_attempts);
       }
     }
@@ -385,7 +396,7 @@ private:
       }
 
       if (!context_->switch_controller_client_->service_is_ready()) {
-        RCLCPP_ERROR(context_->logger_, "Controller manager service not available.");
+        RCLCPP_WARN_THROTTLE(context_->logger, *context_->node->get_clock(), 2000, "/controller_manager/switch_controller service not currently available.");
         return false;
       }
 
@@ -417,6 +428,8 @@ private:
         context_->desired_active_controllers_ = context_->current_active_controllers_;
       }
 
+      RCLCPP_INFO(context_->logger, "Successfully switched controllers.");
+
       // TODO: We could add a sanity check call to
       //  /controller_manager/list_controllers : controller_manager_msgs/srv/ListControllers to double check
     }
@@ -425,6 +438,8 @@ private:
      * Called whenever a switch request finished without succeeding.
      */
     void on_switch_failure() {
+      RCLCPP_ERROR(context_->logger, "Failed to switch controllers.");
+
       // TODO: Get current active controllers by calling /controller_manager/list_controllers : controller_manager_msgs/srv/ListControllers
 
       // TODO: Warn of any irreconcilable differences in desired state. Did an important controller fail?

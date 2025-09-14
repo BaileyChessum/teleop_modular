@@ -18,7 +18,6 @@
 #include <set>
 #include <string>
 #include <map>
-#include <math.h>
 #include <optional>
 #include <rclcpp/logging.hpp>
 #include <algorithm>

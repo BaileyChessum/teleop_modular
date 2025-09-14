@@ -66,10 +66,10 @@ buildRosPackage {
   doCheck = true;
 
   # Added to debug a crazy segfault
-  # dontStrip = true;
-  # CMAKE_BUILD_TYPE = "Debug";
-  # cmakeFlags = [
-  #   "-DCMAKE_BUILD_TYPE=Debug"
-  #   "-DCMAKE_CXX_FLAGS=-g"
-  # ];
+  dontStrip = true;
+  CMAKE_BUILD_TYPE = "Debug";
+  cmakeFlags = [
+    "-DCMAKE_BUILD_TYPE=Debug"
+    "-DCMAKE_CXX_FLAGS=-g"
+  ];
 }
