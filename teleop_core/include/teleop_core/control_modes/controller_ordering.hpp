@@ -103,6 +103,14 @@ public:
   }
 
   /**
+   * Returns true if the ordering defines an order for the given name
+   */
+  [[nodiscard]] inline bool contains(const std::string & name) const noexcept {
+    const auto it = name_to_id_.find(name);
+    return it != name_to_id_.end();
+  }
+
+  /**
    * Get the name in the well-ordering_ at the given index
    */
   const std::string& operator[](const size_t id) {

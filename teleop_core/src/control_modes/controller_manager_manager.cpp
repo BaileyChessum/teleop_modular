@@ -24,6 +24,9 @@ ControllerManagerManager::Context::Context(const rclcpp::Node::SharedPtr& node)
   switch_controller_client_ =
       node->create_client<controller_manager_msgs::srv::SwitchController>(
           "/controller_manager/switch_controller");
+  list_controllers_client_ =
+      node->create_client<controller_manager_msgs::srv::ListControllers>(
+          "/controller_manager/list_controllers");
 }
 
 }  // namespace teleop
