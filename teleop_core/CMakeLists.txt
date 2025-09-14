@@ -61,7 +61,6 @@ add_library(${PROJECT_NAME} SHARED
   src/inputs/input_pipeline_builder.cpp
 
   src/control_modes/controller_manager_manager.cpp
-  src/control_modes/controller_manager_manager_worker.cpp
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)  # Require C++17
