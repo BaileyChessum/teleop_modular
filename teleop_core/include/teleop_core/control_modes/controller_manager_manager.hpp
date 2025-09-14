@@ -268,18 +268,28 @@ private:
     void main() {
       RCLCPP_DEBUG(context_->logger, "Starting service loop.");
 
-      while (running_.load()) {
+      while (running()) {
         wait_for_change();
 
-        if (!running_.load())
+        if (!running())
           break;
 
         update_controllers();
 
-        if (!running_.load())
+        if (!running())
           break;
 
-        wait_for_future();
+        // Don't do sanity check if theres nothing in ros2_control
+        if (!context_->desired_active_controllers_.empty() || !context_->current_active_controllers_.empty()) {
+          // Check the actual active controllers in ros2_control
+          if (get_actual_current_controllers()) {
+            if (!running())
+              break;
+
+            // Something changed as a result of checking ros2_control, so perform another update on the controllers
+            update_controllers();
+          }
+        }
       }
 
       RCLCPP_DEBUG(context_->logger, "Service loop ending.");
@@ -322,22 +332,19 @@ private:
      * Waits until the future is ready.
      * Polls running_ every 100ms to try stop
      */
-    void wait_for_future() {
+    controller_manager_msgs::srv::SwitchController::Response::SharedPtr wait_for_future() {
       // Wait for any switch controllers future to complete
       while (running_.load() && future_.has_value() && future_->valid()) {
         // TODO: Parameterize period
         auto status = future_->wait_for(std::chrono::milliseconds(100));
 
-        if (status == std::future_status::timeout) {
-          RCLCPP_ERROR(context_->logger, "Switch controller request timed out!");
-          break;
-        }
         if (status != std::future_status::ready)
           continue;
 
         try {
           auto result = future_->get(); // consume future
-          service_future_result(result);
+          future_ = std::nullopt;
+          return result;
         }
         catch (const std::exception& e) {
           RCLCPP_ERROR(context_->logger, "Service call failed: %s", e.what());
@@ -346,13 +353,15 @@ private:
         future_ = std::nullopt;
         break;  // done with this request
       }
+
+      return nullptr;
     }
 
     /**
      * Waits until the list_future_ is ready.
      * Polls running_ every 100ms to try stop
      */
-    void wait_for_list_future() {
+    controller_manager_msgs::srv::ListControllers::Response::SharedPtr wait_for_list_future() {
       // Wait for any switch controllers future to complete
       while (running_.load() && list_future_.has_value() && list_future_->valid()) {
         // TODO: Parameterize period
@@ -370,8 +379,9 @@ private:
         }
 
         try {
-          auto result = list_future_->get(); // consume future
-          service_list_future_result(result);
+          auto result = list_future_->get();
+          list_future_ = std::nullopt;
+          return result;
         }
         catch (const std::exception& e) {
           RCLCPP_ERROR(context_->logger, "List service call failed: %s", e.what());
@@ -380,6 +390,8 @@ private:
         list_future_ = std::nullopt;
         break;  // done with this request
       }
+
+      return nullptr;
     }
 
     /**
@@ -456,6 +468,15 @@ private:
         RCLCPP_ERROR(context_->logger, "/controller_manager/switch_controller not available after %d attempts. Stopping attempts.",
                      max_attempts);
       }
+
+      if (!running())
+        return;
+
+      auto response = wait_for_future();
+      if (!response)
+        return;
+
+      service_future_result(response);
     }
 
     /**
@@ -527,9 +548,10 @@ private:
 
     /**
      * Called when we get the result back from a list controllers request
+     * \returns whether anything in current_active_controllers actually changed as a result of this method call.
      */
-    void service_list_future_result(const controller_manager_msgs::srv::ListControllers::Response::SharedPtr & response) {
-      RCLCPP_INFO(context_->logger, "Actual controller states were found!");
+    bool service_list_future_result(const controller_manager_msgs::srv::ListControllers::Response::SharedPtr & response) {
+      bool changed = false;
 
       {
         std::lock_guard lock2(context_->current_active_controllers_mutex_);
@@ -558,10 +580,15 @@ private:
           RCLCPP_INFO(context_->logger, "  - \"%s\" (id: %lu)\t: %s",
                       controller.name.c_str(), id, controller.state.c_str());
 
-          if (is_active)
-            context_->current_active_controllers_.insert(id);
-          else
-            context_->current_active_controllers_.erase(id);
+          if (is_active) {
+            auto [_, element_changed] = context_->current_active_controllers_.insert(id);
+            changed = changed || element_changed;
+          }
+          else {
+            auto no_elements_erased = context_->current_active_controllers_.erase(id);
+            if (no_elements_erased > 0)
+              changed = true;
+          }
         }
       }
 
@@ -571,14 +598,11 @@ private:
         const auto name = context_->ordering_[id];
         RCLCPP_INFO(context_->logger, "  - \"%s\" (id: %lu)", name.c_str(), id);
       }
+
+      return changed;
     }
 
-    /**
-     * Called whenever a switch request finished without succeeding.
-     */
-    void on_switch_failure() {
-      RCLCPP_ERROR(context_->logger, "Failed to switch controllers.");
-
+    bool get_actual_current_controllers() {
       // TODO: Get current active controllers by calling /controller_manager/list_controllers : controller_manager_msgs/srv/ListControllers
       while (!context_->switch_controller_client_->service_is_ready() && running()) {
         RCLCPP_ERROR(context_->logger, "List controllers service is not ready.");
@@ -586,29 +610,29 @@ private:
       }
 
       if (!running())
-        return;
+        return false;
 
       RCLCPP_INFO(context_->logger, "Getting the actual controllers states from the controller manager...");
       const auto request = std::make_shared<controller_manager_msgs::srv::ListControllers::Request>();
       list_future_ = context_->list_controllers_client_->async_send_request(request);
 
-      wait_for_list_future();
+      auto response = wait_for_list_future();
+      if (!response)
+        return false;
+
+      service_list_future_result(response);
 
       if (!running())
-        return;
+        return false;
 
-      update_controllers();
+      return true;
+    }
 
-
-
-      // TODO: Warn of any irreconcilable differences in desired state. Did an important controller fail?
-
-      // TODO: Load the current active controllers into context_->current_active_controllers_
-
-      // TODO: Load any missing controllers, with warning
-
-      // TODO: Perform switch request to make the controller
-
+    /**
+     * Called whenever a switch request finished without succeeding.
+     */
+    void on_switch_failure() {
+      RCLCPP_ERROR(context_->logger, "Failed to switch controllers.");
     }
 
     std::shared_ptr<Context> context_;
