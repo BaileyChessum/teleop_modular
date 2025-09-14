@@ -20,7 +20,6 @@
 #include "teleop_core/events/EventCollection.hpp"
 
 namespace {
-
   constexpr float EPSILON = 1e-6;
 }
 

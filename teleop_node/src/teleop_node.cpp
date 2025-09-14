@@ -10,7 +10,7 @@
 #include "teleop_node/teleop_node.hpp"
 
 #include "teleop_core/colors.hpp"
-#include "teleop_core/control_modes/ControlModeManager.hpp"
+#include "teleop_core/control_modes/control_mode_manager.hpp"
 #include <iostream>
 #include "teleop_core/utilities/get_parameter.hpp"
 

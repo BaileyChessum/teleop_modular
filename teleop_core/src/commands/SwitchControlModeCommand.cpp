@@ -12,7 +12,7 @@
 //
 
 #include "teleop_core/commands/SwitchControlModeCommand.hpp"
-#include "teleop_core/control_modes/ControlModeManager.hpp"
+#include "teleop_core/control_modes/control_mode_manager.hpp"
 
 namespace teleop
 {

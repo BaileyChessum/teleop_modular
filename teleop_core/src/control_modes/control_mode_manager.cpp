@@ -8,7 +8,7 @@
 //     http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#include "teleop_core/control_modes/ControlModeManager.hpp"
+#include "teleop_core/control_modes/control_mode_manager.hpp"
 
 #include <controller_manager_msgs/srv/detail/switch_controller__struct.hpp>
 #include <lifecycle_msgs/msg/detail/state__struct.hpp>

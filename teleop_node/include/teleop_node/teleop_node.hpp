@@ -13,7 +13,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 
-#include "teleop_core/control_modes/ControlModeManager.hpp"
+#include "teleop_core/control_modes/control_mode_manager.hpp"
 #include "teleop_core/input_sources/InputSourceManager.hpp"
 #include "teleop_core/commands/CommandManager.hpp"
 #include "teleop_core/inputs/state/StateManager.hpp"

@@ -36,7 +36,7 @@ add_library(${PROJECT_NAME} SHARED
   src/inputs/Button.cpp
   src/inputs/Axis.cpp
   src/commands/Command.cpp
-  src/control_modes/ControlModeManager.cpp
+  src/control_modes/control_mode_manager.cpp
   src/inputs/InputManager.cpp
   src/events/EventCollection.cpp
 
@@ -59,10 +59,9 @@ add_library(${PROJECT_NAME} SHARED
   src/inputs/InputMap.cpp
 
   src/inputs/input_pipeline_builder.cpp
-  include/teleop_core/control_modes/controller_manager_manager.cpp
-  include/teleop_core/control_modes/controller_manager_manager.hpp
-  include/teleop_core/control_modes/controller_manager_manager_worker.cpp
-  include/teleop_core/control_modes/controller_manager_manager_worker.hpp
+
+  src/control_modes/controller_manager_manager.cpp
+  src/control_modes/controller_manager_manager_worker.cpp
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)  # Require C++17
