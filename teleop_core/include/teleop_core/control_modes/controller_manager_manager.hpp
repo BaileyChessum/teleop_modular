@@ -33,21 +33,28 @@ namespace teleop
 class ControllerManagerManager
 {
 public:
-  ControllerManagerManager(rclcpp::Node::SharedPtr node)
+  explicit ControllerManagerManager(rclcpp::Node::SharedPtr node)
     : node_(std::move(node))
   {
   }
 
   ~ControllerManagerManager() {
+    if (worker_) {
+      worker_->end_loop();
+      worker_ = nullptr;
+    }
   }
 
   /**
    * For each control mode, declares what the controller names are. This allows the ordering to be calculated.
    * The service loop thread_ is started as a side effect.
    */
-  void register_controllers_for_ids(const std::vector<std::reference_wrapper<std::vector<std::string>>>& controller_names_for_ids)
+  void register_controllers_for_ids(const std::vector<std::reference_wrapper<std::vector<std::string>>> & controller_names_for_ids)
   {
-    // TODO: Stop any running thread
+    if (worker_) {
+      worker_->end_loop();
+      worker_ = nullptr;
+    }
 
     for (const auto& names_ref : controller_names_for_ids)
       context_->ordering_.add(names_ref.get());
@@ -64,13 +71,9 @@ public:
   }
 
   /**
-   * Function run by thread_
-   */
-  void service_loop() {
-  }
-
-  /**
    * Tries to update the active controllers, given control mode ids to be activated and deactivated.
+   * \param activate_cm_ids The set of control mode ids being activated
+   * \param deactivate_cm_ids The set of control mode ids being deactivated
    */
   void switch_active(const std::vector<size_t> & activate_cm_ids, const std::vector<size_t> & deactivate_cm_ids) {
     mutate_desired_active_controllers(activate_cm_ids, deactivate_cm_ids);
@@ -79,6 +82,25 @@ public:
 
   void invoke_update() {
     // TODO: Spawn or reuse thread to perform update here
+
+    if (worker_ && !worker_->running())
+      worker_ = nullptr;  //< Should never run, but added for safety
+
+    if (worker_) {
+      if (worker_->can_invoke_update()) {
+        // Reuse existing worker thread
+        worker_->invoke_update();
+        return;
+      }
+
+      // Kill the existing worker thread
+      worker_->end_loop();
+      worker_ = nullptr;
+    }
+
+    // Start a new worker thread
+    worker_ = std::make_shared<Worker>(context_);
+    worker_->invoke_update();
   }
 
 
@@ -87,7 +109,7 @@ private:
    * Contains data shared between the class and any Workers
    */
   struct Context {
-    explicit Context(const rclcpp::Node::SharedPtr& node);
+    explicit Context(const rclcpp::Node::SharedPtr & node);
 
     /// Client to call the service on the controller manager to change the currently active controllers.
     rclcpp::Client<controller_manager_msgs::srv::SwitchController>::SharedPtr switch_controller_client_ = nullptr;
@@ -95,7 +117,12 @@ private:
     std::vector<std::set<size_t>> controllers_for_ids_{};  //< set of controller ids for each control mode id
     ControllerOrdering ordering_{};
 
+    /// The set of controllers we think are actually active on the controller manager
     std::set<size_t> current_active_controllers_{};
+    /// Mutex to guard current_active_controllers_ changes
+    std::mutex current_active_controllers_mutex_{};
+
+    /// The set of controllers we want to be active on the controller manager
     std::set<size_t> desired_active_controllers_{};
     /// Mutex to guard desired_active_controllers_ changes
     std::mutex desired_active_controllers_mutex_{};
@@ -119,7 +146,6 @@ private:
     void start() {
       if (running_.load())
         return;
-
       running_ = true;
       auto self = shared_from_this();
 
@@ -133,25 +159,36 @@ private:
      * Make the thread stop without waiting for the thread to stop.
      */
     void end_loop() {
-      running_ = false;
+      running_.store(false, std::memory_order_release);
+      update_condition_.notify_all();
     }
 
     /**
      * Returns true if this worker can accept a new update
      */
     [[nodiscard]] inline bool can_invoke_update() const noexcept {
-      return can_invoke_update_.load();
+      return can_invoke_update_.load(std::memory_order_acquire);
+    }
+
+    /**
+     * Returns true if this worker is runnign
+     */
+    [[nodiscard]] inline bool running() const noexcept {
+      return running_.load(std::memory_order_acquire);
     }
 
     /**
      * Unblocks the service thread to send a new message to the controller manager.
      */
     void invoke_update() {
-      {
-        std::lock_guard lock(mutex_);
-        should_update_ = true;
+      if (!can_invoke_update()) {
+        RCLCPP_ERROR(context_->logger_, "Tried to invoke an update, but can_invoke_update() is false.");
+        return;
       }
 
+      std::lock_guard lock(mutex_); //< Just to be safe with needing to reset after waiting
+
+      should_update_.store(true, std::memory_order_release);
       update_condition_.notify_one();
     }
 
@@ -163,12 +200,12 @@ private:
         wait_for_change();
 
         if (!running_.load())
-          continue;
+          break;
 
         update_controllers();
 
         if (!running_.load())
-          continue;
+          break;
 
         wait_for_future();
       }
@@ -176,9 +213,48 @@ private:
       RCLCPP_DEBUG(context_->logger_, "Service loop ending.");
     }
 
+    /**
+     * Blocks until desired_active_controllers_ changes (should_update_ becomes true),
+     * or the thread should stop running (running_ becomes false)
+     */
+    void wait_for_change() {
+      std::unique_lock lock(mutex_);
+      can_invoke_update_.store(true, std::memory_order_release);
+
+      // Wait for changes to desired_active_controllers_
+      update_condition_.wait(
+          lock, [&] {
+            return should_update_.load(std::memory_order_acquire) || !running_.load(std::memory_order_acquire);
+          });
+
+      should_update_.store(false, std::memory_order_release);
+      can_invoke_update_.store(false, std::memory_order_release);
+    }
+
+
+    /**
+     * Waits for a given amount of time, or until the thread needs to exit
+     */
+    template<typename TRep, typename TPeriod>
+    bool wait_for(const std::chrono::duration<TRep, TPeriod> & wait_time) {
+      std::unique_lock lock(mutex_);
+
+      // Wait for changes to desired_active_controllers_
+      auto result = update_condition_.wait_for(lock, wait_time, [&] {
+        return !running_.load(std::memory_order_acquire);
+      });
+
+      return result;
+    }
+
+    /**
+     * Waits until the future is ready.
+     * Polls running_ every 100ms to try stop
+     */
     void wait_for_future() {
       // Wait for any switch controllers future to complete
       while (running_.load() && future_.has_value() && future_->valid()) {
+        // TODO: Parameterize period
         auto status = future_->wait_for(std::chrono::milliseconds(100));
 
         if (status != std::future_status::ready)
@@ -186,9 +262,9 @@ private:
 
         try {
           auto result = future_->get(); // consume future
-          // TODO: Handle the result
+          service_future_result(result);
         } catch (const std::exception& e) {
-          // RCLCPP_ERROR(logger_, "Service call failed: %s", e.what());
+           RCLCPP_ERROR(context_->logger_, "Service call failed: %s", e.what());
         }
         break;  // done with this request
       }
@@ -199,16 +275,22 @@ private:
      */
     void update_controllers() {
       std::set<size_t> desired_active_controllers;
-
-      { // Copy active controls while holding a lock
-        std::unique_lock lock(context_->desired_active_controllers_mutex_);
-        desired_active_controllers = context_->desired_active_controllers_;
-      }
+      std::set<size_t> current_active_controllers;
 
       std::set<size_t> deactivate_set{};
       std::set<size_t> activate_set{};
 
-      set_differences(context_->current_active_controllers_, desired_active_controllers, deactivate_set, activate_set);
+      { // Copy current controls while holding a lock
+        std::lock_guard lock(context_->current_active_controllers_mutex_);
+        current_active_controllers = context_->current_active_controllers_;
+      }
+
+      { // Copy active controls while holding a lock
+        std::lock_guard lock(context_->desired_active_controllers_mutex_);
+        desired_active_controllers = context_->desired_active_controllers_;
+      }
+
+      set_differences(current_active_controllers, desired_active_controllers, deactivate_set, activate_set);
 
       // Convert the id sets into controller names
       std::vector<std::string> deactivate_names{};
@@ -224,8 +306,29 @@ private:
       for (auto id : activate_set)
         activate_names.emplace_back(context_->ordering_[id]);
 
-      // TODO: Send message to the controller manager
-      switch_controllers(deactivate_names, activate_names);
+      if (!running())
+        return;
+
+      // Attempt the switch
+      bool result = switch_controllers(deactivate_names, activate_names);
+
+      // Repeatedly retry a fixed number of times, with a short delay between attempts
+      const int max_attempts = 10;
+      // TODO: Parameterize retry count
+      for (int i = 1; i < max_attempts && !result && running_.load(); ++i) {
+        // Wait for a short amount of time, or until the thread should stop running.
+        // TODO: Parameterize period
+        wait_for(std::chrono::milliseconds(100));
+        if (!running_.load())
+          return;
+
+        result = switch_controllers(deactivate_names, activate_names);
+      }
+
+      if (running() && !result) {
+        RCLCPP_ERROR(context_->logger_, "Controller manager not available after %d attempts. Stopping attempts.",
+                     max_attempts);
+      }
     }
 
     bool switch_controllers(
@@ -248,29 +351,55 @@ private:
       request->activate_asap = true;
 
       future_ = context_->switch_controller_client_->async_send_request(request);
-      future_.value().valid();
 
-      // TODO: Error recovery when the controller isn't able to switch the controllers.
       return true;
     }
 
-    /**
-     * Blocks until desired_active_controllers_ changes, or until future_ receives a value
-     */
-    void wait_for_change() {
-      std::unique_lock lock(mutex_);
 
-      // Wait for changes to desired_active_controllers_
-      update_condition_.wait(
-          lock, [&] {
-            return should_update_.load() || !running_.load();
-          });
+    /**
+     * Called when we get the result back from a switch controller request
+     */
+    void service_future_result(const controller_manager_msgs::srv::SwitchController::Response::SharedPtr & response) {
+      if (!response->ok) {
+        on_switch_failure();
+        return;
+      }
+
+      // We can now assume context_->current_active_controllers_ represents the actual state of the controllers
+      {
+        // TODO: Confirm we wont cause deadlock
+        std::lock_guard lock2(context_->current_active_controllers_mutex_);
+        std::lock_guard lock1(context_->desired_active_controllers_mutex_);
+
+        context_->desired_active_controllers_ = context_->current_active_controllers_;
+      }
+
+      // TODO: We could add a sanity check call to /controller_manager/list_controllers : controller_manager_msgs/srv/ListControllers to double check
+    }
+
+    /**
+     * Called whenever a switch request finished without succeeding.
+     */
+    void on_switch_failure() {
+      // TODO: Get current active controllers by calling /controller_manager/list_controllers : controller_manager_msgs/srv/ListControllers
+
+      // TODO: Warn of any irreconcilable differences in desired state. Did an important controller fail?
+
+      // TODO: Load the current active controllers into context_->current_active_controllers_
+
+      // TODO: Load any missing controllers, with warning
+
+      // TODO: Perform switch request to make the controller
+
     }
 
     std::shared_ptr<Context> context_;
     std::thread thread_;
+
+    // When true, the thread will try its best to exit and die
     std::atomic<bool> running_ = false;
-    std::atomic<bool> can_invoke_update_ = false;
+    // When true, you can request updates from this thread. Otherwise, you need to spawn a new thread and kill this one.
+    std::atomic<bool> can_invoke_update_ = true;
 
     // Concurrency control
     /// Mutex to guard update condition changes
@@ -290,10 +419,10 @@ private:
    * \param[out] right_difference right - left
    */
   static void set_differences(
-      const std::set<size_t>& left,
-      const std::set<size_t>& right,
-      std::set<size_t>& left_difference,
-      std::set<size_t>& right_difference)
+      const std::set<size_t> & left,
+      const std::set<size_t> & right,
+      std::set<size_t> & left_difference,
+      std::set<size_t> & right_difference)
   {
     left_difference.clear();
     right_difference.clear();
@@ -333,7 +462,7 @@ private:
     const auto deactivate_ids = ControllerOrdering::merge_id_sets(deactivate_id_sets);
 
     // Hold lock
-    std::unique_lock lock(context_->desired_active_controllers_mutex_);
+    std::lock_guard lock(context_->desired_active_controllers_mutex_);
 
     // Remove from desired ids
     for (const auto id : deactivate_ids)
@@ -349,18 +478,6 @@ private:
     // Add to desired ids
     for (const auto id : activate_ids)
       context_->desired_active_controllers_.insert(id);
-  }
-
-  void service_future() {
-//    if (future_.has_value())
-
-
-
-  }
-
-  void service_future_result(controller_manager_msgs::srv::SwitchController::Response response) {
-    // TODO: do something with the future feedback. idk
-
   }
 
   rclcpp::Node::SharedPtr node_;
