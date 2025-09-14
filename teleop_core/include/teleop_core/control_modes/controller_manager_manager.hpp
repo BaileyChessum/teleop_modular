@@ -58,32 +58,33 @@ public:
     }
 
     for (const auto& names_ref : controller_names_for_ids)
-      context_->ordering_.add(names_ref.get());
-    context_->ordering_.sort();
+      context_->ordering.add(names_ref.get());
+    context_->ordering.sort();
 
-    context_->controllers_for_ids_.clear();
+    context_->controllers_for_ids.clear();
     for (const auto& names_ref : controller_names_for_ids)
     {
       std::set<size_t> ids{};
-      context_->ordering_.names_to_ids(names_ref.get(), ids);
+      context_->ordering.names_to_ids(names_ref.get(), ids);
 
-      context_->controllers_for_ids_.emplace_back(std::move(ids));
+      context_->controllers_for_ids.emplace_back(std::move(ids));
     }
 
-    RCLCPP_INFO(context_->logger, "Created controller order:");
-    for (size_t i = 0; i < context_->ordering_.size(); ++i) {
-      RCLCPP_INFO(context_->logger, "  - \"%s\"", context_->ordering_[i].c_str());
-    }
-
-    RCLCPP_INFO(context_->logger, "Control mode controllers:");
-    for (size_t i = 0; i < context_->controllers_for_ids_.size(); ++i) {
-      RCLCPP_INFO(context_->logger, "  [%lu]", i);
-      for (const auto id : context_->controllers_for_ids_[i])
-      {
-        RCLCPP_INFO(context_->logger, "    - \"%s\" (id: %lu)", context_->ordering_[id].c_str(), id);
+    if (context_->params.log_controllers) {
+      RCLCPP_INFO(context_->logger, "Created controller activation order:");
+      for (size_t i = 0; i < context_->ordering.size(); ++i) {
+        RCLCPP_INFO(context_->logger, "  - \"%s\"", context_->ordering[i].c_str());
       }
-    }
+      RCLCPP_INFO(context_->logger, " ");
 
+      RCLCPP_INFO(context_->logger, "Controllers for each control mode:");
+      for (size_t i = 0; i < context_->controllers_for_ids.size(); ++i) {
+        RCLCPP_INFO(context_->logger, "  [%lu]", i);
+        for (const auto id : context_->controllers_for_ids[i])
+          RCLCPP_INFO(context_->logger, "    - \"%s\" (id: %lu)", context_->ordering[id].c_str(), id);
+      }
+      RCLCPP_INFO(context_->logger, " ");
+    }
   }
 
   /**
@@ -166,27 +167,63 @@ private:
    * Contains data shared between the class and any Workers
    */
   struct Context {
+    /**
+     * Parameters used by the controller manager manager
+     */
+    struct Params {
+      /// The name of the controller manager to use
+      std::string controller_manager = "/controller_manager";
+      /// Whether to log info about controller switching
+      bool log_controllers = false;
+
+      /// Whether to wait (for the specified reasonable time) for previous requests to finish before starting new
+      /// switch requests
+      bool impatient = false;
+
+      // switch_controller service message values:
+      int strictness = 2;
+      bool activate_asap = true;
+      builtin_interfaces::msg::Duration timeout{};
+
+      /// Time in seconds to keep waiting for a previous switch request to finish before giving up on it "
+      /// and making a new switch request
+      double reasonable_timeout = 3.0;
+
+      int connection_retry_count = 10;
+      double connection_retry_rate = 10.0;
+    };
+
+    /**
+     * Constructor. Creates service clients and gets param values.
+     */
     explicit Context(const rclcpp::Node::SharedPtr & node);
 
+    /// The main teleop_node ROS2 node
     rclcpp::Node::SharedPtr node;
     /// Client to call the service on the controller manager to change the currently active controllers.
-    rclcpp::Client<controller_manager_msgs::srv::SwitchController>::SharedPtr switch_controller_client_ = nullptr;
+    rclcpp::Client<controller_manager_msgs::srv::SwitchController>::SharedPtr switch_controller_client = nullptr;
     /// Client to call the service on the controller manager to change the currently active controllers.
-    rclcpp::Client<controller_manager_msgs::srv::ListControllers>::SharedPtr list_controllers_client_ = nullptr;
+    rclcpp::Client<controller_manager_msgs::srv::ListControllers>::SharedPtr list_controllers_client = nullptr;
 
-    std::vector<std::set<size_t>> controllers_for_ids_{};  //< set of controller ids for each control mode id
-    ControllerOrdering ordering_{};
+    /// ROS2 node parameters used for configuration of controller manager manager behaviour
+    Params params{};
+
+    /// Contains the set of controller ids to activate for each control mode id
+    std::vector<std::set<size_t>> controllers_for_ids{};  //< set of controller ids for each control mode id
+    /// Contains the controller activation order, and controller id <-> name conversions
+    ControllerOrdering ordering{};
 
     /// The set of controllers we think are actually active on the controller manager
-    std::set<size_t> current_active_controllers_{};
+    std::set<size_t> current_active_controllers{};
     /// Mutex to guard current_active_controllers_ changes
-    std::mutex current_active_controllers_mutex_{};
+    std::mutex current_active_controllers_mutex{};
 
     /// The set of controllers we want to be active on the controller manager
-    std::set<size_t> desired_active_controllers_{};
+    std::set<size_t> desired_active_controllers{};
     /// Mutex to guard desired_active_controllers_ changes
-    std::mutex desired_active_controllers_mutex_{};
+    std::mutex desired_active_controllers_mutex{};
 
+    /// Logger used by all threads. Same as logger for the teleop_node, suffixed with .controller_manager_manager
     rclcpp::Logger logger;
   };
 
@@ -280,7 +317,7 @@ private:
           break;
 
         // Don't do sanity check if theres nothing in ros2_control
-        if (!context_->desired_active_controllers_.empty() || !context_->current_active_controllers_.empty()) {
+        if (!context_->desired_active_controllers.empty() || !context_->current_active_controllers.empty()) {
           // Check the actual active controllers in ros2_control
           if (get_actual_current_controllers()) {
             if (!running())
@@ -333,6 +370,30 @@ private:
      * Polls running_ every 100ms to try stop
      */
     controller_manager_msgs::srv::SwitchController::Response::SharedPtr wait_for_future() {
+      controller_manager_msgs::srv::SwitchController::Response::SharedPtr result = nullptr;
+
+      if (!(running_.load() && future_.has_value() && future_->valid()))
+        return nullptr;
+
+      // Do initial patient waiting
+      if (!context_->params.impatient)
+      {
+        auto wait_duration = std::chrono::duration<double>(context_->params.reasonable_timeout);
+        auto status = future_->wait_for(wait_duration);
+
+        if (status == std::future_status::ready) {
+          try {
+            result = future_->get(); // consume future
+            future_ = std::nullopt;
+            return result;
+          }
+          catch (const std::exception& e) {
+            RCLCPP_ERROR(context_->logger, "Service call failed: %s", e.what());
+            return nullptr;
+          }
+        }
+      }
+
       // Wait for any switch controllers future to complete
       while (running_.load() && future_.has_value() && future_->valid()) {
         // TODO: Parameterize period
@@ -342,19 +403,17 @@ private:
           continue;
 
         try {
-          auto result = future_->get(); // consume future
+          result = future_->get(); // consume future
           future_ = std::nullopt;
           return result;
         }
         catch (const std::exception& e) {
           RCLCPP_ERROR(context_->logger, "Service call failed: %s", e.what());
+          return nullptr;
         }
-
-        future_ = std::nullopt;
-        break;  // done with this request
       }
 
-      return nullptr;
+      return result;
     }
 
     /**
@@ -362,36 +421,51 @@ private:
      * Polls running_ every 100ms to try stop
      */
     controller_manager_msgs::srv::ListControllers::Response::SharedPtr wait_for_list_future() {
+      controller_manager_msgs::srv::ListControllers::Response::SharedPtr result = nullptr;
+
+      if (!(running_.load() && list_future_.has_value() && list_future_->valid()))
+        return nullptr;
+
+      // Do initial patient waiting
+      if (!context_->params.impatient) {
+        auto wait_duration = std::chrono::duration<double>(context_->params.reasonable_timeout);
+        auto status = list_future_->wait_for(wait_duration);
+
+        if (status == std::future_status::ready) {
+          try {
+            result = list_future_->get();
+            list_future_ = std::nullopt;
+            return result;
+          }
+          catch (const std::exception& e) {
+            RCLCPP_ERROR(context_->logger, "List service call failed: %s", e.what());
+            list_future_ = std::nullopt;
+            return nullptr;
+          }
+        }
+      }
+
       // Wait for any switch controllers future to complete
       while (running_.load() && list_future_.has_value() && list_future_->valid()) {
         // TODO: Parameterize period
-        auto status = list_future_->wait_for(std::chrono::milliseconds(3000));
+        auto status = list_future_->wait_for(std::chrono::milliseconds(100));
 
-        if (status == std::future_status::timeout) {
-          RCLCPP_ERROR(context_->logger, "List services request timed out!");
-          const auto request = std::make_shared<controller_manager_msgs::srv::ListControllers::Request>();
-          list_future_ = context_->list_controllers_client_->async_send_request(request);
+        if (status != std::future_status::ready)
           continue;
-        }
-        if (status != std::future_status::ready) {
-          RCLCPP_INFO(context_->logger, "No response yet for list services..");
-          continue;
-        }
 
         try {
-          auto result = list_future_->get();
+          result = list_future_->get();
           list_future_ = std::nullopt;
           return result;
         }
         catch (const std::exception& e) {
           RCLCPP_ERROR(context_->logger, "List service call failed: %s", e.what());
+          list_future_ = std::nullopt;
+          return nullptr;
         }
-
-        list_future_ = std::nullopt;
-        break;  // done with this request
       }
 
-      return nullptr;
+      return result;
     }
 
     /**
@@ -406,30 +480,34 @@ private:
       std::set<size_t> activate_set{};
 
       { // Copy current controls while holding a lock
-        std::lock_guard lock(context_->current_active_controllers_mutex_);
-        current_active_controllers = context_->current_active_controllers_;
+        std::lock_guard lock(context_->current_active_controllers_mutex);
+        current_active_controllers = context_->current_active_controllers;
       }
 
       { // Copy active controls while holding a lock
-        std::lock_guard lock(context_->desired_active_controllers_mutex_);
-        desired_active_controllers = context_->desired_active_controllers_;
+        std::lock_guard lock(context_->desired_active_controllers_mutex);
+        desired_active_controllers = context_->desired_active_controllers;
       }
-
-      RCLCPP_INFO(context_->logger, "desired_active_controllers_:");
-      for (const auto id : desired_active_controllers)
-        RCLCPP_INFO(context_->logger, "    - \"%s\" (id: %lu)", context_->ordering_[id].c_str(), id);
-      RCLCPP_INFO(context_->logger, "current_active_controllers_:");
-      for (const auto id : current_active_controllers)
-        RCLCPP_INFO(context_->logger, "    - \"%s\" (id: %lu)", context_->ordering_[id].c_str(), id);
 
       set_differences(current_active_controllers, desired_active_controllers, deactivate_set, activate_set);
 
-      RCLCPP_INFO(context_->logger, "deactivate_set:");
-      for (const auto id : deactivate_set)
-        RCLCPP_INFO(context_->logger, "    - \"%s\" (id: %lu)", context_->ordering_[id].c_str(), id);
-      RCLCPP_INFO(context_->logger, "activate_set:");
-      for (const auto id : activate_set)
-        RCLCPP_INFO(context_->logger, "    - \"%s\" (id: %lu)", context_->ordering_[id].c_str(), id);
+      if (context_->params.log_controllers) {
+        RCLCPP_INFO(context_->logger, "desired_active_controllers:");
+        for (const auto id : desired_active_controllers)
+          RCLCPP_INFO(context_->logger, "    - \"%s\" (id: %lu)", context_->ordering[id].c_str(), id);
+        RCLCPP_INFO(context_->logger, "current_active_controllers:");
+        for (const auto id : current_active_controllers)
+          RCLCPP_INFO(context_->logger, "    - \"%s\" (id: %lu)", context_->ordering[id].c_str(), id);
+        RCLCPP_INFO(context_->logger, " ");
+
+        RCLCPP_INFO(context_->logger, "deactivate_set:");
+        for (const auto id : deactivate_set)
+          RCLCPP_INFO(context_->logger, "    - \"%s\" (id: %lu)", context_->ordering[id].c_str(), id);
+        RCLCPP_INFO(context_->logger, "activate_set:");
+        for (const auto id : activate_set)
+          RCLCPP_INFO(context_->logger, "    - \"%s\" (id: %lu)", context_->ordering[id].c_str(), id);
+        RCLCPP_INFO(context_->logger, " ");
+      }
 
       // Convert the id sets into controller names
       std::vector<std::string> deactivate_names{};
@@ -440,10 +518,10 @@ private:
 
       // deactivate names are provided in reverse order
       for (auto it = deactivate_set.rbegin(); it != deactivate_set.rend(); ++it)
-        deactivate_names.emplace_back(context_->ordering_[*it]);
+        deactivate_names.emplace_back(context_->ordering[*it]);
 
       for (auto id : activate_set)
-        activate_names.emplace_back(context_->ordering_[id]);
+        activate_names.emplace_back(context_->ordering[id]);
 
       if (!running())
         return;
@@ -452,12 +530,10 @@ private:
       bool result = switch_controllers(deactivate_names, activate_names);
 
       // Repeatedly retry a fixed number of times, with a short delay between attempts
-      const int max_attempts = 10;
-      // TODO: Parameterize retry count
-      for (int i = 1; i < max_attempts && !result && running_.load(); ++i) {
+      const int max_attempts = context_->params.connection_retry_count;
+      for (int i = 1; (max_attempts < 0 || i < max_attempts) && !result && running_.load(); ++i) {
         // Wait for a short amount of time, or until the thread should stop running.
-        // TODO: Parameterize period
-        wait_for(std::chrono::milliseconds(100));
+        wait_for(std::chrono::duration<double>(1.0 / context_->params.connection_retry_rate));
         if (!running_.load())
           return;
 
@@ -465,8 +541,8 @@ private:
       }
 
       if (running() && !result) {
-        RCLCPP_ERROR(context_->logger, "/controller_manager/switch_controller not available after %d attempts. Stopping attempts.",
-                     max_attempts);
+        RCLCPP_ERROR(context_->logger, "%s/switch_controller not available after %d attempts. Stopping attempts.",
+                     context_->params.controller_manager.c_str(), max_attempts);
       }
 
       if (!running())
@@ -487,38 +563,25 @@ private:
         const std::vector<std::string> & controllers_to_deactivate,
         const std::vector<std::string> & controllers_to_activate)
     {
-      RCLCPP_INFO(context_->logger, "Current active controllers:");
-      for (const auto id : context_->current_active_controllers_) {
-        const auto name = context_->ordering_[id];
-        RCLCPP_INFO(context_->logger, "  - %s", name.c_str());
-      }
-
-      RCLCPP_INFO(context_->logger, "Deactivating:");
-      for (const auto& name : controllers_to_deactivate) {
-        RCLCPP_INFO(context_->logger, "  - %s", name.c_str());
-      }
-
-      RCLCPP_INFO(context_->logger, "Activating:");
-      for (const auto& name : controllers_to_activate) {
-        RCLCPP_INFO(context_->logger, "  - %s", name.c_str());
-      }
-
       if (controllers_to_deactivate.empty() && controllers_to_activate.empty()) {
         return true;
       }
 
-      if (!context_->switch_controller_client_->service_is_ready()) {
-        RCLCPP_WARN_THROTTLE(context_->logger, *context_->node->get_clock(), 2000, "/controller_manager/switch_controller service not currently available.");
+      if (!context_->switch_controller_client->service_is_ready()) {
+        RCLCPP_WARN_THROTTLE(context_->logger, *context_->node->get_clock(), 2000,
+                             "%s/switch_controller service not currently available.",
+                             context_->params.controller_manager.c_str());
         return false;
       }
 
       const auto request = std::make_shared<controller_manager_msgs::srv::SwitchController::Request>();
       request->deactivate_controllers = controllers_to_deactivate;
       request->activate_controllers = controllers_to_activate;
-      request->strictness = 2;
-      request->activate_asap = true;
+      request->strictness = context_->params.strictness;
+      request->activate_asap = context_->params.activate_asap;
+      request->timeout = context_->params.timeout;
 
-      future_ = context_->switch_controller_client_->async_send_request(request);
+      future_ = context_->switch_controller_client->async_send_request(request);
       return true;
     }
 
@@ -527,23 +590,21 @@ private:
      */
     void service_future_result(const controller_manager_msgs::srv::SwitchController::Response::SharedPtr & response) {
       if (!response->ok) {
-        on_switch_failure();
+        RCLCPP_ERROR(context_->logger, "Failed to switch controllers.");
         return;
       }
 
       // We can now assume context_->current_active_controllers_ represents the actual state of the controllers
       {
         // TODO: Confirm we wont cause deadlock
-        std::lock_guard lock2(context_->current_active_controllers_mutex_);
-        std::lock_guard lock1(context_->desired_active_controllers_mutex_);
+        std::lock_guard lock2(context_->current_active_controllers_mutex);
+        std::lock_guard lock1(context_->desired_active_controllers_mutex);
 
-        context_->current_active_controllers_ = context_->desired_active_controllers_;
+        context_->current_active_controllers = context_->desired_active_controllers;
       }
 
-      RCLCPP_INFO(context_->logger, "Successfully switched controllers.");
-
-      // TODO: We could add a sanity check call to
-      //  /controller_manager/list_controllers : controller_manager_msgs/srv/ListControllers to double check
+      if (context_->params.log_controllers)
+        RCLCPP_INFO(context_->logger, "Successfully switched controllers.\n");
     }
 
     /**
@@ -553,15 +614,19 @@ private:
     bool service_list_future_result(const controller_manager_msgs::srv::ListControllers::Response::SharedPtr & response) {
       bool changed = false;
 
+      if (context_->params.log_controllers)
+        RCLCPP_INFO(context_->logger, "Actual controller states from ros2_control:");
+
       {
-        std::lock_guard lock2(context_->current_active_controllers_mutex_);
+        std::lock_guard lock2(context_->current_active_controllers_mutex);
 
         for (const auto& controller : response->controller)
         {
           // Ignore controllers not defined in teleop
-          if (!context_->ordering_.contains(controller.name)) {
-            RCLCPP_INFO(context_->logger, "  - \"%s\" (not defined in teleop)\t: %s",
-                        controller.name.c_str(), controller.state.c_str());
+          if (!context_->ordering.contains(controller.name)) {
+            if (context_->params.log_controllers)
+              RCLCPP_INFO(context_->logger, "  - \"%s\" (not defined in teleop)\t: %s",
+                          controller.name.c_str(), controller.state.c_str());
             continue;
           }
 
@@ -575,46 +640,57 @@ private:
                          controller.name.c_str(), controller.state.c_str());
           }
 
-          const auto id = context_->ordering_[controller.name];
+          const auto id = context_->ordering[controller.name];
 
-          RCLCPP_INFO(context_->logger, "  - \"%s\" (id: %lu)\t: %s",
-                      controller.name.c_str(), id, controller.state.c_str());
+          if (context_->params.log_controllers)
+            RCLCPP_INFO(context_->logger, "  - \"%s\" (id: %lu)\t: %s",
+                        controller.name.c_str(), id, controller.state.c_str());
 
           if (is_active) {
-            auto [_, element_changed] = context_->current_active_controllers_.insert(id);
+            auto [_, element_changed] = context_->current_active_controllers.insert(id);
             changed = changed || element_changed;
           }
           else {
-            auto no_elements_erased = context_->current_active_controllers_.erase(id);
+            auto no_elements_erased = context_->current_active_controllers.erase(id);
             if (no_elements_erased > 0)
               changed = true;
           }
         }
       }
 
-      RCLCPP_INFO(context_->logger, "Retrieved actual active controllers:");
-      for (const auto id : context_->current_active_controllers_)
-      {
-        const auto name = context_->ordering_[id];
-        RCLCPP_INFO(context_->logger, "  - \"%s\" (id: %lu)", name.c_str(), id);
+      if (context_->params.log_controllers) {
+        RCLCPP_INFO(context_->logger, "Retrieved actual active controllers:");
+        for (const auto id : context_->current_active_controllers)
+        {
+          const auto name = context_->ordering[id];
+          RCLCPP_INFO(context_->logger, "  - \"%s\" (id: %lu)", name.c_str(), id);
+        }
       }
 
       return changed;
     }
 
     bool get_actual_current_controllers() {
-      // TODO: Get current active controllers by calling /controller_manager/list_controllers : controller_manager_msgs/srv/ListControllers
-      while (!context_->switch_controller_client_->service_is_ready() && running()) {
-        RCLCPP_ERROR(context_->logger, "List controllers service is not ready.");
-        wait_for(std::chrono::milliseconds(100));
+      const int max_attempts = context_->params.connection_retry_count;
+      for (int i = 0; (max_attempts < 0 || i < max_attempts) && !context_->switch_controller_client->service_is_ready() && running(); ++i) {
+        RCLCPP_WARN_THROTTLE(context_->logger, *context_->node->get_clock(), 2000, "%s/list_controllers service not currently available.", context_->params.controller_manager.c_str());
+        wait_for(std::chrono::duration<double>(1.0 / context_->params.connection_retry_rate));
       }
 
       if (!running())
         return false;
 
-      RCLCPP_INFO(context_->logger, "Getting the actual controllers states from the controller manager...");
+      if (!context_->switch_controller_client->service_is_ready()) {
+        RCLCPP_ERROR(context_->logger, "%s/list_controllers not available after %d attempts. Stopping attempts.",
+                     context_->params.controller_manager.c_str(), max_attempts);
+        return false;
+      }
+
+      if (context_->params.log_controllers)
+        RCLCPP_INFO(context_->logger, "Getting the actual controllers states from the controller manager...");
+
       const auto request = std::make_shared<controller_manager_msgs::srv::ListControllers::Request>();
-      list_future_ = context_->list_controllers_client_->async_send_request(request);
+      list_future_ = context_->list_controllers_client->async_send_request(request);
 
       auto response = wait_for_list_future();
       if (!response)
@@ -632,7 +708,6 @@ private:
      * Called whenever a switch request finished without succeeding.
      */
     void on_switch_failure() {
-      RCLCPP_ERROR(context_->logger, "Failed to switch controllers.");
     }
 
     std::shared_ptr<Context> context_;
@@ -666,26 +741,26 @@ private:
     std::vector<std::reference_wrapper<std::set<size_t>>> deactivate_id_sets{};
     deactivate_id_sets.reserve(deactivate_cm_ids.size());
     for (const auto cm_id : deactivate_cm_ids)
-      deactivate_id_sets.emplace_back(std::ref(context_->controllers_for_ids_[cm_id]));
+      deactivate_id_sets.emplace_back(std::ref(context_->controllers_for_ids[cm_id]));
     const auto deactivate_ids = ControllerOrdering::merge_id_sets(deactivate_id_sets);
 
     // Get activate ids
     std::vector<std::reference_wrapper<std::set<size_t>>> activate_id_sets{};
     activate_id_sets.reserve(activate_cm_ids.size());
     for (const auto cm_id : activate_cm_ids)
-      activate_id_sets.emplace_back(std::ref(context_->controllers_for_ids_[cm_id]));
+      activate_id_sets.emplace_back(std::ref(context_->controllers_for_ids[cm_id]));
     const auto activate_ids = ControllerOrdering::merge_id_sets(activate_id_sets);
 
     // Hold lock
-    std::lock_guard lock(context_->desired_active_controllers_mutex_);
+    std::lock_guard lock(context_->desired_active_controllers_mutex);
 
     // Remove from desired ids
     for (const auto id : deactivate_ids)
-      context_->desired_active_controllers_.erase(id);
+      context_->desired_active_controllers.erase(id);
 
     // Add to desired ids
     for (const auto id : activate_ids)
-      context_->desired_active_controllers_.insert(id);
+      context_->desired_active_controllers.insert(id);
   }
 
   rclcpp::Node::SharedPtr node_;
