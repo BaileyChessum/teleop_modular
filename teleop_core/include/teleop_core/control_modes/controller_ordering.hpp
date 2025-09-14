@@ -63,30 +63,6 @@ public:
     }
   }
 
-  void id_sets_to_names(const std::vector<std::reference_wrapper<std::set<size_t>>>& id_set_refs, std::vector<std::string>& out) {
-    out.clear();
-
-    const auto merged_ids = merge_id_sets(id_set_refs);
-
-
-
-  }
-
-
-  /**
-   * Merges left and merges right, then gets the differences of the two merged sets from left and right
-   * \param[out] left_difference left - right
-   * \param[out] right_difference right - left
-   */
-  static void merged_set_differences(
-      const std::vector<std::reference_wrapper<std::set<size_t>>>& left,
-      const std::vector<std::reference_wrapper<std::set<size_t>>>& right,
-      std::set<size_t>& left_difference,
-      std::set<size_t>& right_difference)
-  {
-    set_differences(merge_id_sets(left), merge_id_sets(right), left_difference, right_difference);
-  }
-
   /**
    * Recursive merges an array of sorted id vectors
    */
