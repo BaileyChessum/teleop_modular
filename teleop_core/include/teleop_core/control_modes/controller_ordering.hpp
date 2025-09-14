@@ -112,6 +112,10 @@ public:
     return handles_[id].name;
   }
 
+  [[nodiscard]] inline size_t size() const noexcept {
+    return handles_.size();
+  }
+
   /**
    * Ensures the controllers are sorted
    */

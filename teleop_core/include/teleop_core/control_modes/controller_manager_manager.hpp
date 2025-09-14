@@ -68,6 +68,21 @@ public:
 
       context_->controllers_for_ids_.emplace_back(std::move(ids));
     }
+
+    RCLCPP_INFO(context_->logger, "Created controller order:");
+    for (size_t i = 0; i < context_->ordering_.size(); ++i) {
+      RCLCPP_INFO(context_->logger, "  - \"%s\"", context_->ordering_[i].c_str());
+    }
+
+    RCLCPP_INFO(context_->logger, "Control mode controllers:");
+    for (size_t i = 0; i < context_->controllers_for_ids_.size(); ++i) {
+      RCLCPP_INFO(context_->logger, "  [%lu]", i);
+      for (const auto id : context_->controllers_for_ids_[i])
+      {
+        RCLCPP_INFO(context_->logger, "    - \"%s\" (id: %lu)", context_->ordering_[id].c_str(), id);
+      }
+    }
+
   }
 
   /**
@@ -128,10 +143,12 @@ public:
       if (*l_it < *r_it) {
         left_difference.insert(*l_it);
         ++l_it;
-      } else if (*l_it < *r_it) {
+      }
+      else if (*l_it > *r_it) {
         right_difference.insert(*r_it);
         ++r_it;
-      } else {
+      }
+      else {
         // element is common to both sets, skip both
         ++l_it;
         ++r_it;
@@ -342,7 +359,21 @@ private:
         desired_active_controllers = context_->desired_active_controllers_;
       }
 
+      RCLCPP_INFO(context_->logger, "desired_active_controllers_:");
+      for (const auto id : desired_active_controllers)
+        RCLCPP_INFO(context_->logger, "    - \"%s\" (id: %lu)", context_->ordering_[id].c_str(), id);
+      RCLCPP_INFO(context_->logger, "current_active_controllers_:");
+      for (const auto id : current_active_controllers)
+        RCLCPP_INFO(context_->logger, "    - \"%s\" (id: %lu)", context_->ordering_[id].c_str(), id);
+
       set_differences(current_active_controllers, desired_active_controllers, deactivate_set, activate_set);
+
+      RCLCPP_INFO(context_->logger, "deactivate_set:");
+      for (const auto id : deactivate_set)
+        RCLCPP_INFO(context_->logger, "    - \"%s\" (id: %lu)", context_->ordering_[id].c_str(), id);
+      RCLCPP_INFO(context_->logger, "activate_set:");
+      for (const auto id : activate_set)
+        RCLCPP_INFO(context_->logger, "    - \"%s\" (id: %lu)", context_->ordering_[id].c_str(), id);
 
       // Convert the id sets into controller names
       std::vector<std::string> deactivate_names{};
@@ -391,6 +422,22 @@ private:
         const std::vector<std::string> & controllers_to_deactivate,
         const std::vector<std::string> & controllers_to_activate)
     {
+      RCLCPP_INFO(context_->logger, "Current active controllers:");
+      for (const auto id : context_->current_active_controllers_) {
+        const auto name = context_->ordering_[id];
+        RCLCPP_INFO(context_->logger, "  - %s", name.c_str());
+      }
+
+      RCLCPP_INFO(context_->logger, "Deactivating:");
+      for (const auto& name : controllers_to_deactivate) {
+        RCLCPP_INFO(context_->logger, "  - %s", name.c_str());
+      }
+
+      RCLCPP_INFO(context_->logger, "Activating:");
+      for (const auto& name : controllers_to_activate) {
+        RCLCPP_INFO(context_->logger, "  - %s", name.c_str());
+      }
+
       if (controllers_to_deactivate.empty() && controllers_to_activate.empty()) {
         return true;
       }
@@ -405,6 +452,7 @@ private:
       request->activate_controllers = controllers_to_activate;
       request->strictness = 2;
       request->activate_asap = true;
+
 
       future_ = context_->switch_controller_client_->async_send_request(request);
       return true;
@@ -425,7 +473,7 @@ private:
         std::lock_guard lock2(context_->current_active_controllers_mutex_);
         std::lock_guard lock1(context_->desired_active_controllers_mutex_);
 
-        context_->desired_active_controllers_ = context_->current_active_controllers_;
+        context_->current_active_controllers_ = context_->desired_active_controllers_;
       }
 
       RCLCPP_INFO(context_->logger, "Successfully switched controllers.");
