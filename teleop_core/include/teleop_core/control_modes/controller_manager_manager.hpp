@@ -80,6 +80,9 @@ public:
     invoke_update();
   }
 
+  /**
+   * Tries to get a worker thread to call the controller manager
+   */
   void invoke_update() {
     // TODO: Spawn or reuse thread to perform update here
 
@@ -102,7 +105,6 @@ public:
     worker_ = std::make_shared<Worker>(context_);
     worker_->invoke_update();
   }
-
 
 private:
   /**
@@ -193,6 +195,9 @@ private:
     }
 
   private:
+    /**
+     * Entry point the the worker thread.
+     */
     void main() {
       RCLCPP_DEBUG(context_->logger_, "Starting service loop.");
 
@@ -230,7 +235,6 @@ private:
       should_update_.store(false, std::memory_order_release);
       can_invoke_update_.store(false, std::memory_order_release);
     }
-
 
     /**
      * Waits for a given amount of time, or until the thread needs to exit
@@ -271,7 +275,8 @@ private:
     }
 
     /**
-     * Calculates the difference between current_active_controllers and desired_active_controllers
+     * Calculates the difference between current_active_controllers and desired_active_controllers,
+     * then repeatedly calls switch_controllers()
      */
     void update_controllers() {
       std::set<size_t> desired_active_controllers;
@@ -331,6 +336,10 @@ private:
       }
     }
 
+    /**
+     * Makes the call to the controller manager to try switch the active controllers
+     * \returns True if the controller manager service was available and the service was called.
+     */
     bool switch_controllers(
         const std::vector<std::string> & controllers_to_deactivate,
         const std::vector<std::string> & controllers_to_activate)
@@ -351,10 +360,8 @@ private:
       request->activate_asap = true;
 
       future_ = context_->switch_controller_client_->async_send_request(request);
-
       return true;
     }
-
 
     /**
      * Called when we get the result back from a switch controller request
@@ -374,7 +381,8 @@ private:
         context_->desired_active_controllers_ = context_->current_active_controllers_;
       }
 
-      // TODO: We could add a sanity check call to /controller_manager/list_controllers : controller_manager_msgs/srv/ListControllers to double check
+      // TODO: We could add a sanity check call to
+      //  /controller_manager/list_controllers : controller_manager_msgs/srv/ListControllers to double check
     }
 
     /**
