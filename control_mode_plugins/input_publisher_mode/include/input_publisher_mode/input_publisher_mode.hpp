@@ -17,7 +17,7 @@
 #include "control_mode/control_mode.hpp"
 #include "input_publisher_mode/visibility_control.h"
 #include "teleop_msgs/teleop_msgs/msg/input_names.hpp"
-#include "teleop_msgs/teleop_msgs/msg/combined_input_values.hpp"
+#include "teleop_msgs/teleop_msgs/msg/input_values.hpp"
 
 namespace input_publisher_mode
 {
@@ -25,7 +25,7 @@ namespace input_publisher_mode
 using namespace control_mode;
 
 /**
- * \class A generic control mode that forwards inputs from teleop_modular.
+ * \class a generic control mode that forwards inputs from teleop_modular.
  */
 class INPUT_PUBLISHER_MODE_PUBLIC InputPublisherMode : public ControlMode
 {
@@ -44,6 +44,11 @@ public:
    */
   void publish_halt_message(const rclcpp::Time & now) const;
 
+  /**
+   * \brief Publishes a message containing the axis and button names.
+   */
+  void publish_input_names_message() const;
+
   CallbackReturn on_activate(const State & previous_state) override;
   return_type on_update(const rclcpp::Time & now, const rclcpp::Duration & period) override;
 
@@ -58,31 +63,46 @@ protected:
 private:
   /// Helper struct to hold parameters used by the control mode.
   struct Params {
-    /// The topic name to send messages to.
-    std::string topic = "";
-    /// The ROS2 topic Quality of Service value to use in publisher_.
-    int qos = 10;
+    /// The topic name to send input name messages to.
+    std::string input_names_topic = "";
+    /// The ROS2 topic Quality of Service value to use in names_publisher_.
+    int input_names_qos = 10;
+    /// The topic name to send input messages to.
+    std::string inputs_topic = "";
+    /// The ROS2 topic Quality of Service value to use in inputs_publisher_.
+    int inputs_qos = 10;
+    /// list of axis names to publish
+    std::vector<std::string> axis_names = {};
+    /// list of button names to publish
+    std::vector<std::string> button_names = {};
   };
 
   /// Stores current parameter values
   Params params_;
 
-  // TODO: Set an appropriate message type for the publisher, then uncomment its declaration/usages
-  rclcpp::Publisher<Inp>::SharedPtr publisher_;
+  /// Publisher for input names
+  rclcpp::Publisher<teleop_msgs::msg::InputNames>::SharedPtr names_publisher_;
+  /// Publisher for inputs
+  rclcpp::Publisher<teleop_msgs::msg::InputValues>::SharedPtr inputs_publisher_;
 
-  // TODO: Add shared pointers for any buttons/axes you need here, then set them in on_capture_inputs().
+  /// Names of the buttons to publish
+  std::vector<std::string> button_names_;
+  /// Names of the axes to publish
+  std::vector<std::string> axis_names_;
+  /// Reference to the axes inputs
+  std::vector<Axis::SharedPtr> axes_;
+  /// reference to the button inputs
+  std::vector<Button::SharedPtr> buttons_;
 
-  // You can hold references to inputs like this, and set their values in on_capture_inputs:
-  /// Input from 0 to 1 that directly scales the output speed.
-  Axis::SharedPtr speed_;
+  /// Count of the number of axes
+  std::uint16_t axis_count_;
+  /// Count of the number of buttons
+  std::uint16_t button_count_;
 
-  /// If you need to store some unknown number N inputs and associated params, you can make a helper struct like this,
-  /// then store an array of them. If you had one input per joint, this could be 'JointHandle' for example, with an
-  /// `std::vector<JointHandle> joints_;` to hold them all.
-  // struct InputHandle {
-  //   Axis::SharedPtr axis_;  //< Set this in on_capture_inputs
-  //   float some_param_;      //< Set this in on_configure
-  // };
+  /// Static vector used to publish axis values
+  std::vector<float> axis_values_;
+  /// Static vector used to publish button values
+  std::vector<uint8_t> button_values_;
 };
 
 }  // namespace input_publisher_mode
