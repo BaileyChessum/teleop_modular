@@ -1,3 +1,14 @@
+// Copyright 2025 Bailey Chessum
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Created by Felicity Matthews on 31/8/25.
+//
 #ifndef INPUT_PUBLISHER_MODE__INPUT_PUBLISHER_MODE_HPP_
 #define INPUT_PUBLISHER_MODE__INPUT_PUBLISHER_MODE_HPP_
 
@@ -5,6 +16,8 @@
 #include <string>
 #include "control_mode/control_mode.hpp"
 #include "input_publisher_mode/visibility_control.h"
+#include "teleop_msgs/teleop_msgs/msg/input_names.hpp"
+#include "teleop_msgs/teleop_msgs/msg/combined_input_values.hpp"
 
 namespace input_publisher_mode
 {
@@ -21,7 +34,7 @@ public:
 
   return_type on_init() override;
   CallbackReturn on_configure(const State & previous_state) override;
-  void on_capture_inputs(Inputs inputs) override;
+  void on_configure_inputs(Inputs inputs) override;
 
   /**
    * \brief Publishes a message to tell the control system to do nothing. Used when the control mode is locked, and
@@ -55,7 +68,7 @@ private:
   Params params_;
 
   // TODO: Set an appropriate message type for the publisher, then uncomment its declaration/usages
-  // rclcpp::Publisher<TODO>::SharedPtr publisher_;
+  rclcpp::Publisher<Inp>::SharedPtr publisher_;
 
   // TODO: Add shared pointers for any buttons/axes you need here, then set them in on_capture_inputs().
 

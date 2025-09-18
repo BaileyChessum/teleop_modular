@@ -11,6 +11,7 @@
 , rclcpp
 , pluginlib
 , teleop-modular-control-mode
+, teleop-modular-msgs
 , rclcpp-lifecycle
 }:
 

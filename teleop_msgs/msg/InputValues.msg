@@ -5,7 +5,7 @@
 # The header specifies the time at which the input values were received from the triggering input source.
 # All inputs in one message have to be recorded at the same time.
 #
-# This message consists of a multiple arrays, one for each input type (buttons/axes)
+# This message consists of multiple arrays, one for each input type (buttons/axes)
 # The goal is to be able to have topics that act like publishing Inputs.msg messages, but without the overhead of
 # frequently publishing every name for every input
 #

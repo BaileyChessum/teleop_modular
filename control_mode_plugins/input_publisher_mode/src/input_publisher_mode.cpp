@@ -1,3 +1,14 @@
+// Copyright 2025 Bailey Chessum
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Created by Felicity Matthews on 31/8/25.
+//
 #include "input_publisher_mode/input_publisher_mode.hpp"
 
 namespace input_publisher_mode
@@ -44,7 +55,7 @@ CallbackReturn InputPublisherMode::on_configure(const State &)
   return CallbackReturn::SUCCESS;
 }
 
-void InputPublisherMode::on_capture_inputs(Inputs inputs)
+void InputPublisherMode::on_configure_inputs(Inputs inputs)
 {
   // This method is always run after on_configure(),
   // so you can assume that you already have any necessary parameters
