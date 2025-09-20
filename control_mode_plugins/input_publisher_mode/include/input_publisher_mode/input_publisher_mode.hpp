@@ -17,7 +17,7 @@
 #include "control_mode/control_mode.hpp"
 #include "input_publisher_mode/visibility_control.h"
 #include "teleop_msgs/teleop_msgs/msg/input_names.hpp"
-#include "teleop_msgs/teleop_msgs/msg/"
+#include "teleop_msgs/teleop_msgs/msg/combined_input_values.hpp"
 
 namespace input_publisher_mode
 {
@@ -81,7 +81,7 @@ private:
   /// Publisher for input names
   rclcpp::Publisher<teleop_msgs::msg::InputNames>::SharedPtr names_publisher_;
   /// Publisher for inputs
-  rclcpp::Publisher<teleop_msgs::msg::InputValues>::SharedPtr inputs_publisher_;
+  rclcpp::Publisher<teleop_msgs::msg::CombinedInputValues>::SharedPtr inputs_publisher_;
 
   /// Names of the buttons to publish
   std::vector<std::string> button_names_;

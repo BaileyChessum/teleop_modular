@@ -66,7 +66,7 @@ CallbackReturn InputPublisherMode::on_configure(const State &)
 
   // Create publishers
   names_publisher_ = get_node()->create_publisher<teleop_msgs::msg::InputNames>(params_.input_names_topic, qos);
-  inputs_publisher_ = get_node()->create_publisher<teleop_msgs::msg::InputValues>(params_.inputs_topic, params_.inputs_qos);
+  inputs_publisher_ = get_node()->create_publisher<teleop_msgs::msg::CombinedInputValues>(params_.inputs_topic, params_.inputs_qos);
 
   // Initialise button and axis names
   axis_names_ = params_.axis_names;
@@ -75,22 +75,22 @@ CallbackReturn InputPublisherMode::on_configure(const State &)
   // Print axes and button names prettily
   std::stringstream log;
 
-  log << C_SUBTITLE "Published Button Names:" C_RESET;
+  log << "Publishing inputs:";
+  log << "\n  " C_QUIET << names_publisher_->get_topic_name() << "        \t[teleop_msgs/msg/InputNames]" C_RESET;
+  log << "\n  " C_QUIET<< inputs_publisher_->get_topic_name() << " \t[teleop_msgs/msg/CombinedInputValues]" C_RESET;
 
+  log << "\n\tButtons:";
   for (auto& button : button_names_)
   {
-    log << "\n\t- " C_INPUT << button << C_RESET;
+    log << "\n\t  - " C_INPUT << button << C_RESET;
   }
-  RCLCPP_INFO(logger, "%s", log.str().c_str());
 
-  log = std::stringstream();
-  log << C_SUBTITLE "Published Axes Names:" C_RESET;
-
+  log << "\n\tAxes:";
   for (auto& axis : axis_names_)
   {
-    log << "\n\t- " C_INPUT << axis << C_RESET;
+    log << "\n\t  - " C_INPUT << axis << C_RESET;
   }
-  RCLCPP_INFO(logger, "%s", log.str().c_str());
+  RCLCPP_INFO(logger, "%s\n", log.str().c_str());
 
   return CallbackReturn::SUCCESS;
 }
@@ -142,8 +142,9 @@ void InputPublisherMode::publish_input_names_message() const
 void InputPublisherMode::publish_halt_message(const rclcpp::Time & now) const
 {
   // TODO: Implement for your message type, or remove the method if it is not appropriate for the use case.
-  auto msg = std::make_unique<teleop_msgs::msg::InputValues>();
-  msg->header.stamp = now;
+  auto msg = std::make_unique<teleop_msgs::msg::CombinedInputValues>();
+  msg->values.header.stamp = now;
+  msg->events.header.stamp = now;
   inputs_publisher_->publish(std::move(msg));
 }
 
@@ -161,8 +162,9 @@ return_type InputPublisherMode::on_update(const rclcpp::Time & now, const rclcpp
   // const float speed = std::max(speed_->value(), 0.0f);
 
   // Construct and send a message using values from inputs
-  auto msg = std::make_unique<teleop_msgs::msg::InputValues>();
-  msg->header.stamp = now;
+  auto msg = std::make_unique<teleop_msgs::msg::CombinedInputValues>();
+  msg->values.header.stamp = now;
+  msg->events.header.stamp = now;
 
   // Update values
   for (int i = 0; i < static_cast<int>(axis_names_.size()); i++)
@@ -174,8 +176,8 @@ return_type InputPublisherMode::on_update(const rclcpp::Time & now, const rclcpp
     button_values_[i] = buttons_[i]->value();
   }
 
-  msg->axes = axis_values_;
-  msg->buttons = button_values_;
+  msg->values.axes = axis_values_;
+  msg->values.buttons = button_values_;
 
   inputs_publisher_->publish(std::move(msg));
 
