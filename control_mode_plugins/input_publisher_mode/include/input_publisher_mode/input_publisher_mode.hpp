@@ -17,7 +17,7 @@
 #include "control_mode/control_mode.hpp"
 #include "input_publisher_mode/visibility_control.h"
 #include "teleop_msgs/teleop_msgs/msg/input_names.hpp"
-#include "teleop_msgs/teleop_msgs/msg/input_values.hpp"
+#include "teleop_msgs/teleop_msgs/msg/"
 
 namespace input_publisher_mode
 {
@@ -65,8 +65,6 @@ private:
   struct Params {
     /// The topic name to send input name messages to.
     std::string input_names_topic = "";
-    /// The ROS2 topic Quality of Service value to use in names_publisher_.
-    int input_names_qos = 10;
     /// The topic name to send input messages to.
     std::string inputs_topic = "";
     /// The ROS2 topic Quality of Service value to use in inputs_publisher_.

@@ -41,6 +41,7 @@ buildRosPackage {
 
   propagatedBuildInputs = [
     # Add message packages here
+    teleop-modular-msgs
   ];
 
   # Enable running tests during build?

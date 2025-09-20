@@ -10,6 +10,8 @@
 // Created by Felicity Matthews on 31/8/25.
 //
 #include "input_publisher_mode/input_publisher_mode.hpp"
+#include "input_publisher_mode/colors.hpp"
+#include <sstream>
 
 namespace input_publisher_mode
 {
@@ -27,7 +29,6 @@ return_type InputPublisherMode::on_init()
 
   // Declare parameters here! Or consider using something like generate_parameter_library instead.
   node->declare_parameter<std::string>("input_names_topic", "");
-  node->declare_parameter<int>("input_names_qos", 10);
   node->declare_parameter<std::string>("inputs_topic", "");
   node->declare_parameter<int>("inputs_qos", 10);
   node->declare_parameter<std::vector<std::string>>("axis_names", {});
@@ -44,7 +45,6 @@ CallbackReturn InputPublisherMode::on_configure(const State &)
   // Use this callback method to get any parameters for your control mode!
   params_ = Params();
   node->get_parameter<std::string>("input_names_topic", params_.input_names_topic);
-  node->get_parameter<int>("input_names_qos", params_.input_names_qos);
   node->get_parameter<std::string>("inputs_topic", params_.inputs_topic);
   node->get_parameter<int>("inputs_qos", params_.inputs_qos);
   node->get_parameter<std::vector<std::string>>("axis_names", params_.axis_names);
@@ -60,13 +60,37 @@ CallbackReturn InputPublisherMode::on_configure(const State &)
     params_.inputs_topic = params_.input_names_topic + "/values";
   }
 
+  // QoS settings
+  rclcpp::QoS qos(10);
+  qos.durability(rclcpp::DurabilityPolicy::TransientLocal);
+
   // Create publishers
-  names_publisher_ = get_node()->create_publisher<teleop_msgs::msg::InputNames>(params_.input_names_topic, params_.input_names_qos);
+  names_publisher_ = get_node()->create_publisher<teleop_msgs::msg::InputNames>(params_.input_names_topic, qos);
   inputs_publisher_ = get_node()->create_publisher<teleop_msgs::msg::InputValues>(params_.inputs_topic, params_.inputs_qos);
 
   // Initialise button and axis names
   axis_names_ = params_.axis_names;
   button_names_ = params_.button_names;
+
+  // Print axes and button names prettily
+  std::stringstream log;
+
+  log << C_SUBTITLE "Published Button Names:" C_RESET;
+
+  for (auto& button : button_names_)
+  {
+    log << "\n\t- " C_INPUT << button << C_RESET;
+  }
+  RCLCPP_INFO(logger, "%s", log.str().c_str());
+
+  log = std::stringstream();
+  log << C_SUBTITLE "Published Axes Names:" C_RESET;
+
+  for (auto& axis : axis_names_)
+  {
+    log << "\n\t- " C_INPUT << axis << C_RESET;
+  }
+  RCLCPP_INFO(logger, "%s", log.str().c_str());
 
   return CallbackReturn::SUCCESS;
 }
@@ -109,11 +133,10 @@ void InputPublisherMode::publish_input_names_message() const
 
   // publish input names
   auto msg = std::make_unique<teleop_msgs::msg::InputNames>();
+  msg->value_topic = names_publisher_->get_topic_name();
   msg->axis_names = axis_names_;
   msg->button_names = button_names_;
   names_publisher_->publish(std::move(msg));
-  RCLCPP_INFO(logger, "Published Button Names: %s", std::accumulate(button_names_.begin(), button_names_.end(), std::string(", ")).c_str());
-  RCLCPP_INFO(logger, "Published Axes Names: %s", std::accumulate(axis_names_.begin(), axis_names_.end(), std::string(", ")).c_str());
 }
 
 void InputPublisherMode::publish_halt_message(const rclcpp::Time & now) const
