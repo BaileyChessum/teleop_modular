@@ -92,11 +92,6 @@ private:
   /// reference to the button inputs
   std::vector<Button::SharedPtr> buttons_;
 
-  /// Count of the number of axes
-  std::uint16_t axis_count_;
-  /// Count of the number of buttons
-  std::uint16_t button_count_;
-
   /// Static vector used to publish axis values
   std::vector<float> axis_values_;
   /// Static vector used to publish button values
