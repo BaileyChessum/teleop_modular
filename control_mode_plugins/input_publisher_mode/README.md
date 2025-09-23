@@ -49,7 +49,7 @@ input_publisher_mode:
       - "x_effort"
       - "y_effort"
     
-    # List of Butoon names to publish. (One of axis_names or button_names required)
+    # List of Button names to publish. (One of axis_names or button_names required)
     button_names:
       - "fast_mode"
 ```
