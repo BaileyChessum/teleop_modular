@@ -1,25 +1,28 @@
 # input_publisher_mode/InputPublisherMode
 
-A generic control mode that forwards inputs from teleop_modular.
+A generic control mode that publishes inputs from teleop_modular.
 
 ### Inputs
 
 #### Axes
-*TODO: List and describe axes here*
-- `speed`: The input axis that scales the output speed from 0 to 1.
+
+Publishes all Axes as configured in the configuration file.
 
 #### Buttons
-*TODO: List and describe buttons here*
+
+Publishes all Buttons as configured in the configuration file.
+
 - `locked`: When true, the control mode will send all zeroes to make the robot halt. *(optional)*
 
 > **Note**: `locked` is automatically captured by teleop_modular and exposed through the `bool is_locked()` method.
 
 ### Parameters
 
-*TODO: Describe your parameters here*
-
-- `topic : string` The topic name to send messages to (Required)
-- `qos : int` The ROS2 topic Quality of Service value to use in the publisher (Optional, defaults to 10) 
+- `input_names_topic : string` The topic name to send input name messages to (Required)
+- `inputs_topic : string` The topic name to send input messages to (Optional, defaults to input_names_topic + "/values")
+- `inputs_qos : int` The ROS2 topic Quality of Service value to use in the inputs publisher (Optional, defaults to 10) 
+- `axis_names : string[]` The list of Axis names to publish. (One of axis_names or button_names required)
+- `button_names : string[]` The list of Button names to publish. (One of axis_names or button_names required)
 
 ```yaml
 # Example parameter file
@@ -32,11 +35,21 @@ teleop_node:
 
 input_publisher_mode:
   ros__parameters:
-    # Topic to send messages to (Required)
-    topic: "/turtle1/cmd_vel"
+    # Topic to send name messages to (Required)
+    input_names_topic: "/turtle1/input"
+
+    # Topic to send input messages to. (Optional, defaults to input_names_topic + "/values")
+    inputs_topic: "/turtle1/input/values";
     
-    # The ROS2 topic Quality of Service value to use in the publisher (Optional, defaults to 10)
-    qos: 10
+    # The ROS2 topic Quality of Service value to use in the inputs publisher (Optional, defaults to 10)
+    inputs_qos: 10
+
+    # List of Axis names to publish. (One of axis_names or button_names required)
+    axis_names:
+      - "x_effort"
+      - "y_effort"
     
-    # TODO: Add an example usage of your parameters here
+    # List of Butoon names to publish. (One of axis_names or button_names required)
+    button_names:
+      - "fast_mode"
 ```

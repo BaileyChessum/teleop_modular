@@ -69,6 +69,12 @@ CallbackReturn InputPublisherMode::on_configure(const State &)
   inputs_publisher_ = get_node()->create_publisher<teleop_msgs::msg::CombinedInputValues>(params_.inputs_topic, params_.inputs_qos);
 
   // Initialise button and axis names
+  if (params_.axis_names.empty() && params_.button_names.empty())
+  {
+    RCLCPP_ERROR(logger, "One of \"axis_names\" or \"button_names\" parameters must be non-empty!");
+    return CallbackReturn::ERROR;
+  }
+
   axis_names_ = params_.axis_names;
   button_names_ = params_.button_names;
 
