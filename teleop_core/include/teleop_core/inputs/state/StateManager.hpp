@@ -60,10 +60,13 @@ public:
   }
 
   virtual void relink() override {
-    relink_pipeline();
+    if (input_pipeline_established_)
+      relink_pipeline();
   }
 
 private:
+  bool input_pipeline_established_ = false;
+
   StateCollection<uint8_t, Button> buttons_;
   StateCollection<float, Axis> axes_;
 };

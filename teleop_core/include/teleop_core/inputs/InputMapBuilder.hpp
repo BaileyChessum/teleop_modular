@@ -43,8 +43,11 @@ public:
    * \input Either an external T*, or for internal use in push_aggregate, an inputs id for the output InputMap.
    */
   inline void declare_aggregate(const std::string& name, std::variant<size_t, T*> input) {
+    auto logger = rclcpp::get_logger("input_map_builder");
+
     const auto it = map_.find(name);
     if (it == map_.end()) {
+      RCLCPP_DEBUG(logger, "Setting %s reference directly", name.c_str());
       // No conflict -- set directly
       map_[name] = input;
       return;
@@ -56,9 +59,11 @@ public:
     // If there is an existing aggregate, simply append the id to its sources
     const auto aggregate_it = aggregates_.find(name);
     if (aggregate_it != aggregates_.end()) {
+      RCLCPP_DEBUG(logger, "Adding %s reference to aggregate", name.c_str());
       aggregate_it->second.source_ids.push_back(input);
     }
     else {
+      RCLCPP_DEBUG(logger, "Adding %s reference to new aggregate", name.c_str());
       // Otherwise make a new aggregate
       const auto aggregate_target_id = push_replace(name);
       typename InputAggregator<T>::Props aggregate{{}, aggregate_target_id };

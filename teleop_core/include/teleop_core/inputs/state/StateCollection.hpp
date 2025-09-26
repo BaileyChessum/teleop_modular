@@ -80,6 +80,7 @@ public:
     RCLCPP_DEBUG(logger, "Making new state shared pointer.");
     // Make and register a new state
     const auto state = std::make_shared<State<T>>(name, value);
+    state->value = value;
     items_[name] = state;
 
     RCLCPP_DEBUG(logger, "Relinking input pipeline.");

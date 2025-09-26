@@ -40,7 +40,6 @@ public:
   ~TeleopNode() override;
 
   void initialize(const std::weak_ptr<rclcpp::Executor> & executor);
-  void log_existing_inputs();
 
   /**
    * Infinite loop that repeatedly services updates from input sources. The heart of the program.

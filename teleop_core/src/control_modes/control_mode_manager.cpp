@@ -379,6 +379,7 @@ bool ControlModeManager::get_type_for_control_mode(
 
 void ControlModeManager::link_inputs(const InputManager::Props& previous, InputManager::Props& next, const InputPipelineBuilder::DeclaredNames& declared_names) {
   // No inputs to provide!
+  next = previous;
 }
 
 void ControlModeManager::declare_input_names(InputPipelineBuilder::DeclaredNames& names)

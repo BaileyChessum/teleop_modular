@@ -55,8 +55,6 @@ void TeleopNode::initialize(const std::weak_ptr<rclcpp::Executor> & executor)
   commands_ = std::make_shared<internal::CommandManager>(get_node(), shared_from_this());
   commands_->configure(events_.get_events());
 
-  log_existing_inputs();
-
   // Input source initialization and setup depends on commands and control modes to first request the inputs that want
   // populated.
   RCLCPP_DEBUG(logger, "TeleopNode::init(): Creating input sources.");
@@ -83,31 +81,6 @@ void TeleopNode::initialize(const std::weak_ptr<rclcpp::Executor> & executor)
   events_.get_events()["start"]->invoke();
   events_.update(now);
   RCLCPP_DEBUG(logger, "TeleopNode::init(): Fully initialized!");
-}
-
-void TeleopNode::log_existing_inputs()
-{
-  std::stringstream log;
-
-  // if (inputs_.get_axes().size() > 0) {
-  //   log << C_INPUT "\tAxes:\n" C_RESET;
-  //
-  //   for (const auto & axis : inputs_.get_axes()) {
-  //     log << C_INPUT "\t  " << axis->get_name() << "\t" << axis.value() << "\n" C_RESET;
-  //   }
-  // }
-  //
-  // if (inputs_.get_buttons().size() > 0) {
-  //   log << C_INPUT "\tButtons:\n" C_RESET;
-  //
-  //   for (const auto & button : inputs_.get_buttons()) {
-  //     log << C_INPUT "\t  " << button->get_name() << "\t" << button.value() << "\n" C_RESET;
-  //   }
-  // }
-
-  RCLCPP_DEBUG(
-    get_node()->get_logger(), C_TITLE "Registered inputs:\n" C_RESET "%s\n",
-    log.str().c_str());
 }
 
 void TeleopNode::service_input_updates()

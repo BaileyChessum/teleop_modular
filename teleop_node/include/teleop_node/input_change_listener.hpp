@@ -41,7 +41,9 @@ public:
    * next.
    * \param[in,out] next The result of this Element. Always stores the previous result from this Element.
    */
-  void link_inputs(const InputManager::Props&, InputManager::Props&, const InputPipelineBuilder::DeclaredNames&) override {};
+  void link_inputs(const InputManager::Props& previous, InputManager::Props& next, const InputPipelineBuilder::DeclaredNames&) override {
+    next = previous;
+  };
 
   /**
    * Callback ran when hardened inputs are available.

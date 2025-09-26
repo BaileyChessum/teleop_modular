@@ -44,10 +44,13 @@ void SetButtonCommand::on_initialize(
   }
 
   params_ = params;
+
+  context.get_states().get_buttons().set(params_.name, 0);
 }
 
 void SetButtonCommand::execute(CommandDelegate & context, const rclcpp::Time & now)
 {
+  RCLCPP_DEBUG(get_logger(), "Setting \"%s\" to \"%d\"", params_.name.c_str(), params_.value);
   context.get_states().get_buttons().set(params_.name, params_.value);
 }
 
