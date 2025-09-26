@@ -34,10 +34,6 @@ template<typename T, typename InputT>
 class StateCollection
 {
 public:
-//  static_assert(
-//    std::is_base_of_v<InputCommon<T>, InputT>,
-//    "InputT must be an input type inheriting from InputCommon (Button, Axis).");
-
   explicit StateCollection(InputPipelineElementDelegate& delegate)
     : delegate_(delegate)
   {
@@ -81,10 +77,12 @@ public:
 
     auto logger = rclcpp::get_logger("state_collection");
 
-    RCLCPP_DEBUG()
+    RCLCPP_DEBUG(logger, "Making new state shared pointer.");
     // Make and register a new state
     const auto state = std::make_shared<State<T>>(name, value);
     items_[name] = state;
+
+    RCLCPP_DEBUG(logger, "Relinking input pipeline.");
     delegate_.relink();
   }
 
@@ -95,15 +93,22 @@ public:
   void clear(const std::string & name)
   {
     // Find the element
-    // auto it = items_.find(name);
+    auto it = items_.find(name);
 
-    // if (it == items_.end()) {
-    //   // Do nothing, as its already undefined
-    //   return;
-    // }
+    if (it == items_.end()) {
+      // Do nothing, as its already undefined
+      return;
+    }
 
-    // it->second.input->remove_definition(it->second.state->reference);
-    // items_.erase(name);
+    auto shared_ptr = it->second;
+
+    auto logger = rclcpp::get_logger("state_collection");
+    RCLCPP_DEBUG(logger, "Erasing \"%s\" from collection, then relinking", name.c_str());
+    items_.erase(name);
+    delegate_.relink();
+
+    RCLCPP_DEBUG(logger, "Dropping state shared pointer for \"%s\"", name.c_str());
+    shared_ptr.reset();
   }
 
   // Make the collection iterable

@@ -16,6 +16,7 @@
 
 #include "teleop_core/inputs/InputMapBuilder.hpp"
 #include "teleop_core/inputs/InputManager.hpp"
+#include <utility>
 #include <vector>
 #include <set>
 #include <functional>
@@ -28,11 +29,19 @@ public:
   virtual void relink() = 0;
 };
 
+class PositionalInputPipelineElementDelegate : public InputPipelineElementDelegate {
+public:
+  virtual void relink_from(size_t index) = 0;
+  void relink() override {
+    relink_from(0);
+  }
+};
+
 /**
  * Manages multiple things that add stuff to InputMapBuilders for InputManager::Props, but which might need to retrigger
  * the rest of the build process down the line.
  */
-class InputPipelineBuilder
+class InputPipelineBuilder : public PositionalInputPipelineElementDelegate
 {
 public:
   /**
@@ -113,7 +122,10 @@ public:
   /**
    * Relinks all inputs from elements index and up
    */
-  void relink_from(size_t index) {
+  void relink_from(size_t index) override {
+    auto logger = rclcpp::get_logger("input_pipeline_builder");
+    RCLCPP_DEBUG(logger, "Relinking input pipline from element %lu", index);
+
     if (!previously_declared_names_) {
       declare_names();
     }
@@ -133,6 +145,7 @@ public:
       if (!previously_linked_)
         element.next = previous_inputs;
 
+      RCLCPP_DEBUG(logger, "Relinking input pipline element %lu", i);
       element.element.get().link_inputs(previous_inputs, element.next, names_);
       previous_inputs = element.next;
     }
@@ -140,9 +153,11 @@ public:
     previously_linked_ = true;
 
     // Harden the inputs
+    RCLCPP_DEBUG(logger, "Hardening inputs");
     auto hardened = target_.init(elements_[elements_.size() - 1].next);
 
     for (size_t i = index; i < elements_.size(); i++) {
+      RCLCPP_DEBUG(logger, "Providing inputs to input pipeline element %lu", i);
       elements_[i].element.get().on_inputs_available(hardened);
     }
   }
@@ -173,9 +188,7 @@ public:
     const auto index = elements_.size();
     auto previous_inputs = index > 0 ? elements_[index - 1].next : InputManager::Props();
 
-    elements_.emplace_back(element, previous_inputs, [index, this](){
-      this->relink_from(index);
-    });
+    elements_.emplace_back(element, previous_inputs, *this, index);
 
     // Update the pipeline if previously set up
     if (previously_declared_names_)
@@ -187,7 +200,7 @@ public:
   /**
    * Creates a new pipeline without any elements
    */
-  InputPipelineBuilder(InputManager& target) : target_(target) {}
+  explicit InputPipelineBuilder(InputManager& target) : target_(target) {}
 
   /**
    * Used for unit tests. Removes all elements. Does not relink after clearing.
@@ -207,9 +220,7 @@ public:
     elements_.reserve(elements.size());
     for (size_t i = 0; i < elements.size(); i++) {
       auto& element = elements[i];
-      elements_.emplace_back(element, InputManager::Props{}, [i, this](){
-        this->relink_from(i);
-      });
+      elements_.emplace_back(element, InputManager::Props{}, *this, i);
     }
   }
 
@@ -221,14 +232,24 @@ private:
   public:
     std::reference_wrapper<Element> element;
     InputManager::Props next;
-    std::function<void()> relink_callback;
+
+    PositionalInputPipelineElementDelegate & delegate;
+    size_t position;
 
     void relink() override {
-      relink_callback();
+      auto logger = rclcpp::get_logger("input_pipeline_element_handle");
+      RCLCPP_DEBUG(logger, "Relinking inputs.");
+
+      delegate.relink_from(position);
     }
 
-    ElementHandle(std::reference_wrapper<Element> element, InputManager::Props next, std::function<void()> callback)
-      : element(element), next(next), relink_callback(callback) {
+    ElementHandle(
+        std::reference_wrapper<Element> element,
+        InputManager::Props next,
+        PositionalInputPipelineElementDelegate & delegate,
+        size_t position)
+      : element(element), next(std::move(next)), delegate(delegate), position(position)
+    {
       element.get().set_pipeline_delegate(*this);
     }
   };

@@ -33,6 +33,11 @@ void InputChangeListener::on_inputs_available(InputManager::Hardened& inputs)
 {
   std::stringstream log;
 
+  button_names_.clear();
+  axis_names_.clear();
+  previous_buttons_.clear();
+  previous_axes_.clear();
+
   button_names_.reserve(inputs.buttons.size());
   buttons_.reserve(inputs.buttons.size());
   previous_buttons_.reserve(inputs.buttons.size());
