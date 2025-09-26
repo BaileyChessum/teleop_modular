@@ -79,6 +79,9 @@ public:
       return;
     }
 
+    auto logger = rclcpp::get_logger("state_collection");
+
+    RCLCPP_DEBUG()
     // Make and register a new state
     const auto state = std::make_shared<State<T>>(name, value);
     items_[name] = state;

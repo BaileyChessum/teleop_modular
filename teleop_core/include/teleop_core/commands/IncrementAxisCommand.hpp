@@ -25,7 +25,8 @@ public:
   IncrementAxisCommand() = default;
   void on_initialize(
     const std::string & prefix,
-    const ParameterInterface::SharedPtr & parameters) override;
+    const ParameterInterface::SharedPtr & parameters,
+    CommandDelegate & context) override;
 
   void execute(CommandDelegate & context, const rclcpp::Time & now) override;
 

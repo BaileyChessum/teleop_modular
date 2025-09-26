@@ -8,7 +8,7 @@
 //     http://www.apache.org/licenses/LICENSE-2.0
 //
 //
-// Created by nova on 7/4/25.
+// Created by Bailey Chessum on 7/4/25.
 //
 
 #include "teleop_core/commands/SetButtonCommand.hpp"
@@ -18,7 +18,8 @@ namespace teleop
 
 void SetButtonCommand::on_initialize(
   const std::string & prefix,
-  const ParameterInterface::SharedPtr & parameters)
+  const ParameterInterface::SharedPtr & parameters,
+  CommandDelegate & context)
 {
   Params params{};
 

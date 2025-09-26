@@ -19,7 +19,8 @@ namespace teleop
 
 void IncrementAxisCommand::on_initialize(
   const std::string & prefix,
-  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & parameters)
+  const ParameterInterface::SharedPtr & parameters,
+  CommandDelegate & context)
 {
   Params params{};
 

@@ -40,10 +40,12 @@ public:
 
   /**
    * Sets up the command. Alternative to the constructor, which works with pluginlib.
-   * @param name       The name of the command, as defined in the parameter file.
-   * @param on         The list of events that should make the command be executed when invoked.
-   * @param logging    The logging interface to use.
-   * @param parameters The parameter interface to use when configuring the command.
+   * \param[in] context     An interface providing access to the internals of Teleop_Modular, for the command to mess
+   *                        with.
+   * \param[in] name        The name of the command, as defined in the parameter file.
+   * \param[in] on          The list of events that should make the command be executed when invoked.
+   * \param[in] logging     The logging interface to use.
+   * \param[in] parameters  The parameter interface to use when configuring the command.
    */
   void initialize(
     const CommandDelegate::WeakPtr & context, const std::string & name,
@@ -53,18 +55,21 @@ public:
   /**
    * Allows command implementations to perform implementation specific configuration through the given parameters
    * interface.
-   * @param prefix[in]      The prefix string to prepend to all parameter definitions. E.g. "commands.name."
-   * @param parameters[in]  Interface to allow the command to get parameters
+   * \param[in] prefix      The prefix string to prepend to all parameter definitions. E.g. "commands.name."
+   * \param[in] parameters  Interface to allow the command to get parameters
+   * \param[in] context     An interface providing access to the internals of Teleop_Modular, for the command to mess
+   *                        with.
    */
   virtual void on_initialize(
     const std::string & prefix,
-    const ParameterInterface::SharedPtr & parameters) = 0;
+    const ParameterInterface::SharedPtr & parameters,
+    CommandDelegate & context) = 0;
 
   /**
    * Method to execute the functionality for the command implementation, called when any of the command's "on" events
    * are invoked.
-   * @param context An interface providing access to the internals of Teleop_Modular, for the command to mess with.
-   * @param now     The time from the input that caused this execution.
+   * \param context An interface providing access to the internals of Teleop_Modular, for the command to mess with.
+   * \param now     The time from the input that caused this execution.
    */
   virtual void execute(CommandDelegate & context, const rclcpp::Time & now) = 0;
 
