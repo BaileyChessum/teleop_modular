@@ -37,6 +37,8 @@ void InputChangeListener::on_inputs_available(InputManager::Hardened& inputs)
   axis_names_.clear();
   previous_buttons_.clear();
   previous_axes_.clear();
+  axes_.clear();
+  buttons_.clear();
 
   button_names_.reserve(inputs.buttons.size());
   buttons_.reserve(inputs.buttons.size());

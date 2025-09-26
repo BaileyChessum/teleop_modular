@@ -46,6 +46,8 @@ void Command::initialize(
 
 void Command::on_event_invoked(const rclcpp::Time & now)
 {
+  RCLCPP_DEBUG(get_logger(), "Executing command \"%s\"", get_name().c_str());
+
   if (const auto context = context_.lock()) {
     execute(*context, now);
   }

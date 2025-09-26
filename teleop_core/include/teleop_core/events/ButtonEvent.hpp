@@ -37,9 +37,9 @@ public:
 
   // TODO: Rename to make clear that these are the inputs we want to consume, not provide
   /**
-     * Allows an element to declare what inputs it CONSUMES, not provides. This is useful for any dynamic remapping of
-     * any previous elements in the pipeline.
-     * \param[in, out] names the set accumulating all declared input names. Add names to declare to this set.
+   * Allows an element to declare what inputs it CONSUMES, not provides. This is useful for any dynamic remapping of
+   * any previous elements in the pipeline.
+   * \param[in, out] names the set accumulating all declared input names. Add names to declare to this set.
    */
   void declare_input_names(DeclaredNames& names) override;;
 
