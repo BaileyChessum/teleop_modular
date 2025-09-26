@@ -11,6 +11,7 @@
 
   <depend>pluginlib</depend>
   <depend>rclcpp</depend>
+  <depend>teleop_msgs</depend>
 
   <build_depend>control_mode</build_depend>
   <build_export_depend>control_mode</build_export_depend>
