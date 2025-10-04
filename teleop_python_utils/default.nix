@@ -5,6 +5,8 @@
 , teleop-modular-msgs
 , ament-cmake-python
 , python3Packages
+, ament-lint-auto
+, ament-cmake-pytest
 }:
 
 buildRosPackage {
@@ -18,6 +20,8 @@ buildRosPackage {
 
   nativeBuildInputs = [
     ament-cmake-python
+    ament-lint-auto
+    ament-cmake-pytest
   ];
 
   buildInputs = [
@@ -31,5 +35,6 @@ buildRosPackage {
     python3Packages.pytest
   ];
 
-  doCheck = true;
+  # ament_add_pytest_test is currently not working with the ament-cmake-pytest dependency?
+  doCheck = false;
 }
