@@ -10,6 +10,7 @@
 , teleop-modular-msgs
 , teleop-modular-srvs
 , teleop-modular-python-utils
+, teleop-modular-input-publisher-mode
 }:
 
 buildRosPackage {
@@ -40,6 +41,7 @@ buildRosPackage {
     teleop-modular-msgs
     teleop-modular-srvs
     teleop-modular-python-utils
+    teleop-modular-input-publisher-mode
   ];
 
   meta = {
