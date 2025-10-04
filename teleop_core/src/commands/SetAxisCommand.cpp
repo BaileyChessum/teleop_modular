@@ -17,7 +17,8 @@ namespace teleop
 
 void SetAxisCommand::on_initialize(
   const std::string & prefix,
-  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & parameters)
+  const ParameterInterface::SharedPtr & parameters,
+  CommandDelegate & context)
 {
   Params params{};
 
@@ -42,6 +43,8 @@ void SetAxisCommand::on_initialize(
   }
 
   params_ = params;
+
+  context.get_states().get_buttons().set(params_.name, 0);
 }
 
 void SetAxisCommand::execute(CommandDelegate & context, const rclcpp::Time & now)

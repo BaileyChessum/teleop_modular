@@ -14,17 +14,17 @@
 from rclpy.node import Node
 from rclpy.lifecycle import LifecycleNode
 from rclpy.qos import QoSProfile
-from typing import Union, Optional, Dict, List
+from typing import Union, Optional, List
 
-from teleop_msgs.msg import InputNames, InputValues, InvokedEvents, CombinedInputValues, CombinedInputs
+from teleop_msgs.msg import InputNames, InputValues, InvokedEvents, CombinedInputValues
 from teleop_msgs.msg import Inputs as InputsMessage
 
-from teleop_python_utils.EventCollection import EventCollection
-from teleop_python_utils.Event import Event, Callback
-from teleop_python_utils.Button import Button
-from teleop_python_utils.ButtonCollection import ButtonCollection
-from teleop_python_utils.Axis import Axis
-from teleop_python_utils.AxisCollection import AxisCollection
+from .EventCollection import EventCollection
+from .Event import Event, Callback
+from .Button import Button
+from .ButtonCollection import ButtonCollection
+from .Axis import Axis
+from .AxisCollection import AxisCollection
 
 # We want to support both Nodes and LifecycleNodes
 NodeType = Union[Node, LifecycleNode]

@@ -22,6 +22,9 @@
 #include <rclcpp/executor.hpp>
 #include "control_mode/control_mode.hpp"
 #include "teleop_core/inputs/InputManager.hpp"
+#include "teleop_core/inputs/input_pipeline_builder.hpp"
+#include "control_mode/event/event_collection.hpp"
+#include "teleop_core/control_modes/controller_manager_manager.hpp"
 
 namespace teleop::internal
 {
@@ -29,20 +32,29 @@ namespace teleop::internal
 /**
  * Class responsible for managing the registered control modes, the current control mode, and switching between them.
  */
-class ControlModeManager final
+class ControlModeManager final : public InputPipelineBuilder::Element
 {
 public:
   explicit ControlModeManager(
     const std::shared_ptr<rclcpp::Node> & node,
-    const std::weak_ptr<rclcpp::Executor> & executor)
-  : node_(node), executor_(executor)
+    const std::weak_ptr<rclcpp::Executor> & executor,
+    control_mode::EventCollection & events)
+  : node_(node), executor_(executor), events_(events)
   {
   }
 
   /**
    * Populates the control_modes_ from the params in node_.
    */
-  void configure(InputManager & inputs);
+  void configure();
+
+  /**
+   * @brief Attempts to activate a control mode.
+   * @param activate The names of the control modes to activate.
+   * @param deactivate The names of the control modes to deactivate.
+   * @return True if successfully switched to the control modes.
+   */
+  bool switch_control_mode(const std::vector<std::string> & activate, const std::vector<std::string> & deactivate);
 
   /**
    * @brief Attempts to activate a control mode.
@@ -85,6 +97,27 @@ public:
 
   void activate_initial_control_mode();
 
+  /**
+     * Add inputs to the builder.
+     * \param[in] previous The result of the previous InputPipelineBuilder::Element, to use as a basis for populating
+     * next.
+     * \param[in,out] next The result of this Element. Always stores the previous result from this Element.
+   */
+  void link_inputs(const InputManager::Props& previous, InputManager::Props& next, const InputPipelineBuilder::DeclaredNames& names) override;
+
+  // TODO: Rename to make clear that these are the inputs we want to consume, not provide
+  /**
+     * Allows an element to declare what inputs it CONSUMES, not provides. This is useful for any dynamic remapping of
+     * any previous elements in the pipeline.
+     * \param[in, out] names the set accumulating all declared input names. Add names to declare to this set.
+   */
+  void declare_input_names(InputPipelineBuilder::DeclaredNames& names) override;
+
+  /**
+     * Callback ran when hardened inputs are available.
+   */
+  void on_inputs_available(InputManager::Hardened& inputs) override;
+
 private:
   /**
    * Resets everything for the controller manager
@@ -114,20 +147,22 @@ private:
   std::shared_ptr<rclcpp::Node> node_;
   /// Add spawned nodes to this to get them to spin
   std::weak_ptr<rclcpp::Executor> executor_;
+  /// Used to get events from when configuring inputs
+  control_mode::EventCollection& events_;
+
+  /// Helps with switching controllers in ros2_control, managing separate threads, error recovery and activation order.
+  ControllerManagerManager controllers_ = ControllerManagerManager(node_);
 
   // Control modes
   /// Loads the control modes, and needs to stay alive during the whole lifecycle of the control modes.
   std::unique_ptr<pluginlib::ClassLoader<control_mode::ControlMode>> control_mode_loader_;
 
+  // TODO: Replace with control_modes_by_id_ and name_to_cm_id_
   /// Currently loaded control modes.
   std::map<std::string, std::shared_ptr<control_mode::ControlMode>> control_modes_{};
-  /// The currently active control mode.
-  // std::shared_ptr<control_mode::ControlMode> current_control_mode_ = nullptr;
 
-  // Service calls
-  /// Client to call the service on the controller manager to change the currently active controllers.
-  rclcpp::Client<controller_manager_msgs::srv::SwitchController>::SharedPtr
-    switch_controller_client_ = nullptr;
+  std::vector<std::shared_ptr<control_mode::ControlMode>> control_modes_by_id_{};
+  std::map<std::string, size_t> name_to_cm_id_{};
 };
 
 }  // namespace teleop::internal

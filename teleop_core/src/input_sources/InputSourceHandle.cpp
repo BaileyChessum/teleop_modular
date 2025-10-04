@@ -29,19 +29,16 @@ using utils::get_parameter_or_default;
 
 InputSourceHandle::InputSourceHandle(
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & parameters,
-  InputManager & inputs, const std::shared_ptr<InputSource> & source)
-: inputs_(std::ref(inputs)), parameters_(parameters), source_(source)
+  const std::shared_ptr<InputSource> & source)
+: parameters_(parameters), source_(source)
 {
-  declare_and_link_inputs();
 }
 
 InputSourceHandle::InputSourceHandle(
-  InputManager & inputs,
   const std::shared_ptr<InputSource> & source)
-: inputs_(std::ref(inputs)), source_(source),
+: source_(source),
   parameters_(source->get_node()->get_node_parameters_interface())
 {
-  declare_and_link_inputs();
 }
 
 template<>
@@ -52,14 +49,14 @@ InputSourceHandle::TransformedRemapValue<uint8_t, InputSourceHandle::Transformed
   value = 0;
 
   if (from.has_value()) {
-    value = from.value().get();
+    value = *from.value();
   }
 
   // Apply button from axis
   if (from_other.has_value()) {
     auto & from_axis = from_other.value();
 
-    if (from_axis.axis.get() < from_axis.threshold) {
+    if (*from_axis.axis < from_axis.threshold) {
       value = 1;
     }
   }
@@ -82,18 +79,18 @@ InputSourceHandle::TransformedRemapValue<float, InputSourceHandle::TransformedRe
   value = 0.0f;
 
   if (from.has_value()) {
-    value = from.value().get();
+    value = *from.value();
   }
 
   // Apply axis from buttons
   if (from_other.has_value()) {
     auto & from_buttons = from_other.value();
 
-    if (from_buttons.negative.has_value() && from_buttons.negative.value().get()) {
+    if (from_buttons.negative.has_value() && *from_buttons.negative.value()) {
       value -= 1.0f;
     }
 
-    if (from_buttons.positive.has_value() && from_buttons.positive.value().get()) {
+    if (from_buttons.positive.has_value() && *from_buttons.positive.value()) {
       value += 1.0f;
     }
   }
@@ -150,47 +147,30 @@ void InputSourceHandle::update(const rclcpp::Time & now)
   }
 }
 
-void InputSourceHandle::add_definitions_to_inputs() const
-{
-  // Add declarations to inputs
-  for (auto & button : button_definitions_) {
-    for (auto & definition : button.references) {
-      button.input->add_definition(definition);
-    }
-  }
-
-  for (auto & axis : axis_definitions_) {
-    for (auto & definition : axis.references) {
-      axis.input->add_definition(definition);
-    }
-  }
-}
-
-void InputSourceHandle::declare_and_link_inputs()
+void InputSourceHandle::declare_and_link_inputs(const InputPipelineBuilder::DeclaredNames& names)
 {
   const auto logger = source_->get_node()->get_logger();
   // TODO(BaileyChessum): Check if inputs are already linked, and unlink them
 
   auto declarations = source_->export_inputs();
-  const auto remap_params = get_remap_params();
+  const auto remap_params = get_remap_params(names);
   remap(declarations, remap_params);
 
-  add_definitions_to_inputs();
+  // add_definitions_to_inputs();
 }
 
-InputSourceHandle::RemapParams InputSourceHandle::get_remap_params()
+InputSourceHandle::RemapParams InputSourceHandle::get_remap_params(const InputPipelineBuilder::DeclaredNames& names)
 {
   RemapParams remap_params;
-  auto & inputs = inputs_.get();
 
-  for (const auto & button : inputs.get_buttons()) {
-    if (auto params = get_remap_button_params(button->get_name()); params.has_value()) {
+  for (const auto & name : names.button_names) {
+    if (auto params = get_remap_button_params(name); params.has_value()) {
       remap_params.buttons.emplace_back(*params);
     }
   }
 
-  for (const auto & axis : inputs.get_axes()) {
-    if (auto params = get_remap_axis_params(axis->get_name()); params.has_value()) {
+  for (const auto & name : names.axis_names) {
+    if (auto params = get_remap_axis_params(name); params.has_value()) {
       remap_params.axes.emplace_back(*params);
     }
   }
@@ -367,25 +347,24 @@ void InputSourceHandle::remap(
   RemapParams remap_params)
 {
   const auto logger = source_->get_node()->get_logger();
-  auto & inputs = inputs_.get();
 
   // Stores, for each exported button, whether the button is remapped
   std::vector<bool> is_button_remapped(declarations.button_names.size(), false);
   std::vector<bool> is_axis_remapped(declarations.axis_names.size(), false);
 
   // Reset definitions
-  button_definitions_.clear();
-  button_definitions_.reserve(declarations.button_names.size());
+  button_definitions.clear();
+  button_definitions.reserve(declarations.button_names.size());
   transformed_buttons_.clear();
   transformed_buttons_.reserve(remap_params.buttons.size());
-  std::vector<Button::SharedPtr> transformed_buttons_deferred_registration;
+  std::vector<std::string> transformed_buttons_deferred_registration;
   transformed_buttons_deferred_registration.reserve(remap_params.buttons.size());
 
   // Create definitions for each remapped input, marking which ones have been remapped
-  auto & buttons = inputs.get_buttons();
+//  const auto & buttons = names.button_names;
   for (auto & [name, from, transform, from_axis] : remap_params.buttons) {
     // Find if there is a direct renaming
-    std::optional<std::reference_wrapper<uint8_t>> reference = std::nullopt;
+    std::optional<uint8_t*> reference = std::nullopt;
     if (from.has_value()) {  // Find the index for the 'from' param in button_names
       const auto it = std::find(
         declarations.button_names.begin(), declarations.button_names.end(),
@@ -395,7 +374,7 @@ void InputSourceHandle::remap(
         const size_t index = std::distance(declarations.button_names.begin(), it);
         is_button_remapped[index] = true;
 
-        reference = std::ref(declarations.buttons[index]);
+        reference = &declarations.buttons[index];
       } else {
         // TODO(BaileyChessum): Recursively declare the missing 'from', merging transforms until reaching a valid
         // original input
@@ -414,10 +393,7 @@ void InputSourceHandle::remap(
         continue;
       }
 
-      button_definitions_.emplace_back(
-        buttons[name], reference.has_value() ?
-        (std::vector{reference.value()}) :
-        (std::vector<std::reference_wrapper<uint8_t>>{}));
+      button_definitions.emplace_back(name, reference.value());
       continue;
     }
 
@@ -431,7 +407,7 @@ void InputSourceHandle::remap(
 
       if (axis_it != declarations.axis_names.end()) {
         const size_t axis_index = std::distance(declarations.axis_names.begin(), axis_it);
-        const auto axis_reference = std::ref(declarations.axes[axis_index]);
+        const auto axis_reference = &declarations.axes[axis_index];
         from_axis_transform = TransformedRemapButtonFromAxis{axis_reference,
           from_axis.value().threshold};
         is_axis_remapped[axis_index] = true;
@@ -446,29 +422,29 @@ void InputSourceHandle::remap(
 
     // Create the transform, but defer registration to after all the transformed buttons have been created.
     transformed_buttons_.emplace_back(0, reference, from_axis_transform, transform);
-    transformed_buttons_deferred_registration.emplace_back(buttons[name]);
+    transformed_buttons_deferred_registration.emplace_back(name);
   }
 
   // Register deferred transform buttons
   for (size_t i = 0; i < transformed_buttons_deferred_registration.size(); ++i) {
     auto & transformed_button = transformed_buttons_[i];
-    const auto & button = transformed_buttons_deferred_registration[i];
-    button_definitions_.emplace_back(button, std::vector{std::ref(transformed_button.value)});
+    const auto & name = transformed_buttons_deferred_registration[i];
+    button_definitions.emplace_back(name, &transformed_button.value);
   }
 
   // Reset definitions
-  axis_definitions_.clear();
-  axis_definitions_.reserve(declarations.axis_names.size());
+  axis_definitions.clear();
+  axis_definitions.reserve(declarations.axis_names.size());
   transformed_axes_.clear();
   transformed_axes_.reserve(remap_params.axes.size());
-  std::vector<Axis::SharedPtr> transformed_axes_deferred_registration;
+  std::vector<std::string> transformed_axes_deferred_registration;
   transformed_axes_deferred_registration.reserve(remap_params.axes.size());
 
   // Create definitions for each remapped input, marking which ones have been remapped
-  auto & axes = inputs.get_axes();
+//  auto & axes = inputs.get_axes();
   for (auto & [name, from, transform, from_buttons] : remap_params.axes) {
     // Find if there is a direct renaming
-    std::optional<std::reference_wrapper<float>> reference = std::nullopt;
+    std::optional<float*> reference = std::nullopt;
     if (from.has_value()) {  // Find the index for the 'from' param in axis_names
       const auto it = std::find(
         declarations.axis_names.begin(), declarations.axis_names.end(),
@@ -478,7 +454,7 @@ void InputSourceHandle::remap(
         const size_t index = std::distance(declarations.axis_names.begin(), it);
         is_axis_remapped[index] = true;
 
-        reference = std::ref(declarations.axes[index]);
+        reference = &declarations.axes[index];
       } else {
         // TODO(BaileyChessum): Recursively declare the missing 'from', merging transforms until reaching a valid
         // original input
@@ -497,17 +473,14 @@ void InputSourceHandle::remap(
         continue;
       }
 
-      axis_definitions_.emplace_back(
-        axes[name], reference.has_value() ?
-        (std::vector{reference.value()}) :
-        (std::vector<std::reference_wrapper<float>>{}));
+      axis_definitions.emplace_back(name, reference.value());
       continue;
     }
 
     // Find if there is a remapping from an axis
     std::optional<TransformedRemapAxisFromButtons> from_buttons_transform;
     if (from_buttons.has_value()) {
-      std::optional<std::reference_wrapper<uint8_t>> negative_reference = std::nullopt;
+      std::optional<uint8_t*> negative_reference = std::nullopt;
       if (from_buttons.value().negative.has_value()) {
         const auto negative_it = std::find(
           declarations.button_names.begin(), declarations.button_names.end(),
@@ -517,7 +490,7 @@ void InputSourceHandle::remap(
           const size_t negative_index = std::distance(
             declarations.button_names.begin(),
             negative_it);
-          negative_reference = std::ref(declarations.buttons[negative_index]);
+          negative_reference = &declarations.buttons[negative_index];
           is_button_remapped[negative_index] = true;
         } else {
           // TODO(BaileyChessum): Recursively declare the missing 'from', merging transforms until reaching a valid
@@ -530,7 +503,7 @@ void InputSourceHandle::remap(
         }
       }
 
-      std::optional<std::reference_wrapper<uint8_t>> positive_reference = std::nullopt;
+      std::optional<uint8_t*> positive_reference = std::nullopt;
       if (from_buttons.value().positive.has_value()) {
         const auto positive_it = std::find(
           declarations.button_names.begin(), declarations.button_names.end(),
@@ -540,7 +513,7 @@ void InputSourceHandle::remap(
           const size_t positive_index = std::distance(
             declarations.button_names.begin(),
             positive_it);
-          positive_reference = std::ref(declarations.buttons[positive_index]);
+          positive_reference = &declarations.buttons[positive_index];
           is_button_remapped[positive_index] = true;
         } else {
           // TODO(BaileyChessum): Recursively declare the missing 'from', merging transforms until reaching a valid
@@ -553,20 +526,19 @@ void InputSourceHandle::remap(
         }
       }
 
-      from_buttons_transform = TransformedRemapAxisFromButtons{negative_reference,
-        positive_reference};
+      from_buttons_transform = TransformedRemapAxisFromButtons{negative_reference, positive_reference};
     }
 
     // Create the transform, but defer registration to after all the transformed axes have been created.
     transformed_axes_.emplace_back(0.0f, reference, from_buttons_transform, transform);
-    transformed_axes_deferred_registration.emplace_back(axes[name]);
+    transformed_axes_deferred_registration.emplace_back(name);
   }
 
   // Register deferred transform axes
   for (size_t i = 0; i < transformed_axes_deferred_registration.size(); ++i) {
     auto & transformed_axis = transformed_axes_[i];
-    const auto & axis = transformed_axes_deferred_registration[i];
-    axis_definitions_.emplace_back(axis, std::vector{std::ref(transformed_axis.value)});
+    const auto & name = transformed_axes_deferred_registration[i];
+    axis_definitions.emplace_back(name, &transformed_axis.value);
   }
 
   // Create definitions for unmapped inputs
@@ -576,9 +548,9 @@ void InputSourceHandle::remap(
     }
 
     const auto & name = declarations.button_names[i];
-    const auto reference = std::ref(declarations.buttons[i]);
+    const auto reference = &declarations.buttons[i];
 
-    button_definitions_.emplace_back(buttons[name], std::vector{reference});
+    button_definitions.emplace_back(name, reference);
   }
 
   // Create definitions for unmapped inputs
@@ -588,9 +560,9 @@ void InputSourceHandle::remap(
     }
 
     const auto & name = declarations.axis_names[i];
-    const auto reference = std::ref(declarations.axes[i]);
+    const auto reference = &declarations.axes[i];
 
-    axis_definitions_.emplace_back(axes[name], std::vector{reference});
+    axis_definitions.emplace_back(name, reference);
   }
 }
 

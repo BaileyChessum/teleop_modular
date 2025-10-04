@@ -46,9 +46,9 @@ protected:
 private:
   /// We use infinity as the default limit, as it will effectively not impose a limit while avoiding branching
   static constexpr double infinity = std::numeric_limits<double>::infinity();
-  /// Helper type to hold 3 Axis::SharedPtrs to make a up a vector
-  using AxisVector3 = std::array<Axis::SharedPtr, 3>;
-  /// Helper type to hold 3 Axis::SharedPtrs to make a up a vector. You could also use Eigen for more complex use cases.
+  /// Helper type to hold 3 Axiss to make a up a vector
+  using AxisVector3 = std::array<Axis, 3>;
+  /// Helper type to hold 3 Axiss to make a up a vector. You could also use Eigen for more complex use cases.
   using NumberVector3 = std::array<double, 3>;
 
   /// Helper struct to avoid duplicating code for the nearly identical logic for linear and angular components of twist.
@@ -104,7 +104,7 @@ private:
   VectorHandle angular_;
 
   /// Input from 0 to 1 that directly scales the output speed.
-  Axis::SharedPtr speed_;
+  Axis speed_;
 };
 
 }  // namespace teleop_modular_twist

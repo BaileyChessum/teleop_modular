@@ -55,7 +55,7 @@ struct SpawnableLog
     output << "\t- " << name;
 
     if (type.has_value() && !error.has_value()) {
-      output << "\t" C_QUIET << type.value();
+      output << "\t" C_QUIET << ": " << type.value();
     }
 
     if (error.has_value()) {

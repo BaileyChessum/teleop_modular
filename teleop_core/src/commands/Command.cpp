@@ -8,7 +8,7 @@
 //     http://www.apache.org/licenses/LICENSE-2.0
 //
 //
-// Created by nova on 6/28/25.
+// Created by nova on 28/6/25.
 //
 
 #include "teleop_core/commands/Command.hpp"
@@ -35,13 +35,24 @@ void Command::initialize(
   }
 
   // Do command implementation specific parameterization
-  on_initialize("commands." + name + ".", parameters);
+
+  if (const auto context_shared = context_.lock()) {
+    on_initialize("commands." + name + ".", parameters, *context_shared);
+  }
+  else {
+    RCLCPP_ERROR(get_logger(), "Failed to access command delegate when initializing \"%s\"", get_name().c_str());
+  }
 }
 
 void Command::on_event_invoked(const rclcpp::Time & now)
 {
+  RCLCPP_DEBUG(get_logger(), "Executing command \"%s\"", get_name().c_str());
+
   if (const auto context = context_.lock()) {
     execute(*context, now);
+  }
+  else {
+    RCLCPP_ERROR(get_logger(), "Failed to access command delegate when initializing \"%s\"", get_name().c_str());
   }
 }
 

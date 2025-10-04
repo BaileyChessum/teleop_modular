@@ -12,8 +12,7 @@
 # Created by Bailey Chessum on 2/8/25.
 #
 from typing import Dict, Iterator, Tuple
-from teleop_python_utils.EventCollection import EventCollection
-from teleop_python_utils.Axis import Axis
+from .Axis import Axis
 
 class AxisCollection:
     def __init__(self):

@@ -11,9 +11,9 @@
 // Created by nova on 7/9/25.
 //
 
-#include "teleop_core/events/Event.hpp"
+#include "control_mode/event/event.hpp"
 
-namespace teleop
+namespace control_mode
 {
 
 Event::Event(std::string name, std::weak_ptr<internal::EventListenerQueue> listener_queue)

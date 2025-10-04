@@ -15,11 +15,14 @@
 #define TELEOP_MODULAR_INPUTSOURCEHANDLE_HPP
 
 #include <memory>
+#include <utility>
 #include <vector>
 #include <rclcpp/node_interfaces/node_parameters_interface.hpp>
 #include "input_source/input_source.hpp"
 #include "teleop_core/utilities/better_multimap.hpp"
 #include "teleop_core/inputs/InputManager.hpp"
+#include "teleop_core/inputs/InputDefinition.hpp"
+#include "teleop_core/inputs/input_pipeline_builder.hpp"
 
 namespace teleop::internal
 {
@@ -31,18 +34,18 @@ class InputSourceHandle
 
 public:
   explicit InputSourceHandle(
-    const ParameterInterface::SharedPtr & parameters, InputManager & inputs,
+    const ParameterInterface::SharedPtr & parameters,
     const std::shared_ptr<input_source::InputSource> & source);
 
   explicit InputSourceHandle(
-    InputManager & inputs,
     const std::shared_ptr<input_source::InputSource> & source);
 
   void update(const rclcpp::Time & now);
 
-  void add_definitions_to_inputs() const;
+  void declare_and_link_inputs(const InputPipelineBuilder::DeclaredNames& names);
 
-  void declare_and_link_inputs();
+  std::vector<InputDefinition<uint8_t>> button_definitions{};
+  std::vector<InputDefinition<float>> axis_definitions{};
 
 private:
   struct ButtonTransformParams
@@ -98,12 +101,12 @@ private:
   struct TransformedRemapValue
   {
     T value;
-    std::optional<std::reference_wrapper<T>> from;
+    std::optional<T*> from;
     std::optional<fromOtherT> from_other;
     std::optional<transformT> transform;
 
     TransformedRemapValue(
-      T value, std::optional<std::reference_wrapper<T>> from, std::optional<fromOtherT> from_other,
+      T value, std::optional<T*> from, std::optional<fromOtherT> from_other,
       std::optional<transformT> transform)
     : value(value), from(from), from_other(from_other), transform(transform)
     {
@@ -114,13 +117,13 @@ private:
 
   struct TransformedRemapButtonFromAxis
   {
-    std::reference_wrapper<float> axis;
+    float* axis;
     float threshold = 0.0f;
   };
   struct TransformedRemapAxisFromButtons
   {
-    std::optional<std::reference_wrapper<uint8_t>> negative;
-    std::optional<std::reference_wrapper<uint8_t>> positive;
+    std::optional<uint8_t*> negative;
+    std::optional<uint8_t*> positive;
   };
 
   using TransformedRemapButton = TransformedRemapValue<uint8_t, TransformedRemapButtonFromAxis,
@@ -128,28 +131,9 @@ private:
   using TransformedRemapAxis = TransformedRemapValue<float, TransformedRemapAxisFromButtons,
       AxisTransformParams>;
 
-  /// This is an actual connection of an input to a defining value
-  template<typename T, typename InputT>
-  struct Definition
-  {
-    static_assert(
-      std::is_base_of_v<InputCommon<T>, InputT>,
-      "InputT must be an input type inheriting from InputCommon (Button, Axis).");
-
-    /// We hold a shared pointer to keep any exported input alive
-    std::shared_ptr<InputT> input;
-    std::vector<std::reference_wrapper<T>> references;
-
-    Definition(
-      const std::shared_ptr<InputT> input,
-      const std::vector<std::reference_wrapper<T>> & references)
-    : input(input), references(references)
-    {
-    }
-  };
 
   void remap(input_source::InputDeclarationSpans declarations, RemapParams remap_params);
-  RemapParams get_remap_params();
+  RemapParams get_remap_params(const InputPipelineBuilder::DeclaredNames& names);
 
   std::optional<RemapButtonParams> get_remap_button_params(const std::string & name);
   std::optional<ButtonTransformParams> get_button_transform_params(const std::string & name);
@@ -157,14 +141,11 @@ private:
   std::optional<RemapAxisParams> get_remap_axis_params(const std::string & name);
   std::optional<AxisTransformParams> get_axis_transform_params(const std::string & name);
 
-  std::vector<Definition<uint8_t, Button>> button_definitions_;
-  std::vector<Definition<float, Axis>> axis_definitions_;
 
   std::vector<TransformedRemapButton> transformed_buttons_;
   std::vector<TransformedRemapAxis> transformed_axes_;
 
   std::shared_ptr<input_source::InputSource> source_;
-  std::reference_wrapper<InputManager> inputs_;
   ParameterInterface::SharedPtr parameters_;
 };
 

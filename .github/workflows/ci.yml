@@ -34,16 +34,36 @@ jobs:
           key: ccache-${{ matrix.ROS_DISTRO }}-${{ matrix.ROS_REPO }}-${{github.run_id}}
           restore-keys: |
             ccache-${{ matrix.ROS_DISTRO }}-${{ matrix.ROS_REPO }}-
-      - name: Enable core dumps
-        run: ulimit -c unlimited
       - uses: 'ros-industrial/industrial_ci@master' # run industrial_ci
         env: # either pass all entries explicitly
           ROS_DISTRO: ${{ matrix.ROS_DISTRO }}
           ROS_REPO: ${{ matrix.ROS_REPO }}
           ADDITIONAL_DEBS: "ros-${{ matrix.ROS_DISTRO }}-controller-manager-msgs ros-${{ matrix.ROS_DISTRO }}-ros-base"
-      - name: Upload core dump
+          BEFORE_RUN_TARGET_TEST: |
+            echo "=== RUNNING THE BEFORE_RUN_TARGET_TEST ==="
+            sudo apt-get update
+            sudo apt-get install -y gdb
+            sudo chmod a+x /root/target_ws/install/teleop_core/lib/teleop_core/test_inputs_manual
+            cd /root/target_ws
+            set +u
+            source /opt/ros/${{ matrix.ROS_DISTRO }}/setup.bash
+            source install/setup.bash
+            set -u
+            : "${LD_LIBRARY_PATH:=}"  # default to empty if unset
+            export LD_LIBRARY_PATH=install/teleop_core/lib:$LD_LIBRARY_PATH
+            gdb -ex "run" -ex "bt" -ex "bt full" -ex "quit" --args /root/target_ws/install/teleop_core/lib/teleop_core/test_inputs_manual
+          ARTIFACTS: /root/target_ws
+
+      - name: Upload workspace on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: core-dump-${{matrix.ROS_DISTRO}}
-          path: core*
+          name: "ws-${{ matrix.ROS_DISTRO }}-failure"
+          path: target_ws
+
+      - name: Upload workspace
+        uses: actions/upload-artifact@v4
+        with:
+          name: "ws-${{ matrix.ROS_DISTRO }}"
+          path: target_ws
+

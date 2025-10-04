@@ -18,13 +18,15 @@ namespace teleop
 
 void InputManager::update(const rclcpp::Time & now)
 {
-  for (auto & button : buttons_) {
-    button->debounce(now);
-  }
+  button_map_.update();
+  axis_map_.update();
+}
 
-  for (auto & axis : axes_) {
-    axis->debounce(now);
-  }
+InputManager::Hardened InputManager::init(const InputManager::Props& props) {
+  props.button_builder.construct(button_map_);
+  props.axis_builder.construct(axis_map_);
+
+  return {button_map_, axis_map_};
 }
 
 }  // namespace teleop

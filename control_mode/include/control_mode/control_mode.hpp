@@ -22,8 +22,9 @@
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <rclcpp/executor.hpp>
 #include "visibility_control.h"
-#include "input_interface.hpp"
+#include "input_ptr.hpp"
 #include "input_collection.hpp"
+#include "event/event_collection.hpp"
 
 namespace control_mode
 {
@@ -54,6 +55,8 @@ struct CONTROL_MODE_PUBLIC_TYPE Inputs
 {
   ButtonCollection & buttons;
   AxisCollection & axes;
+
+  EventCollection & events;
 };
 
 /**
@@ -112,7 +115,7 @@ public:
    */
   [[nodiscard]] bool is_locked()
   {
-    return locked_->value();
+    return locked_.value();
   }
 
   /**
@@ -235,8 +238,8 @@ public:
 
 protected:
   /// An input button to represent a lock for the control mode. The control mode should tell the control system to halt
-  /// when ->value() is true
-  Button::SharedPtr locked_;
+  /// when .value() is true
+  Button locked_;
 
 private:
   /// The ROS2 node created by teleop_modular, which we get params from (for base and child classes)
