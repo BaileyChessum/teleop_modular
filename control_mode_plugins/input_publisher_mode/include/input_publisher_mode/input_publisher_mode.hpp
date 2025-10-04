@@ -88,9 +88,9 @@ private:
   /// Names of the axes to publish
   std::vector<std::string> axis_names_;
   /// Reference to the axes inputs
-  std::vector<Axis::SharedPtr> axes_;
+  std::vector<Axis> axes_;
   /// reference to the button inputs
-  std::vector<Button::SharedPtr> buttons_;
+  std::vector<Button> buttons_;
 
   /// Static vector used to publish axis values
   std::vector<float> axis_values_;
