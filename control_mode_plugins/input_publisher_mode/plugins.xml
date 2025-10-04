@@ -1,0 +1,6 @@
+<library path="input_publisher_mode">
+    <!-- Control Modes -->
+    <class name="input_publisher_mode/InputPublisherMode" type="input_publisher_mode::InputPublisherMode" base_class_type="control_mode::ControlMode">
+        <description>A generic control mode that forwards inputs from teleop_modular.</description>
+    </class>
+</library>

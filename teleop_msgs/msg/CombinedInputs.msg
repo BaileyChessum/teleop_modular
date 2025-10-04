@@ -4,5 +4,6 @@
 #
 # See the header comments for InputValues and InputNames!
 
+teleop_msgs/InputNames names
 teleop_msgs/InputValues values
 teleop_msgs/InvokedEvents events
