@@ -175,11 +175,11 @@ return_type InputPublisherMode::on_update(const rclcpp::Time & now, const rclcpp
   // Update values
   for (int i = 0; i < static_cast<int>(axis_names_.size()); i++)
   {
-    axis_values_[i] = axes_[i]->value();
+    axis_values_[i] = axes_[i].value();
   }
   for (int i = 0; i < static_cast<int>(button_names_.size()); i++)
   {
-    button_values_[i] = buttons_[i]->value();
+    button_values_[i] = buttons_[i].value();
   }
 
   msg->values.axes = axis_values_;
