@@ -49,7 +49,7 @@ Every input source and control mode get their own node from which to retrieve pa
 > for:
 >
 > ```cpp
-> linear_.x = inputs.axes["linear.x"];  //< get input shared_ptr with meaningful name
+> linear_.x = inputs.axes["linear.x"];  //< get an input pointer with a meaningful name
 > // ...
 > twist.linear.x = *linear_.x;
 > ```
