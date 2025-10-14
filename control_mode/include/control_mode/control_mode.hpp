@@ -76,6 +76,18 @@ public:
      * control_modes.control_mode_name.controllers parameter in the main teleop_modular node.
      */
     std::vector<std::string> controllers;
+
+    /**
+     * Whether this control mode should be activated on startup.
+     * Actual parameter name is "active".
+     */
+    bool start_active;
+
+    /**
+     * Name of the control mode to use in various user-facing logs.
+     * Tries to derive a display name from a snake case get_name() by default.
+     */
+    std::string display_name;
   };
 
   ~ControlMode() override;
@@ -235,6 +247,8 @@ public:
 
   /// Gets the names of all ros2_control controllers to activate alongside this control mode.
   [[nodiscard]] const std::vector<std::string> & get_controllers() const;
+  /// Gets common params for the control mode, including whether the control mode should start active, and controllers
+  [[nodiscard]] const CommonParams & get_common_params() const;
 
 protected:
   /// An input button to represent a lock for the control mode. The control mode should tell the control system to halt

@@ -95,7 +95,7 @@ public:
 
   void add(const std::string & key, const std::shared_ptr<control_mode::ControlMode> & value);
 
-  void activate_initial_control_mode();
+  void activate_initial_control_modes();
 
   /**
      * Add inputs to the builder.
@@ -123,16 +123,6 @@ private:
    * Resets everything for the controller manager
    */
   void reset();
-
-  /**
-   * Switches ros2_control controllers in the controller_manager for the given change in control modes.
-   * @param controllers_to_deactivate the control mode being deactivated.
-   * @param controllers_to_activate the control mode being activated.
-   * @return True if the request was made successfully. False otherwise.
-   */
-  [[nodiscard]] bool switch_controllers(
-    const std::vector<std::string> & controllers_to_deactivate,
-    const std::vector<std::string> & controllers_to_activate) const;
 
   /**
    * Gets the control mode plugin class type name for a given control mode name, to be given to pluginlib to load.
