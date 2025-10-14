@@ -82,6 +82,12 @@ public:
      * Actual parameter name is "active".
      */
     bool start_active;
+
+    /**
+     * Name of the control mode to use in various user-facing logs.
+     * Tries to derive a display name from a snake case get_name() by default.
+     */
+    std::string display_name;
   };
 
   ~ControlMode() override;

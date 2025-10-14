@@ -125,16 +125,6 @@ private:
   void reset();
 
   /**
-   * Switches ros2_control controllers in the controller_manager for the given change in control modes.
-   * @param controllers_to_deactivate the control mode being deactivated.
-   * @param controllers_to_activate the control mode being activated.
-   * @return True if the request was made successfully. False otherwise.
-   */
-  [[nodiscard]] bool switch_controllers(
-    const std::vector<std::string> & controllers_to_deactivate,
-    const std::vector<std::string> & controllers_to_activate) const;
-
-  /**
    * Gets the control mode plugin class type name for a given control mode name, to be given to pluginlib to load.
    * Declares the necessary parameter to get the type name as a side effect.
    * @param[in]  name The name of the control mode to get the plugin type name for.

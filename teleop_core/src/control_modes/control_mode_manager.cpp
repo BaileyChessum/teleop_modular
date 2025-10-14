@@ -20,6 +20,7 @@
 #include "teleop_core/control_modes/fake_event_collection.hpp"
 #include <algorithm>
 #include <stdexcept>
+#include <iomanip>  //< for std::setw, std::setfill
 
 namespace teleop::internal
 {
@@ -90,7 +91,12 @@ void ControlModeManager::configure()
       control_mode_name.c_str());
 
     std::string control_mode_type;
-    const std::string pretty_name = snake_to_title(control_mode_name);
+
+    const auto params = node_->get_node_parameters_interface();
+    const auto display_name = get_parameter_or_default<std::string>(
+        params, "control_modes." + control_mode_name + ".display_name",
+        "The name to use in user-facing logs for this control mode.",
+        snake_to_title(control_mode_name));
 
     // Get the control mode's plugin type name
     if (!get_type_for_control_mode(control_mode_name, control_mode_type)) {
@@ -99,7 +105,7 @@ void ControlModeManager::configure()
         "Failed to find type for control mode \"%s\" in params. Have you defined %s.type in your "
         "parameter file?",
         control_mode_name.c_str(), control_mode_name.c_str());
-      registered_modes_log << C_FAIL_QUIET << "\n\t- " << pretty_name << C_FAIL_QUIET <<
+      registered_modes_log << C_FAIL_QUIET << "\n\t- " << display_name << C_FAIL_QUIET <<
         "\t(failed - "
                            << control_mode_name << ".type param missing) " << C_RESET;
       continue;
@@ -113,7 +119,7 @@ void ControlModeManager::configure()
       RCLCPP_ERROR(
         logger, "Failed to find control mode plugin \"%s\" for mode \"%s\"!\nwhat(): %s",
         control_mode_type.c_str(), control_mode_name.c_str(), ex.what());
-      registered_modes_log << C_FAIL_QUIET << "\n\t- " << pretty_name << C_FAIL_QUIET
+      registered_modes_log << C_FAIL_QUIET << "\n\t- " << display_name << C_FAIL_QUIET
                            << "\t(failed - can't find plugin " << control_mode_type << ") " <<
         C_RESET;
       continue;
@@ -125,7 +131,6 @@ void ControlModeManager::configure()
       node_->get_node_base_interface()->get_context());
 
     // Get common params for control modes
-    const auto params = node_->get_node_parameters_interface();
     const auto controllers = get_parameter_or_default<std::vector<std::string>>(
       params, "control_modes." + control_mode_name + ".controllers",
       "The names of ros2_control controllers to use for this control mode.",
@@ -137,7 +142,8 @@ void ControlModeManager::configure()
 
     const control_mode::ControlMode::CommonParams common_params{
       controllers,
-      start_active
+      start_active,
+      display_name
     };
 
     // Set up the control mode
@@ -152,7 +158,7 @@ void ControlModeManager::configure()
       common_params);
     executor.reset();  // Release executor
 
-    registered_modes_log << "\n\t- " << pretty_name << C_QUIET << "\t: " << control_mode_type <<
+    registered_modes_log << "\n\t- " << display_name << C_QUIET << "\t: " << control_mode_type <<
       C_RESET;
     control_modes_[control_mode_name] = control_mode_class;
   }
@@ -270,6 +276,12 @@ bool ControlModeManager::switch_control_mode(
   // transitions will succeed
   controllers_.switch_active(deactivate_ids, activate_ids);
 
+  // These store the ids of modes to log after all switches have occurred:
+  std::vector<size_t> deactivate_log_ids{};
+  std::vector<size_t> activate_log_ids{};
+  deactivate_log_ids.reserve(deactivate_ids.size());
+  activate_log_ids.reserve(activate_ids.size());
+
   // Deactivate control modes
   std::vector<size_t> failed_deactivation_ids{};
   for (const auto& cm_id : deactivate_ids)
@@ -284,7 +296,9 @@ bool ControlModeManager::switch_control_mode(
                    control_modes_by_id_[cm_id]->get_name().c_str());
     }
     else {
-      RCLCPP_DEBUG(logger, C_MODE "%s deactivated" C_RESET, control_modes_by_id_[cm_id]->get_name().c_str());
+      RCLCPP_DEBUG(logger, C_DEACTIVATED "%s deactivated" C_RESET,
+                   control_modes_by_id_[cm_id]->get_name().c_str());
+      deactivate_log_ids.emplace_back(cm_id);
     }
   }
 
@@ -301,10 +315,46 @@ bool ControlModeManager::switch_control_mode(
                    control_modes_by_id_[cm_id]->get_name().c_str());
     }
     else {
-      RCLCPP_INFO(logger, C_MODE "%s activated" C_RESET,
-                  snake_to_title(control_modes_by_id_[cm_id]->get_name()).c_str());
+      RCLCPP_DEBUG(logger, C_MODE "%s activated" C_RESET,
+                   control_modes_by_id_[cm_id]->get_name().c_str());
+      activate_log_ids.emplace_back(cm_id);
     }
   }
+
+  // Fancy log statement
+
+  // Get longest name in log
+  size_t longest_name_length = 0;
+  for (const auto& cm_id : activate_ids) {
+    auto size = control_modes_by_id_[cm_id]->get_common_params().display_name.size();
+    if (size > longest_name_length)
+      longest_name_length = size;
+  }
+  for (const auto& cm_id : deactivate_ids) {
+    auto size = control_modes_by_id_[cm_id]->get_common_params().display_name.size();
+    if (size > longest_name_length)
+      longest_name_length = size;
+  }
+
+  // Log every name
+  int name_col_width = static_cast<int>(longest_name_length) + 1;
+  std::stringstream log;
+  for (const auto& cm_id : deactivate_ids) {
+    log << "\n\t" C_DEACTIVATED_QUIET_BOLD "- " C_DEACTIVATED;
+    // Log name left-aligned in column of width = name_col_width
+    log << std::left << std::setw(name_col_width) << std::setfill(' ');
+    log << control_modes_by_id_[cm_id]->get_common_params().display_name;
+    log << C_DEACTIVATED_QUIET "deactivated" C_RESET;
+  }
+  for (const auto& cm_id : activate_ids) {
+    log << "\n\t" C_MODE_QUIET_BOLD "+ " C_MODE;
+    // Log name left-aligned in column of width = name_col_width
+    log << std::left << std::setw(name_col_width) << std::setfill(' ');
+    log << control_modes_by_id_[cm_id]->get_common_params().display_name;
+    log << C_MODE_QUIET "activated" C_RESET;
+  }
+
+  RCLCPP_INFO(logger, C_QUIET_QUIET "Switched control modes:" C_RESET "%s", log.str().c_str());
 
   // Send another controller change request on any transition failure
   if (failed_activation_ids.size() > 0 || failed_deactivation_ids.size() > 0) {
