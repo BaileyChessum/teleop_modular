@@ -56,7 +56,7 @@ return_type ControlMode::init(
   RCLCPP_DEBUG(logger, "Setting up LifecycleNode callbacks for \"%s\"...", name_.c_str());
 
   node_->register_on_configure(std::bind(&ControlMode::on_configure, this, std::placeholders::_1));
-  node_->register_on_activate(std::bind(&ControlMode::on_configure, this, std::placeholders::_1));
+  node_->register_on_activate(std::bind(&ControlMode::on_activate, this, std::placeholders::_1));
   node_->register_on_deactivate(
     std::bind(
       &ControlMode::on_deactivate, this,
