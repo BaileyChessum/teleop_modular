@@ -95,7 +95,7 @@ public:
 
   void add(const std::string & key, const std::shared_ptr<control_mode::ControlMode> & value);
 
-  void activate_initial_control_mode();
+  void activate_initial_control_modes();
 
   /**
      * Add inputs to the builder.

@@ -75,7 +75,7 @@ void TeleopNode::initialize(const std::weak_ptr<rclcpp::Executor> & executor)
   pipeline_.link_inputs();
 
   RCLCPP_DEBUG(logger, "TeleopNode::init(): Starting...");
-  control_mode_manager_->activate_initial_control_mode();
+  control_mode_manager_->activate_initial_control_modes();
 
   const auto now = get_node()->now();
   events_.get_events()["start"]->invoke();

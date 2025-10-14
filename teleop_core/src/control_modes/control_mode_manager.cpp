@@ -130,7 +130,15 @@ void ControlModeManager::configure()
       params, "control_modes." + control_mode_name + ".controllers",
       "The names of ros2_control controllers to use for this control mode.",
       std::vector<std::string>());
-    const control_mode::ControlMode::CommonParams common_params{controllers};
+    const auto start_active = get_parameter_or_default<bool>(
+        params, "control_modes." + control_mode_name + ".active",
+        "Whether this control mode should start active.",
+        false);
+
+    const control_mode::ControlMode::CommonParams common_params{
+      controllers,
+      start_active
+    };
 
     // Set up the control mode
     auto executor = executor_.lock();
@@ -186,10 +194,24 @@ void ControlModeManager::configure()
   // TODO: Gracefully reconfigure the controller manager manager if a new control mode gets added dynamically
 }
 
-void ControlModeManager::activate_initial_control_mode()
+void ControlModeManager::activate_initial_control_modes()
 {  // Activate the first control mode in the list
-  if (!control_modes_.empty()) {
-    (control_modes_.begin()->first);
+  std::vector<std::string> activate;
+
+  for (auto mode : control_modes_by_id_) {
+    if (mode->get_common_params().start_active) {
+      activate.push_back(mode->get_name());
+    }
+  }
+
+  if (!activate.empty()) {
+    switch_control_mode({}, activate);
+  }
+  else {
+    const auto logger = node_->get_logger();
+    RCLCPP_WARN(logger,
+                "No control modes start activated. \nDid you mean to set the parameter:\n"
+                "\tcontrol_modes.<name>.active: true\nfor one of your control modes?");
   }
 }
 
