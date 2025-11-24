@@ -106,6 +106,12 @@ void InputPublisherMode::on_configure_inputs(Inputs inputs)
   // This method is always run after on_configure(),
   // so you can assume that you already have any necessary parameters
 
+  // This method is called twice so clear inputs and values vectors
+  axes_.clear();
+  buttons_.clear();
+  axis_values_.clear();
+  button_values_.clear();
+
   // Capture inputs
   for (const auto & axis_name : axis_names_)
   {
