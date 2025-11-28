@@ -153,10 +153,12 @@ void InputPublisherMode::publish_input_names_message() const
 
 void InputPublisherMode::publish_halt_message(const rclcpp::Time & now) const
 {
-  // TODO: Implement for your message type, or remove the method if it is not appropriate for the use case.
   auto msg = std::make_unique<teleop_msgs::msg::CombinedInputValues>();
   msg->values.header.stamp = now;
   msg->events.header.stamp = now;
+  msg->values.axes = std::vector<float>(axis_names_.size());
+  msg->values.buttons = std::vector<uint8_t>(button_names_.size());
+
   inputs_publisher_->publish(std::move(msg));
 }
 
