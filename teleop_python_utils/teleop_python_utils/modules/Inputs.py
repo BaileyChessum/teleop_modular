@@ -13,7 +13,7 @@
 #
 from rclpy.node import Node
 from rclpy.lifecycle import LifecycleNode
-from rclpy.qos import QoSProfile
+from rclpy.qos import QoSProfile, DurabilityPolicy
 from typing import Union, Optional, List
 
 from teleop_msgs.msg import InputNames, InputValues, InvokedEvents, CombinedInputValues
@@ -35,7 +35,7 @@ class Inputs:
     """
     Helper class for getting input values and event invocations from teleop_modular.
     """
-    DEFAULT_NAMES_QOS = 10
+    DEFAULT_NAMES_QOS = QoSProfile(depth=10, durability=DurabilityPolicy.TRANSIENT_LOCAL)
     DEFAULT_VALUES_QOS = 10
     DEFAULT_EVENTS_QOS = 10
     DEFAULT_SPARSE_QOS = 10
@@ -235,7 +235,7 @@ class Inputs:
 
     def __process_input_values(self, values: InputValues):
         if not self.__names_initialized:
-            self.node.get_logger().debug("Didn't set input values because the name topic hasn't sent a message yet.")
+            self.node.get_logger().warn("Didn't set input values because the name topic hasn't sent a message yet.")
             return
         self.__process_inputs(values.buttons, self.__button_names, values.axes, self.__axis_names)
 
