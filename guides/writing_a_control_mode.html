@@ -1,0 +1,527 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Writing a ControlMode plugin &mdash; teleop_modular v0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=61b5c975" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5e3f2911"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Input source remapping" href="../about/input_source_remapping.html" />
+    <link rel="prev" title="Remapping and transforming inputs" href="remapping_and_transforming_inputs.html" />
+     
+
+    <!-- Light Mode Icons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="../_static/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="../_static/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="../_static/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="../_static/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="../_static/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="../_static/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="../_static/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="../_static/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../_static/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../_static/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../_static/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="../_static/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../_static/favicon/favicon-16x16.png">
+    <link rel="manifest" href="../_static/favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="../_static/favicon/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Dark Mode Icons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="../_static/favicon_white/apple-icon-57x57.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="60x60" href="../_static/favicon_white/apple-icon-60x60.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="72x72" href="../_static/favicon_white/apple-icon-72x72.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="76x76" href="../_static/favicon_white/apple-icon-76x76.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="114x114" href="../_static/favicon_white/apple-icon-114x114.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="120x120" href="../_static/favicon_white/apple-icon-120x120.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="144x144" href="../_static/favicon_white/apple-icon-144x144.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="152x152" href="../_static/favicon_white/apple-icon-152x152.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="180x180" href="../_static/favicon_white/apple-icon-180x180.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="192x192" href="../_static/favicon_white/android-icon-192x192.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="32x32" href="../_static/favicon_white/favicon-32x32.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="96x96" href="../_static/favicon_white/favicon-96x96.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="16x16" href="../_static/favicon_white/favicon-16x16.png" media="(prefers-color-scheme: dark)">
+    <link rel="manifest" href="../_static/favicon_white/manifest.json" media="(prefers-color-scheme: dark)">
+    <meta name="msapplication-TileImage" content="../_static/favicon_white/ms-icon-144x144.png" media="(prefers-color-scheme: dark)">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            teleop_modular
+              <img src="../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_a_teleop_package.html">Writing a teleop package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remapping_and_transforming_inputs.html">Remapping and transforming inputs</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Writing a <code class="docutils literal notranslate"><span class="pre">ControlMode</span></code> plugin</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tasks">Tasks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#install-cookiecutter">1. Install cookiecutter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-the-package">2. Create the package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#add-dependencies">3. Add dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#add-a-publisher">4. Add a publisher</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#capture-inputs">5. Capture inputs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#publish-messages">6. Publish messages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run-your-control-mode">7. Run your control mode</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../about/input_source_remapping.html">Input source remapping</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">teleop_modular</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Writing a <code class="docutils literal notranslate"><span class="pre">ControlMode</span></code> plugin</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/BaileyChessum/teleop_modular/blob/main/docs/guides/writing_a_control_mode.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="writing-a-controlmode-plugin">
+<span id="writing-a-control-mode"></span><h1>Writing a <code class="docutils literal notranslate"><span class="pre">ControlMode</span></code> plugin<a class="headerlink" href="#writing-a-controlmode-plugin" title="Link to this heading"></a></h1>
+<p><strong>Goal</strong>: Create a custom <code class="docutils literal notranslate"><span class="pre">ControlMode</span></code> plugin using C++.</p>
+<p><strong>Tutorial level</strong>: Intermediate</p>
+<p><strong>Time</strong>: 20 minutes</p>
+<section id="background">
+<h2>Background<a class="headerlink" href="#background" title="Link to this heading"></a></h2>
+<p>The purpose of <code class="docutils literal notranslate"><span class="pre">teleop_modular</span></code> is not to be a fancy generic teleop package, but to provide infrastructure you can use
+to create your own teleop package, with specialized control modes.</p>
+<p>It should be easy to create your own control mode plugins to add to your teleop package. This guide will show you how.</p>
+<p>To create the package, we will be using <a class="reference external" href="https://www.cookiecutter.io/">cookiecutter</a> and
+<a class="reference external" href="https://github.com/BaileyChessum/control_mode_template">control_mode_template</a>.</p>
+</section>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
+<p>To test your custom control mode, you should probably set up a simple teleop package to run it:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="getting_started.html#getting-started"><span class="std std-ref">Getting started</span></a></p></li>
+<li><p><a class="reference internal" href="writing_a_teleop_package.html#writing-a-teleop-package"><span class="std std-ref">Writing a teleop package</span></a></p></li>
+</ul>
+</section>
+<section id="tasks">
+<h2>Tasks<a class="headerlink" href="#tasks" title="Link to this heading"></a></h2>
+<section id="install-cookiecutter">
+<h3>1. Install cookiecutter<a class="headerlink" href="#install-cookiecutter" title="Link to this heading"></a></h3>
+<p>Start by installing cookiecutter.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://cookiecutter.readthedocs.io/en/1.7.3/installation.html">Installation - cookiecutter documentation</a></p></li>
+</ul>
+<p>It is a python package, so you can get it through vendors like pip:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>cookiecutter
+</pre></div>
+</div>
+<p>On Debian / Ubuntu, you can get it from:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>cookiecutter
+</pre></div>
+</div>
+<p>Or if you have nix, open up a shell with cookiecutter:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>nix-shell<span class="w"> </span>-p<span class="w"> </span>cookiecutter
+</pre></div>
+</div>
+</section>
+<section id="create-the-package">
+<h3>2. Create the package<a class="headerlink" href="#create-the-package" title="Link to this heading"></a></h3>
+<p>Open a terminal and navigate into your workspace src directory:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>path/to/ws/src
+</pre></div>
+</div>
+<p>Now, create the package with <a class="reference external" href="https://github.com/BaileyChessum/control_mode_template">control_mode_template</a>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>cookiecutter<span class="w"> </span>https://github.com/BaileyChessum/control_mode_template.git
+</pre></div>
+</div>
+<p>You should then be prompted to enter the name of the package, the control mode, and some extra info to generate the
+package:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">[1/6] project_name (example_control_mode): example_control_mode</span>
+<span class="go">[2/6] control_mode_class_name (ExampleControlMode): ExampleControlMode</span>
+<span class="go">[3/6] author_name (TODO: Author Name): Bailey Chessum</span>
+<span class="go">[4/6] author_email (author@example.com): bailey.chessum1@gmail.com</span>
+<span class="go">[5/6] license (TODO: License Definition): Apache-2.0</span>
+<span class="go">[6/6] description (A custom teleop_modular control mode.): An example teleop_modular control mode.</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Make sure to use snake_case for <code class="docutils literal notranslate"><span class="pre">project_name</span></code>, and UpperCamelCase for <code class="docutils literal notranslate"><span class="pre">control_mode_class_name</span></code>.</p>
+</div>
+<p>You should now have a new package for your control mode. The directory structure might look something like:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>ws/
+└── src/
+    └── project_name/
+        ├── include/
+        │   └── project_name/
+        │       ├── project_name.hpp
+        │       └── visibility_control.h
+        ├── src/
+        │   └── project_name.cpp
+        ├── CMakeLists.txt
+        ├── README.md
+        ├── package.xml
+        └── plugins.xml
+</pre></div>
+</div>
+<p>You should be able to build it as part of your workspace, and run it with your teleop package.</p>
+<p>Check <code class="docutils literal notranslate"><span class="pre">plugins.xml</span></code> or the title of the generated <code class="docutils literal notranslate"><span class="pre">README.md</span></code> to find the string to use for <code class="docutils literal notranslate"><span class="pre">.type</span></code> in your teleop_node
+config. It should be <code class="docutils literal notranslate"><span class="pre">project_name/control_mode_class_name</span></code>. A simple example parameter file can also be found at the
+bottom of <code class="docutils literal notranslate"><span class="pre">README.md</span></code>.</p>
+<ul class="simple">
+<li><p>See <a class="reference internal" href="writing_a_teleop_package.html#writing-a-teleop-package"><span class="std std-ref">Writing a teleop package</span></a> for help setting up and running a control mode with teleop_modular.</p></li>
+</ul>
+<p>Open up the project in your favourite IDE with the necessary dependencies available in your shell and load
+<code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code>. Then, let’s get started editing the control mode.</p>
+<p>You’ll find lots of helpful <code class="docutils literal notranslate"><span class="pre">//</span> <span class="pre">TODO:</span></code> comments in the codebase to help point you in the right direction as to what
+needs to be implemented.</p>
+</section>
+<section id="add-dependencies">
+<h3>3. Add dependencies<a class="headerlink" href="#add-dependencies" title="Link to this heading"></a></h3>
+<p>You’ll likely need to have your control mode publish some ROS2 message to your control system. You will need to add the
+package the message type comes from as a dependency to your package.</p>
+<p>open up <code class="docutils literal notranslate"><span class="pre">package.xml</span></code> and add your dependency:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;depend&gt;</span>my_interfaces<span class="nt">&lt;/depend&gt;</span>
+</pre></div>
+</div>
+<p>Then, open up <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> and add your dependency to <code class="docutils literal notranslate"><span class="pre">set(THIS_PACKAGE_INCLUDE_DEPENDS</span></code>:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.8</span><span class="p">)</span>
+<span class="nb">project</span><span class="p">(</span><span class="s">example_control_mode</span><span class="p">)</span>
+
+<span class="nb">set</span><span class="p">(</span><span class="s">THIS_PACKAGE_INCLUDE_DEPENDS</span>
+<span class="w">  </span><span class="s">rclcpp</span>
+<span class="w">  </span><span class="s">rclcpp_lifecycle</span>
+<span class="w">  </span><span class="s">pluginlib</span>
+<span class="w">  </span><span class="s">control_mode</span>
+
+<span class="w">  </span><span class="c"># Add your dependency here:</span>
+<span class="w">  </span><span class="s">my_interfaces</span>
+<span class="p">)</span>
+
+<span class="c"># ...</span>
+</pre></div>
+</div>
+</section>
+<section id="add-a-publisher">
+<h3>4. Add a publisher<a class="headerlink" href="#add-a-publisher" title="Link to this heading"></a></h3>
+<p>Now that you have any packages you need for message types or otherwise, you can add a publisher to <code class="docutils literal notranslate"><span class="pre">project_name.hpp</span></code>
+and <code class="docutils literal notranslate"><span class="pre">project_name.cpp</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Your control mode doesn’t necessarily need to publish messages to ROS2. You could have a control mode that
+calls an Action, or activates an external LifecycleNode, or anything at all! You have free will.</p>
+</div>
+<p>At the top of your <code class="docutils literal notranslate"><span class="pre">.hpp</span></code>, import your message type:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// project_name.hpp</span>
+<span class="cp">#ifndef PROJECT_NAME__PROJECT_NAME_HPP_</span>
+<span class="cp">#define PROJECT_NAME__PROJECT_NAME_HPP_</span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;rclcpp/time.hpp&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;control_mode/control_mode.hpp&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;project_name/visibility_control.h&quot;</span>
+
+<span class="c1">// Include your message type:</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;my_interfaces/msg/example_message.hpp&quot;</span>
+
+<span class="k">namespace</span><span class="w"> </span><span class="nn">project_name</span>
+<span class="p">{</span>
+<span class="c1">// ...</span>
+</pre></div>
+</div>
+<p>Then, add the appropriate publisher as a member variable in <code class="docutils literal notranslate"><span class="pre">project_name.hpp</span></code>. You’ll find a relevant <code class="docutils literal notranslate"><span class="pre">//</span> <span class="pre">TODO:</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// project_name.hpp</span>
+<span class="c1">// ...</span>
+<span class="k">private</span><span class="o">:</span>
+<span class="w">  </span><span class="c1">/// Helper struct to hold parameters used by the control mode.</span>
+<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">Params</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">/// The topic name to send messages to.</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">topic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">/// The ROS2 topic Quality of Service value to use in publisher_.</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">qos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="w">  </span><span class="p">};</span>
+
+<span class="w">  </span><span class="c1">/// Stores current parameter values</span>
+<span class="w">  </span><span class="n">Params</span><span class="w"> </span><span class="n">params_</span><span class="p">;</span>
+
+<span class="w">  </span><span class="c1">// TODO: Set an appropriate message type for the publisher, then uncomment its declaration/usages</span>
+
+<span class="w">  </span><span class="c1">// Uncomment the publisher, and insert the correct message type here:</span>
+<span class="w">  </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">Publisher</span><span class="o">&lt;</span><span class="n">my_interfaces</span><span class="o">::</span><span class="n">msg</span><span class="o">::</span><span class="n">ExampleMessage</span><span class="o">&gt;::</span><span class="n">SharedPtr</span><span class="w"> </span><span class="n">publisher_</span><span class="p">;</span>
+
+<span class="c1">// ...</span>
+</pre></div>
+</div>
+<p>Then, create the publisher in <code class="docutils literal notranslate"><span class="pre">on_configure()</span></code> in the <code class="docutils literal notranslate"><span class="pre">.cpp</span></code> file. You’ll again find a relevant <code class="docutils literal notranslate"><span class="pre">//</span> <span class="pre">TODO:</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// project_name.cpp</span>
+<span class="c1">// ...</span>
+<span class="n">CallbackReturn</span><span class="w"> </span><span class="nf">ExampleControlMode::on_configure</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">State</span><span class="w"> </span><span class="o">&amp;</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_node</span><span class="p">();</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">logger</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_node</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">();</span>
+
+<span class="w">  </span><span class="c1">// Use this callback method to get any parameters for your control mode!</span>
+<span class="w">  </span><span class="n">params_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Params</span><span class="p">();</span>
+<span class="w">  </span><span class="n">node</span><span class="o">-&gt;</span><span class="n">get_parameter</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;topic&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">params_</span><span class="p">.</span><span class="n">topic</span><span class="p">);</span>
+<span class="w">  </span><span class="n">node</span><span class="o">-&gt;</span><span class="n">get_parameter</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="s">&quot;qos&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">params_</span><span class="p">.</span><span class="n">qos</span><span class="p">);</span>
+
+<span class="w">  </span><span class="c1">// Create the publishers based on the params we just got</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">params_</span><span class="p">.</span><span class="n">topic</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// You&#39;ve probably made a mistake if the topic isn&#39;t set!</span>
+<span class="w">    </span><span class="n">RCLCPP_ERROR</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;The </span><span class="se">\&quot;</span><span class="s">topic</span><span class="se">\&quot;</span><span class="s"> parameter must be set to a valid topic name!&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">CallbackReturn</span><span class="o">::</span><span class="n">ERROR</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="c1">// TODO: Set an appropriate message type for the publisher, then uncomment its declaration/usages</span>
+
+<span class="w">  </span><span class="c1">// Uncomment the publisher, and insert the correct message type here:</span>
+<span class="w">  </span><span class="n">publisher_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_node</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">create_publisher</span><span class="o">&lt;</span><span class="n">my_interfaces</span><span class="o">::</span><span class="n">msg</span><span class="o">::</span><span class="n">ExampleMessage</span><span class="o">&gt;</span><span class="p">(</span><span class="n">params_</span><span class="p">.</span><span class="n">topic</span><span class="p">,</span><span class="w"> </span><span class="n">params_</span><span class="p">.</span><span class="n">qos</span><span class="p">);</span>
+
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">CallbackReturn</span><span class="o">::</span><span class="n">SUCCESS</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">// ...</span>
+</pre></div>
+</div>
+</section>
+<section id="capture-inputs">
+<h3>5. Capture inputs<a class="headerlink" href="#capture-inputs" title="Link to this heading"></a></h3>
+<p>To put values into your message during <code class="docutils literal notranslate"><span class="pre">update()</span></code>, you’ll need to have stored references to some inputs to provide the
+values to use in the message.</p>
+<p>For all the inputs you need, add member variables to store them. This could be an <code class="docutils literal notranslate"><span class="pre">Axis</span></code> for floating point
+values, <code class="docutils literal notranslate"><span class="pre">Button</span></code> for true/false values, or some other structure that contains these pointers, such as a
+<code class="docutils literal notranslate"><span class="pre">std::vector&lt;Axis&gt;</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// project_name.hpp</span>
+<span class="w">  </span><span class="c1">// ...</span>
+
+<span class="w">  </span><span class="c1">// TODO: Add shared pointers for any buttons/axes you need here, then set them in on_configure_inputs().</span>
+
+<span class="w">  </span><span class="c1">// You can hold references to inputs like this, and set their values in on_configure_inputs:</span>
+<span class="w">  </span><span class="c1">/// Input from 0 to 1 that directly scales the output speed.</span>
+<span class="w">  </span><span class="n">Axis</span><span class="w"> </span><span class="n">speed_</span><span class="p">;</span>
+
+<span class="w">  </span><span class="c1">// Add any inputs you want here:</span>
+<span class="w">  </span><span class="n">Axis</span><span class="w"> </span><span class="n">some_axis_</span><span class="p">;</span>
+
+
+<span class="w">  </span><span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Then, in <code class="docutils literal notranslate"><span class="pre">on_configure_inputs()</span></code> in your <code class="docutils literal notranslate"><span class="pre">.cpp</span></code> file, assign your input shared pointers:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// project_name.cpp</span>
+<span class="c1">// ...</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">ExampleControlMode::on_configure_inputs</span><span class="p">(</span><span class="n">Inputs</span><span class="w"> </span><span class="n">inputs</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="c1">// This method is always run after on_configure(),</span>
+<span class="w">  </span><span class="c1">// so you can assume that you already have any necessary parameters</span>
+
+<span class="w">  </span><span class="c1">// Capture inputs like this:</span>
+<span class="w">  </span><span class="n">speed_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">inputs</span><span class="p">.</span><span class="n">axes</span><span class="p">[</span><span class="s">&quot;speed&quot;</span><span class="p">];</span>
+
+<span class="w">  </span><span class="c1">// TODO: Add Axis and/or Button member variables, then assign them here.</span>
+
+<span class="w">  </span><span class="c1">// Assign your input shared pointers here:</span>
+<span class="w">  </span><span class="n">some_axis_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">inputs</span><span class="p">.</span><span class="n">axes</span><span class="p">[</span><span class="s">&quot;some_axis_name&quot;</span><span class="p">];</span>
+<span class="w">  </span><span class="n">some_button_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">inputs</span><span class="p">.</span><span class="n">buttons</span><span class="p">[</span><span class="s">&quot;some_button_name&quot;</span><span class="p">];</span>
+<span class="p">}</span>
+<span class="c1">// ...</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can name the inputs whatever you want. Just avoid <code class="docutils literal notranslate"><span class="pre">/</span></code>, spaces, and empty strings.</p>
+</div>
+</section>
+<section id="publish-messages">
+<h3>6. Publish messages<a class="headerlink" href="#publish-messages" title="Link to this heading"></a></h3>
+<p>Now, you can use the inputs you captures to create messages to publish.</p>
+<p>In <code class="docutils literal notranslate"><span class="pre">on_update()</span></code> in your <code class="docutils literal notranslate"><span class="pre">.cpp</span></code> file, create a message, assign the message values using input values, then publish it:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// project_name.cpp</span>
+<span class="c1">// ...</span>
+<span class="n">return_type</span><span class="w"> </span><span class="nf">ExampleControlMode::on_update</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">Time</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">now</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">Duration</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">period</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="c1">// Don&#39;t move when locked</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">is_locked</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">publish_halt_message</span><span class="p">(</span><span class="n">now</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">return_type</span><span class="o">::</span><span class="n">OK</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="c1">// Get input values either with input_.value() or by referencing and implicitly casting *input_</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">speed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">max</span><span class="p">(</span><span class="n">speed_</span><span class="p">.</span><span class="n">value</span><span class="p">(),</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">);</span>
+
+<span class="w">  </span><span class="c1">// TODO: Construct and send a message using values from inputs</span>
+
+<span class="w">  </span><span class="c1">// Uncomment this and put in the correct message type:</span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_unique</span><span class="o">&lt;</span><span class="n">my_interfaces</span><span class="o">::</span><span class="n">msg</span><span class="o">::</span><span class="n">ExampleMessage</span><span class="o">&gt;</span><span class="p">();</span>
+
+<span class="w">  </span><span class="c1">// Set values in your message type:</span>
+<span class="w">  </span><span class="n">msg</span><span class="o">-&gt;</span><span class="n">some_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="n">some_axis_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">speed</span><span class="p">;</span>
+<span class="w">  </span><span class="c1">// Alternatively, you can write:</span>
+<span class="w">  </span><span class="c1">// msg-&gt;some_value = some_axis_.value() * speed;</span>
+
+<span class="w">  </span><span class="c1">// If your message has a header, you can do this:</span>
+<span class="w">  </span><span class="n">msg</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">stamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">now</span><span class="p">;</span>
+
+<span class="w">  </span><span class="c1">// Uncomment this:</span>
+<span class="w">  </span><span class="n">publisher_</span><span class="o">-&gt;</span><span class="n">publish</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">msg</span><span class="p">));</span>
+
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">return_type</span><span class="o">::</span><span class="n">OK</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">// ...</span>
+</pre></div>
+</div>
+<p>It’s also good practice to have your control mode publish some kind of ‘halt’ message whenever the control mode is
+locked. If applicable, implement <code class="docutils literal notranslate"><span class="pre">publish_halt_message()</span></code> similar to above:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// project_name.cpp</span>
+<span class="c1">// ...</span>
+<span class="kt">void</span><span class="w"> </span><span class="p">{{</span><span class="n">cookiecutter</span><span class="p">.</span><span class="n">control_mode_class_name</span><span class="p">}}</span><span class="o">::</span><span class="n">publish_halt_message</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">Time</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">now</span><span class="p">)</span><span class="w"> </span><span class="k">const</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="c1">// TODO: Implement for your message type, or remove the method if it is not appropriate for the use case.</span>
+
+<span class="w">  </span><span class="c1">// Uncomment this and put in the correct message type:</span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_unique</span><span class="o">&lt;</span><span class="n">TODO</span><span class="o">&gt;</span><span class="p">();</span>
+
+<span class="w">  </span><span class="c1">// If your message has a header, you can do this:</span>
+<span class="w">  </span><span class="n">msg</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">stamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">now</span><span class="p">;</span>
+
+<span class="w">  </span><span class="c1">// Uncomment this:</span>
+<span class="w">  </span><span class="n">publisher_</span><span class="o">-&gt;</span><span class="n">publish</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">msg</span><span class="p">));</span>
+<span class="p">}</span>
+<span class="c1">// ...</span>
+</pre></div>
+</div>
+</section>
+<section id="run-your-control-mode">
+<h3>7. Run your control mode<a class="headerlink" href="#run-your-control-mode" title="Link to this heading"></a></h3>
+<p>Now that you have you control mode written, add it to your parameter file for your teleop node:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># teleop.yaml, or whatever you named it</span>
+<span class="nt">teleop_node</span><span class="p">:</span><span class="w">  </span><span class="c1"># or whatever you renamed it</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># ...</span>
+
+<span class="w">    </span><span class="c1"># Change this to use your new control mode</span>
+<span class="w">    </span><span class="nt">control_modes</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">names</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span>
+<span class="w">        </span><span class="c1"># Give your mode a name:</span>
+<span class="w">        </span><span class="s">&quot;custom_control_mode&quot;</span>
+<span class="w">      </span><span class="p p-Indicator">]</span>
+
+<span class="w">      </span><span class="nt">custom_control_mode</span><span class="p">:</span>
+<span class="w">        </span><span class="c1"># You can find the type name to use in the autogenerated README.md</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;project_name/ExampleControlMode&quot;</span>
+
+<span class="c1"># ...</span>
+
+<span class="c1"># Add config for the control mode&#39;s node</span>
+<span class="nt">custom_control_mode</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># Set the appropriate topic here!</span>
+<span class="w">    </span><span class="nt">topic</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/example_topic&quot;</span>
+</pre></div>
+</div>
+<p>Then, rebuild your workspace, source it, and try run your teleop package:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ros2<span class="w"> </span>launch<span class="w"> </span>teleop_example<span class="w"> </span>teleop.launch.py
+</pre></div>
+</div>
+<p>Your control mode plugin should be listed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ros2 launch teleop_arm teleop.launch.py teleop_params:=/home/.../teleop_example/params/teleop.yaml
+[INFO] [launch]: All log files can be found below /home/nova/.ros/log/2025-07-21-01-35-16-545322-nixos-2213788
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [teleop_node-1]: process started with pid [2213791]
+[teleop_node-1] [INFO] [teleop_example] Control Modes:
+[teleop_node-1]      - Custom Control Mode   : project_name/ExampleControlMode
+[teleop_node-1]
+[teleop_node-1] [INFO] [teleop_example] Input Sources:
+[teleop_node-1]
+[teleop_node-1] [INFO] [teleop_example] Custom Control Mode activated
+</pre></div>
+</div>
+<p>Enjoy writing control modes!</p>
+<p>If you have any issues, please post in
+<a class="reference external" href="https://github.com/BaileyChessum/teleop_modular/discussions/new?category=q-a">Discussions</a>, and I will try to help!</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="remapping_and_transforming_inputs.html" class="btn btn-neutral float-left" title="Remapping and transforming inputs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../about/input_source_remapping.html" class="btn btn-neutral float-right" title="Input source remapping" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Bailey Chessum.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

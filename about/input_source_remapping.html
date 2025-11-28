@@ -1,0 +1,288 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Input source remapping &mdash; teleop_modular v0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=61b5c975" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5e3f2911"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Writing a ControlMode plugin" href="../guides/writing_a_control_mode.html" />
+     
+
+    <!-- Light Mode Icons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="../_static/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="../_static/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="../_static/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="../_static/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="../_static/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="../_static/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="../_static/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="../_static/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../_static/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../_static/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../_static/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="../_static/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../_static/favicon/favicon-16x16.png">
+    <link rel="manifest" href="../_static/favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="../_static/favicon/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Dark Mode Icons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="../_static/favicon_white/apple-icon-57x57.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="60x60" href="../_static/favicon_white/apple-icon-60x60.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="72x72" href="../_static/favicon_white/apple-icon-72x72.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="76x76" href="../_static/favicon_white/apple-icon-76x76.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="114x114" href="../_static/favicon_white/apple-icon-114x114.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="120x120" href="../_static/favicon_white/apple-icon-120x120.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="144x144" href="../_static/favicon_white/apple-icon-144x144.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="152x152" href="../_static/favicon_white/apple-icon-152x152.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="180x180" href="../_static/favicon_white/apple-icon-180x180.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="192x192" href="../_static/favicon_white/android-icon-192x192.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="32x32" href="../_static/favicon_white/favicon-32x32.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="96x96" href="../_static/favicon_white/favicon-96x96.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="16x16" href="../_static/favicon_white/favicon-16x16.png" media="(prefers-color-scheme: dark)">
+    <link rel="manifest" href="../_static/favicon_white/manifest.json" media="(prefers-color-scheme: dark)">
+    <meta name="msapplication-TileImage" content="../_static/favicon_white/ms-icon-144x144.png" media="(prefers-color-scheme: dark)">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            teleop_modular
+              <img src="../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/writing_a_teleop_package.html">Writing a teleop package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/remapping_and_transforming_inputs.html">Remapping and transforming inputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/writing_a_control_mode.html">Writing a <code class="docutils literal notranslate"><span class="pre">ControlMode</span></code> plugin</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Input source remapping</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#motivation">Motivation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#input-renaming">Input renaming</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#input-transformations">Input transformations</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#axis-transformations">Axis Transformations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#axis-invert">Axis <code class="docutils literal notranslate"><span class="pre">.invert</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#axis-range">Axis <code class="docutils literal notranslate"><span class="pre">.range</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#axis-power">Axis <code class="docutils literal notranslate"><span class="pre">.power</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#button-transformations">Button Transformations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#button-invert">Button <code class="docutils literal notranslate"><span class="pre">.invert</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">teleop_modular</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Input source remapping</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/BaileyChessum/teleop_modular/blob/main/docs/about/input_source_remapping.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="input-source-remapping">
+<span id="id1"></span><h1>Input source remapping<a class="headerlink" href="#input-source-remapping" title="Link to this heading"></a></h1>
+<p>The logic to do this is currently defined as part of <code class="docutils literal notranslate"><span class="pre">InputSourceHandle.hpp</span></code> and <code class="docutils literal notranslate"><span class="pre">InputSourceHandle.cpp</span></code>.</p>
+<section id="motivation">
+<h2>Motivation<a class="headerlink" href="#motivation" title="Link to this heading"></a></h2>
+<section id="input-renaming">
+<h3>Input renaming<a class="headerlink" href="#input-renaming" title="Link to this heading"></a></h3>
+<p>Input sources can export their inputs with whatever name they want.</p>
+<p>Why? – When using joy across different computers, I found controllers would have their inputs be mapped
+entirely differently when switching between computers. I needed to rewrite all my input mapping for joy to my control
+modes whenever I changed computers.</p>
+<p>Instead, I thought it would be handy to be able to define my control mode input names in terms of names of the inputs on
+the controller, rather than directly to indices of joy message arrays. Then, as part of the parameters for a
+JoyInputSource, I could map the indices to names of the inputs on the controller and load up a different mapping
+depending on the computer I was using.</p>
+<p>Effectively, I am able to worry about my controller being mapped correctly and making a control scheme for my control
+modes separately.</p>
+</section>
+<section id="input-transformations">
+<h3>Input transformations<a class="headerlink" href="#input-transformations" title="Link to this heading"></a></h3>
+<p>This refers to any modifications performed to inputs as part of the <code class="docutils literal notranslate"><span class="pre">remap:</span></code> parameters, such as <code class="docutils literal notranslate"><span class="pre">invert</span></code>, <code class="docutils literal notranslate"><span class="pre">range</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">power</span></code>. These allow you to change the behavior of inputs.</p>
+<p>This was implemented as part of the InputSourceHandle so that all input source implementations would be able to benefit
+from these common utilities.</p>
+</section>
+</section>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<p>Parameters for remapping inputs are defined on the node of the input source being remapped.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">joy_input_source</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+
+<span class="w">    </span><span class="c1"># Defined for all input sources:</span>
+<span class="w">    </span><span class="nt">remap</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">axes</span><span class="p">:</span>
+<span class="w">        </span><span class="c1"># Axis remapping definitions go here</span>
+<span class="w">        </span><span class="nt">final_axis_name</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;original_axis_name&quot;</span>
+<span class="w">          </span><span class="c1"># Transformation params for the input go here</span>
+<span class="w">          </span><span class="c1"># ...</span>
+
+<span class="w">      </span><span class="nt">buttons</span><span class="p">:</span>
+<span class="w">        </span><span class="c1"># Button remapping definitions go here</span>
+<span class="w">        </span><span class="nt">final_button_name</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;original_button_name&quot;</span>
+<span class="w">          </span><span class="c1"># Transformation params for the input go here</span>
+<span class="w">          </span><span class="c1"># ...</span>
+</pre></div>
+</div>
+<p>You define the final name of the output, and specify the original name of the input exported by the input source
+to get the value for that input from with the <code class="docutils literal notranslate"><span class="pre">.from</span></code> parameter.</p>
+<p>Whenever you define parameters to remap an original input to a different name, the input source will no longer expose
+the input under that original name, only the new name.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you want to apply transformations to an input without renaming it, you still need to define <code class="docutils literal notranslate"><span class="pre">.from</span></code>, just use
+the same name.</p>
+</div>
+</section>
+<section id="axis-transformations">
+<h2>Axis Transformations<a class="headerlink" href="#axis-transformations" title="Link to this heading"></a></h2>
+<section id="axis-invert">
+<h3>Axis <code class="docutils literal notranslate"><span class="pre">.invert</span></code><a class="headerlink" href="#axis-invert" title="Link to this heading"></a></h3>
+<p>When true, the sign of the input value will be flipped.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Axis remapping definitions go here</span>
+<span class="nt">final_axis_name</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;original_axis_name&quot;</span>
+<span class="w">  </span><span class="c1"># Transformation params for the input go here</span>
+<span class="w">  </span><span class="nt">invert</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</div>
+</section>
+<section id="axis-range">
+<h3>Axis <code class="docutils literal notranslate"><span class="pre">.range</span></code><a class="headerlink" href="#axis-range" title="Link to this heading"></a></h3>
+<p>This set of parameters allows you to define a linear mapping of input values.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Axis remapping definitions go here</span>
+<span class="nt">final_axis_name</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;original_axis_name&quot;</span>
+<span class="w">  </span><span class="c1"># Transformation params for the input go here</span>
+<span class="w">  </span><span class="nt">range</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">in</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">-1.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1.0</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">out</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">1.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.0</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">clamp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</div>
+<p>The values in <code class="docutils literal notranslate"><span class="pre">.in</span></code> will become the values in <code class="docutils literal notranslate"><span class="pre">.out</span></code> after mapping.</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">.clamp</span></code> is true, values beyond the limits defined in <code class="docutils literal notranslate"><span class="pre">.in</span></code> will be clamped to those extremes (clamping is applied
+before mapping to the <code class="docutils literal notranslate"><span class="pre">.out</span></code> range). Clamping can be done without defining <code class="docutils literal notranslate"><span class="pre">out</span></code>.</p>
+</section>
+<section id="axis-power">
+<h3>Axis <code class="docutils literal notranslate"><span class="pre">.power</span></code><a class="headerlink" href="#axis-power" title="Link to this heading"></a></h3>
+<p>Sometimes midway values of analogue inputs like joysticks just grow too quickly or slowly to be useful. This provides a
+means to counteract this by applying an exponent to the input value.</p>
+<p>Higher <code class="docutils literal notranslate"><span class="pre">power</span></code> values will bias inputs in the range [0, 1] towards 0,
+and lower values of <code class="docutils literal notranslate"><span class="pre">power</span></code> will bias inputs towards 1.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Axis remapping definitions go here</span>
+<span class="nt">final_axis_name</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;original_axis_name&quot;</span>
+<span class="w">  </span><span class="c1"># Transformation params for the input go here</span>
+<span class="w">  </span><span class="nt">power</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="button-transformations">
+<h2>Button Transformations<a class="headerlink" href="#button-transformations" title="Link to this heading"></a></h2>
+<section id="button-invert">
+<h3>Button <code class="docutils literal notranslate"><span class="pre">.invert</span></code><a class="headerlink" href="#button-invert" title="Link to this heading"></a></h3>
+<p>When true, true inputs become false, and false inputs become true.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Button remapping definitions go here</span>
+<span class="nt">final_button_name</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;original_button_name&quot;</span>
+<span class="w">  </span><span class="c1"># Transformation params for the input go here</span>
+<span class="w">  </span><span class="nt">invert</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../guides/writing_a_control_mode.html" class="btn btn-neutral float-left" title="Writing a ControlMode plugin" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Bailey Chessum.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

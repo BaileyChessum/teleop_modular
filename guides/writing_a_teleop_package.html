@@ -1,0 +1,692 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Writing a teleop package &mdash; teleop_modular v0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=61b5c975" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5e3f2911"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Remapping and transforming inputs" href="remapping_and_transforming_inputs.html" />
+    <link rel="prev" title="Getting started" href="getting_started.html" />
+     
+
+    <!-- Light Mode Icons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="../_static/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="../_static/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="../_static/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="../_static/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="../_static/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="../_static/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="../_static/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="../_static/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../_static/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../_static/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../_static/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="../_static/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../_static/favicon/favicon-16x16.png">
+    <link rel="manifest" href="../_static/favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="../_static/favicon/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Dark Mode Icons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="../_static/favicon_white/apple-icon-57x57.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="60x60" href="../_static/favicon_white/apple-icon-60x60.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="72x72" href="../_static/favicon_white/apple-icon-72x72.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="76x76" href="../_static/favicon_white/apple-icon-76x76.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="114x114" href="../_static/favicon_white/apple-icon-114x114.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="120x120" href="../_static/favicon_white/apple-icon-120x120.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="144x144" href="../_static/favicon_white/apple-icon-144x144.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="152x152" href="../_static/favicon_white/apple-icon-152x152.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="180x180" href="../_static/favicon_white/apple-icon-180x180.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="192x192" href="../_static/favicon_white/android-icon-192x192.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="32x32" href="../_static/favicon_white/favicon-32x32.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="96x96" href="../_static/favicon_white/favicon-96x96.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="16x16" href="../_static/favicon_white/favicon-16x16.png" media="(prefers-color-scheme: dark)">
+    <link rel="manifest" href="../_static/favicon_white/manifest.json" media="(prefers-color-scheme: dark)">
+    <meta name="msapplication-TileImage" content="../_static/favicon_white/ms-icon-144x144.png" media="(prefers-color-scheme: dark)">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            teleop_modular
+              <img src="../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Writing a teleop package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tasks">Tasks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#create-a-package">1. Create a package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#add-directories-for-launch-and-parameter-files-to-cmakelists-txt">2. Add directories for launch and parameter files to CMakeLists.txt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-a-launch-file">3. Create a launch file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-the-teleop-yaml-parameter-file">4. Create the teleop.yaml parameter file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#add-a-control-mode">5. Add a control mode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#add-an-input-source">6. Add an input source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mapping-inputs">7. Mapping inputs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="remapping_and_transforming_inputs.html">Remapping and transforming inputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_a_control_mode.html">Writing a <code class="docutils literal notranslate"><span class="pre">ControlMode</span></code> plugin</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../about/input_source_remapping.html">Input source remapping</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">teleop_modular</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Writing a teleop package</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/BaileyChessum/teleop_modular/blob/main/docs/guides/writing_a_teleop_package.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="writing-a-teleop-package">
+<span id="id1"></span><h1>Writing a teleop package<a class="headerlink" href="#writing-a-teleop-package" title="Link to this heading"></a></h1>
+<p><strong>Goal</strong>: Create a package to run a custom configuration of teleop_modular.</p>
+<p><strong>Tutorial level</strong>: Intermediate</p>
+<p><strong>Time</strong>: 40 minutes</p>
+<section id="background">
+<h2>Background<a class="headerlink" href="#background" title="Link to this heading"></a></h2>
+<p>To be able to do anything useful with <code class="docutils literal notranslate"><span class="pre">teleop_modular</span></code>, you’ll need to make a package to contain:</p>
+<ul class="simple">
+<li><p>Your launch file to run <code class="docutils literal notranslate"><span class="pre">teleop_node</span></code></p></li>
+<li><p>Your parameter files</p></li>
+</ul>
+</section>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
+<p>You should have <code class="docutils literal notranslate"><span class="pre">teleop_modular</span></code> installed in your workspace.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="getting_started.html#getting-started"><span class="std std-ref">Getting started</span></a></p></li>
+</ul>
+</section>
+<section id="tasks">
+<h2>Tasks<a class="headerlink" href="#tasks" title="Link to this heading"></a></h2>
+<section id="create-a-package">
+<h3>1. Create a package<a class="headerlink" href="#create-a-package" title="Link to this heading"></a></h3>
+<p>Open a terminal and navigate into your workspace src directory. Then, create a package using <code class="docutils literal notranslate"><span class="pre">ros2</span> <span class="pre">pkg</span> <span class="pre">create</span></code>. I will
+be creating a C++ package in this tutorial, but a python package should also be fine.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>pkg<span class="w"> </span>create<span class="w"> </span>--build-type<span class="w"> </span>ament_cmake<span class="w"> </span>--license<span class="w"> </span>Apache-2.0<span class="w"> </span>teleop_example
+</pre></div>
+</div>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">teleop_example</span></code> with an appropriate name. If I were making a teleop package for a robotic arm, I would name
+this <code class="docutils literal notranslate"><span class="pre">teleop_arm</span></code>.</p>
+<p>Now you should have a package to add your launch file to. Your directory structure might look something like this:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>ws/
+└── src/
+    └── teleop_example/
+        ├── include/
+        ├── src/
+        ├── CMakeLists.txt
+        └── package.xml
+</pre></div>
+</div>
+<p>You can delete <code class="docutils literal notranslate"><span class="pre">include/</span></code> and <code class="docutils literal notranslate"><span class="pre">src/</span></code> if you wish.</p>
+</section>
+<section id="add-directories-for-launch-and-parameter-files-to-cmakelists-txt">
+<h3>2. Add directories for launch and parameter files to CMakeLists.txt<a class="headerlink" href="#add-directories-for-launch-and-parameter-files-to-cmakelists-txt" title="Link to this heading"></a></h3>
+<p>By convention, all launch files for a package are stored in the <code class="docutils literal notranslate"><span class="pre">launch</span></code> directory inside of the package. Make sure to
+create a launch directory at the top-level of the package you created above.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>teleop_example
+mkdir<span class="w"> </span>launch
+mkdir<span class="w"> </span>params
+</pre></div>
+</div>
+<p>To have a package structure that looks like:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>ws/
+└── src/
+    └── teleop_example/
+        ├── CMakeLists.txt
+        ├── package.xml
+        ├── launch/
+        └── params/
+</pre></div>
+</div>
+<p>Then, open <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> to add this:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="c"># Add all the installation directories</span>
+<span class="nb">install</span><span class="p">(</span><span class="s">DIRECTORY</span>
+<span class="w">  </span><span class="s">launch</span>
+<span class="w">  </span><span class="s">params</span>
+<span class="w">  </span><span class="s">DESTINATION</span><span class="w"> </span><span class="s">share/</span><span class="o">${</span><span class="nv">PROJECT_NAME</span><span class="o">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Your final <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> might look something like:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.8</span><span class="p">)</span>
+<span class="nb">project</span><span class="p">(</span><span class="s">teleop_example</span><span class="p">)</span>
+
+<span class="nb">if</span><span class="p">(</span><span class="s">CMAKE_COMPILER_IS_GNUCXX</span><span class="w"> </span><span class="s">OR</span><span class="w"> </span><span class="s">CMAKE_CXX_COMPILER_ID</span><span class="w"> </span><span class="s">MATCHES</span><span class="w"> </span><span class="s2">&quot;Clang&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="nb">add_compile_options</span><span class="p">(</span><span class="s">-Wall</span><span class="w"> </span><span class="s">-Wextra</span><span class="w"> </span><span class="s">-Wpedantic</span><span class="p">)</span>
+<span class="nb">endif</span><span class="p">()</span>
+
+<span class="c"># find dependencies</span>
+<span class="nb">find_package</span><span class="p">(</span><span class="s">ament_cmake</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+
+<span class="c"># Add all the installation directories</span>
+<span class="nb">install</span><span class="p">(</span><span class="s">DIRECTORY</span>
+<span class="w">  </span><span class="s">launch</span>
+<span class="w">  </span><span class="s">params</span>
+<span class="w">  </span><span class="s">DESTINATION</span><span class="w"> </span><span class="s">share/</span><span class="o">${</span><span class="nv">PROJECT_NAME</span><span class="o">}</span>
+<span class="p">)</span>
+
+<span class="nb">ament_package</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="create-a-launch-file">
+<h3>3. Create a launch file<a class="headerlink" href="#create-a-launch-file" title="Link to this heading"></a></h3>
+<p>Next, we need to add a launch file that</p>
+<ul class="simple">
+<li><p>Runs <code class="docutils literal notranslate"><span class="pre">teleop_node</span></code> with a unique name</p></li>
+<li><p>Passes <code class="docutils literal notranslate"><span class="pre">teleop_node</span></code> the appropriate parameter files</p></li>
+</ul>
+<div class="admonition-sidenote admonition">
+<p class="admonition-title">Sidenote</p>
+<p>In this tutorial, I will be using python launch files, as you can use python to have the launch file
+accept some interesting arguments that could change what parameter files you want to load. For example, you could load
+up different configurations for your input sources depending on what controller you wanted to use, such that adding
+<code class="docutils literal notranslate"><span class="pre">device:=xbox</span></code> or <code class="docutils literal notranslate"><span class="pre">device:=ps5</span></code> would load up the configs for those specific devices.</p>
+<p>You can also just run <code class="docutils literal notranslate"><span class="pre">teleop_node</span></code> and pass it your parameter files! I do this to quickly test out different
+parameter file changes without rebuilding the workspace.</p>
+</div>
+<p>Load up your favorite IDE, and create <code class="docutils literal notranslate"><span class="pre">teleop.launch.py</span></code> under <code class="docutils literal notranslate"><span class="pre">teleop_example/launch/</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># teleop.launch.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">launch</span><span class="w"> </span><span class="kn">import</span> <span class="n">LaunchDescription</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">launch.substitutions</span><span class="w"> </span><span class="kn">import</span> <span class="n">LaunchConfiguration</span><span class="p">,</span> <span class="n">PathJoinSubstitution</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">launch.actions</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeclareLaunchArgument</span><span class="p">,</span> <span class="n">OpaqueFunction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">launch_ros.actions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">launch_ros.substitutions</span><span class="w"> </span><span class="kn">import</span> <span class="n">FindPackageShare</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">launch_ros.parameter_descriptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParameterValue</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">launch_setup</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">teleop_example_dir</span> <span class="o">=</span> <span class="n">FindPackageShare</span><span class="p">(</span><span class="s1">&#39;teleop_example&#39;</span><span class="p">)</span>
+
+    <span class="n">teleop_params</span> <span class="o">=</span> <span class="n">LaunchConfiguration</span><span class="p">(</span><span class="s1">&#39;teleop_params&#39;</span><span class="p">)</span>
+    <span class="n">log_inputs</span> <span class="o">=</span> <span class="n">LaunchConfiguration</span><span class="p">(</span><span class="s1">&#39;log_inputs&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">Node</span><span class="p">(</span>
+            <span class="n">package</span><span class="o">=</span><span class="s1">&#39;teleop_node&#39;</span><span class="p">,</span>
+            <span class="n">executable</span><span class="o">=</span><span class="s1">&#39;teleop_node&#39;</span><span class="p">,</span>
+            <span class="n">output</span><span class="o">=</span><span class="s1">&#39;screen&#39;</span><span class="p">,</span>
+            <span class="n">arguments</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;--node-name&#39;</span><span class="p">,</span> <span class="s1">&#39;teleop_example&#39;</span><span class="p">],</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">teleop_params</span><span class="p">,</span>
+                <span class="p">{</span><span class="s1">&#39;log_inputs&#39;</span><span class="p">:</span> <span class="n">ParameterValue</span><span class="p">(</span><span class="n">log_inputs</span><span class="p">,</span> <span class="n">value_type</span><span class="o">=</span><span class="nb">bool</span><span class="p">)}</span>
+            <span class="p">],</span>
+            <span class="n">additional_env</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;RCUTILS_COLORIZED_OUTPUT&#39;</span><span class="p">:</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;RCUTILS_CONSOLE_OUTPUT_FORMAT&#39;</span><span class="p">:</span> <span class="s1">&#39;[</span><span class="si">{severity}</span><span class="s1">] [</span><span class="si">{name}</span><span class="s1">] </span><span class="si">{message}</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">),</span>
+    <span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_launch_description</span><span class="p">():</span>
+    <span class="n">teleop_example_dir</span> <span class="o">=</span> <span class="n">FindPackageShare</span><span class="p">(</span><span class="s1">&#39;teleop_example&#39;</span><span class="p">)</span>
+
+    <span class="n">declared_arguments</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">DeclareLaunchArgument</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;teleop_params&#39;</span><span class="p">,</span>
+            <span class="n">default_value</span><span class="o">=</span><span class="n">PathJoinSubstitution</span><span class="p">([</span><span class="n">teleop_example_dir</span><span class="p">,</span> <span class="s1">&#39;params&#39;</span><span class="p">,</span> <span class="s1">&#39;teleop.yaml&#39;</span><span class="p">]),</span>
+            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;The main parameter file to use for the teleop_node&#39;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">DeclareLaunchArgument</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;log_inputs&#39;</span><span class="p">,</span>
+            <span class="n">default_value</span><span class="o">=</span><span class="s1">&#39;False&#39;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Set this true to display all the inputs. Very useful when trying to configure input sources!&#39;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">LaunchDescription</span><span class="p">(</span>
+        <span class="n">declared_arguments</span> <span class="o">+</span> <span class="p">[</span><span class="n">OpaqueFunction</span><span class="p">(</span><span class="n">function</span><span class="o">=</span><span class="n">launch_setup</span><span class="p">)]</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>Remember to change <code class="docutils literal notranslate"><span class="pre">teleop_example</span></code> to the name of your package.</p>
+<p>We will expand on this launch file later as we add input sources and control modes.</p>
+</section>
+<section id="create-the-teleop-yaml-parameter-file">
+<h3>4. Create the teleop.yaml parameter file<a class="headerlink" href="#create-the-teleop-yaml-parameter-file" title="Link to this heading"></a></h3>
+<p>Create a teleop.yaml file to configure the behavior of the core teleop_node.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># teleop.yaml</span>
+<span class="nt">teleop_example</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># The maximum rate at which updates should occur, and hence the max rate at which commands are sent.</span>
+<span class="w">    </span><span class="c1"># Leaving this unset makes the max update rate unlimited.</span>
+<span class="w">    </span><span class="c1"># update_rate: 50.0</span>
+
+<span class="w">    </span><span class="c1"># The minimum rate at which updates occur.</span>
+<span class="w">    </span><span class="c1"># Leaving this unset will allow for indefinite lapses between updates.</span>
+<span class="w">    </span><span class="nt">min_update_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span>
+
+<span class="w">    </span><span class="c1"># Note: all update rates are in hz</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Make sure you use the same name you gave the node in the launch file at the root of the yaml.</p>
+</div>
+<p>We’ll add control modes and input sources later.</p>
+<p>For now, you should have everything you need to run your teleop package. Try to build and source your workspace, then run the launch file:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>teleop_example<span class="w"> </span>teleop.launch.py
+</pre></div>
+</div>
+<p>Your output might look like:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ros2<span class="w"> </span>launch<span class="w"> </span>teleop_example<span class="w"> </span>teleop.launch.py
+<span class="go">[INFO] [launch]: All log files can be found below /home/nova/.ros/log/2025-07-20-23-34-41-464329-nixos-2142296</span>
+<span class="go">[INFO] [launch]: Default logging verbosity is set to INFO</span>
+<span class="go">[INFO] [teleop_node-1]: process started with pid [2142306]</span>
+<span class="go">[teleop_node-1] [ERROR] [teleop_example] control_modes.names was not set.</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example] Control Modes:</span>
+<span class="go">[teleop_node-1]</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example] Input Sources:</span>
+<span class="go">[teleop_node-1]</span>
+</pre></div>
+</div>
+</section>
+<section id="add-a-control-mode">
+<h3>5. Add a control mode<a class="headerlink" href="#add-a-control-mode" title="Link to this heading"></a></h3>
+<p>In <code class="docutils literal notranslate"><span class="pre">teleop.yaml</span></code> define a control mode. I’ll be using <a class="reference external" href="https://github.com/BaileyChessum/teleop_modular/tree/main/teleop_modular_twist">teleop_modular_twist/TwistControlMode</a>.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># teleop.yaml</span>
+<span class="nt">teleop_example</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># ...</span>
+
+<span class="w">    </span><span class="c1"># Add this:</span>
+<span class="w">    </span><span class="nt">control_modes</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">names</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span>
+<span class="w">        </span><span class="c1"># Give your control mode a name! Use snake_case</span>
+<span class="w">        </span><span class="s">&quot;twist_control_mode&quot;</span>
+<span class="w">      </span><span class="p p-Indicator">]</span>
+
+<span class="w">      </span><span class="c1"># Then declare its type!</span>
+<span class="w">      </span><span class="nt">twist_control_mode</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;teleop_modular_twist/TwistControlMode&quot;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">ros2_control</span></code> users: if you also want Teleop Modular to activate and deactivate controllers in <code class="docutils literal notranslate"><span class="pre">ros2_control</span></code> alongside your control modes,
+you can add the names of the controllers you want to be activated with the control mode under the <code class="docutils literal notranslate"><span class="pre">controllers</span></code> parameter:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># ...</span>
+<span class="nt">twist_control_mode</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;teleop_modular_twist/TwistControlMode&quot;</span>
+<span class="w">  </span><span class="nt">controllers</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span>
+<span class="w">    </span><span class="s">&quot;some_ros2_control_controller_name&quot;</span>
+<span class="w">  </span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</div>
+<p>Then, we need to define parameters for the node created for <code class="docutils literal notranslate"><span class="pre">twist_control_mode</span></code>. You can either add this at the bottom of <code class="docutils literal notranslate"><span class="pre">teleop.yaml</span></code>, or make a new parameter file. I will just be adding them to the end of <code class="docutils literal notranslate"><span class="pre">teleop.yaml</span></code> in this tutorial.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># teleop.yaml</span>
+<span class="nt">teleop_example</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># ...</span>
+
+<span class="c1"># Add this:</span>
+<span class="nt">twist_control_mode</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># Twist messages will be published on this</span>
+<span class="w">    </span><span class="nt">topic</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/twist&quot;</span>
+<span class="w">    </span><span class="c1"># This will disable the input called &#39;speed&#39;, which multiplies every other input when enabled</span>
+<span class="w">    </span><span class="nt">use_speed_input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+
+<span class="w">    </span><span class="nt">scale</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">linear</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">all</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span><span class="w">  </span><span class="c1"># max speed of 2 meters per second</span>
+<span class="w">      </span><span class="nt">angular</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">all</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span><span class="w">  </span><span class="c1"># max angular speed of 2 radians per second</span>
+
+<span class="w">    </span><span class="c1"># Check the README.md for teleop_modular_twist/TwistControlMode for more parameters!</span>
+<span class="w">    </span><span class="c1"># It is very extensive.</span>
+<span class="w">    </span><span class="c1"># https://github.com/BaileyChessum/teleop_modular/tree/main/teleop_modular_twist</span>
+</pre></div>
+</div>
+<p>Check the docs for the control mode you use to find out what parameters exist for it.</p>
+<p>Then, try running it!</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>launch<span class="w"> </span>teleop_example<span class="w"> </span>teleop.launch.py<span class="w"> </span>teleop_params:<span class="o">=</span>/path/to/ws/src/teleop_example/params/teleop.yaml
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We don’t need to rebuild the workspace to try out changes to the config, as long as we specify the absolute
+path to the config file. Specify the absolute path to the config file whenever you want to actively edit your
+parameter files.</p>
+</div>
+<p>Your output should no longer have the error for missing the <code class="docutils literal notranslate"><span class="pre">control_modes.names</span></code> parameter, and your control mode should be listed.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ros2<span class="w"> </span>launch<span class="w"> </span>teleop_arm<span class="w"> </span>teleop.launch.py<span class="w"> </span>teleop_params:<span class="o">=</span>/home/.../teleop_example/params/teleop.yaml
+<span class="go">[INFO] [launch]: All log files can be found below /home/nova/.ros/log/2025-07-21-01-35-16-545322-nixos-2213788</span>
+<span class="go">[INFO] [launch]: Default logging verbosity is set to INFO</span>
+<span class="go">[INFO] [teleop_node-1]: process started with pid [2213791]</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example] Control Modes:</span>
+<span class="go">[teleop_node-1]      - Twist Control Mode    : teleop_modular_twist/TwistControlMode</span>
+<span class="go">[teleop_node-1]</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example] Input Sources:</span>
+<span class="go">[teleop_node-1]</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example] Twist Control Mode activated</span>
+</pre></div>
+</div>
+<p>If you have any issues, please post in
+<a class="reference external" href="https://github.com/BaileyChessum/teleop_modular/discussions/new?category=q-a">Discussions</a>, and I will try to help!</p>
+</section>
+<section id="add-an-input-source">
+<h3>6. Add an input source<a class="headerlink" href="#add-an-input-source" title="Link to this heading"></a></h3>
+<p>Adding an input source is a very similar process to the previous step.</p>
+<p>In <code class="docutils literal notranslate"><span class="pre">teleop.yaml</span></code> define an input source. I’ll be using <cite>teleop_modular_joy/JoyInputSource &lt;https://github.com/BaileyChessum/teleop_modular/tree/main/teleop_modular_joy&gt;</cite>.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># teleop.yaml</span>
+<span class="nt">teleop_example</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># ...</span>
+
+<span class="w">    </span><span class="c1"># Add this:</span>
+<span class="w">    </span><span class="nt">input_sources</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">names</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span>
+<span class="w">        </span><span class="c1"># Give your input source a name! Use snake_case</span>
+<span class="w">        </span><span class="s">&quot;joy_input_source&quot;</span>
+<span class="w">      </span><span class="p p-Indicator">]</span>
+
+<span class="w">      </span><span class="c1"># Then declare its type!</span>
+<span class="w">      </span><span class="nt">joy_input_source</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;teleop_modular_joy/JoyInputSource&quot;</span>
+</pre></div>
+</div>
+<p>Then, we need to define parameters for the node created for <code class="docutils literal notranslate"><span class="pre">joy_input_source</span></code>. You can either add this at the bottom
+of <code class="docutils literal notranslate"><span class="pre">teleop.yaml</span></code>, or make a new parameter file. I will just be adding them to the end of <code class="docutils literal notranslate"><span class="pre">teleop.yaml</span></code> in this tutorial.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># teleop.yaml</span>
+<span class="nt">teleop_example</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># ...</span>
+
+<span class="c1"># Add this:</span>
+<span class="nt">joy_input_source</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">topic</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/joy&quot;</span>
+<span class="w">    </span><span class="c1"># These are the default mappings for a game_controller_node.</span>
+<span class="w">    </span><span class="c1"># https://docs.ros.org/en/ros2_packages/rolling/api/joy/index.html</span>
+<span class="w">    </span><span class="c1"># If you use joy_node, you&#39;ll need to figure out what the mapping is yourself.</span>
+<span class="w">    </span><span class="c1"># So, run joy, `ros2 topic echo /joy`, and mess around with your controller to figure out what it is for you.</span>
+<span class="w">    </span><span class="nt">button_definitions</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span>
+<span class="w">      </span><span class="s">&quot;A&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;B&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;X&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;Y&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;BACK&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;GUIDE&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;START&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;LEFTSTICK&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;RIGHTSTICK&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;LEFTSHOULDER&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;RIGHTSHOULDER&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;DPAD_UP&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;DPAD_DOWN&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;DPAD_LEFT&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;DPAD_RIGHT&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;MISC1&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;PADDLE1&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;PADDLE2&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;PADDLE3&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;PADDLE4&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;TOUCHPAD&quot;</span>
+<span class="w">    </span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">axis_definitions</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span>
+<span class="w">      </span><span class="s">&quot;LEFTX&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;LEFTY&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;RIGHTX&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;RIGHTY&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;TRIGGERLEFT&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;TRIGGERRIGHT&quot;</span>
+<span class="w">    </span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>Check the docs for the input source you use to find out what parameters exist for it.</p>
+<p>In the example above, the <code class="docutils literal notranslate"><span class="pre">joy_input_source</span></code> will export all the axis and button names listed, associated with the
+values from Joy messages, maintaining the same order as the list of names.</p>
+<p>Now, try running it!</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ros2<span class="w"> </span>launch<span class="w"> </span>teleop_example<span class="w"> </span>teleop.launch.py<span class="w"> </span>teleop_params:<span class="o">=</span>/path/to/ws/src/teleop_example/params/teleop.yaml
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ros2 launch teleop_example teleop.launch.py teleop_params:=/home/.../teleop_example/params/teleop.yaml
+[INFO] [launch]: All log files can be found below /home/nova/.ros/log/2025-07-21-02-08-53-614455-nixos-2229263
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [teleop_node-1]: process started with pid [2229273]
+[teleop_node-1] [INFO] [teleop_node] Control Modes:
+[teleop_node-1]      - Twist Control Mode    : teleop_modular_twist/TwistControlMode
+[teleop_node-1]
+[teleop_node-1] [INFO] [teleop_node] Input Sources:
+[teleop_node-1]      - Joy Input Source      : teleop_modular_joy/JoyInputSource
+[teleop_node-1]
+[teleop_node-1] [INFO] [teleop_node] Twist Control Mode activated
+</pre></div>
+</div>
+<p>You should now see your input source listed.</p>
+<p>If you want to see your inputs, you can set the parameter <code class="docutils literal notranslate"><span class="pre">log_inputs:=True</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ros2<span class="w"> </span>launch<span class="w"> </span>teleop_example<span class="w"> </span>teleop.launch.py<span class="w"> </span>...<span class="w"> </span>log_inputs:<span class="o">=</span><span class="nb">true</span>
+</pre></div>
+</div>
+<p>Plug in a controller, and run in another terminal:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ros2<span class="w"> </span>run<span class="w"> </span>joy<span class="w"> </span>game_controller_node
+</pre></div>
+</div>
+<p>Mess around with controller inputs, and you should see them appear in your original terminal:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ros2<span class="w"> </span>launch<span class="w"> </span>teleop_example<span class="w"> </span>teleop.launch.py<span class="w"> </span>teleop_params:<span class="o">=</span>/home/.../teleop_example/params/teleop.yaml<span class="w"> </span>log_inputs:<span class="o">=</span>True
+<span class="go">[INFO] [launch]: All log files can be found below /home/nova/.ros/log/2025-07-21-02-16-07-117871-nixos-2232880</span>
+<span class="go">[INFO] [launch]: Default logging verbosity is set to INFO</span>
+<span class="go">[INFO] [teleop_node-1]: process started with pid [2232890]</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example] Control Modes:</span>
+<span class="go">[teleop_node-1]      - Twist Control Mode    : teleop_modular_twist/TwistControlMode</span>
+<span class="go">[teleop_node-1]</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example] Input Sources:</span>
+<span class="go">[teleop_node-1]      - Joy Input Source      : teleop_modular_joy/JoyInputSource</span>
+<span class="go">[teleop_node-1]</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example] Twist Control Mode activated</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   RIGHTY     0.116634</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   RIGHTX     -0.306491</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   RIGHTY     0.744094</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   RIGHTX     -0.504636</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   RIGHTY     0.983520</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   RIGHTX     -0.364283</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   RIGHTX     -0.124858</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   RIGHTX     -0.017529</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   RIGHTY     0.801887</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   RIGHTY     0.636765</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   RIGHTY     0.455132</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   RIGHTY     0.034073</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   DPAD_RIGHT 1</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   DPAD_RIGHT 0</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   DPAD_LEFT  1</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   DPAD_LEFT  0</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   DPAD_DOWN  1</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   DPAD_DOWN  0</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   DPAD_UP    1</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   DPAD_UP    0</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   DPAD_RIGHT 1</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   DPAD_RIGHT 0</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   DPAD_LEFT  1</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   DPAD_LEFT  0</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   A  1</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   A  0</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   B  1</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   B  0</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   B  1</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   B  0</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   Y  1</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   Y  0</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   X  1</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   X  0</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   TRIGGERRIGHT       -0.252811</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   TRIGGERRIGHT       -0.529405</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   TRIGGERRIGHT       -0.706894</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   TRIGGERRIGHT       -0.872015</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   TRIGGERRIGHT       -1.000000</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   TRIGGERRIGHT       -0.471612</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   TRIGGERRIGHT       -0.050553</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   TRIGGERLEFT        -0.203274</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   TRIGGERLEFT        -0.686270</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   TRIGGERLEFT        -1.000000</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   TRIGGERLEFT        -0.884415</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   TRIGGERLEFT        -0.323003</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   TRIGGERLEFT        -0.000000</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   LEFTSHOULDER       1</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   LEFTSHOULDER       0</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   RIGHTSHOULDER      1</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   RIGHTSHOULDER      0</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   GUIDE      1</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   GUIDE      0</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   START      1</span>
+<span class="go">[teleop_node-1] [INFO] [teleop_example]   START      0</span>
+</pre></div>
+</div>
+<p>You could also change your launch file to run <code class="docutils literal notranslate"><span class="pre">game_controller_node</span></code> or <code class="docutils literal notranslate"><span class="pre">joy_node</span></code> alongside <code class="docutils literal notranslate"><span class="pre">teleop_node</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># teleop.launch.py</span>
+<span class="c1"># ...</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">launch_setup</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="c1"># Add this!</span>
+        <span class="c1"># Automatically run joy alongside teleop</span>
+        <span class="n">Node</span><span class="p">(</span>
+            <span class="n">package</span><span class="o">=</span><span class="s1">&#39;joy&#39;</span><span class="p">,</span>
+            <span class="n">executable</span><span class="o">=</span><span class="s1">&#39;game_controller_node&#39;</span><span class="p">,</span>  <span class="c1"># or joy_node</span>
+            <span class="n">output</span><span class="o">=</span><span class="s2">&quot;screen&quot;</span>
+        <span class="p">),</span>
+
+        <span class="c1"># Runs teleop_node with the given parameter files</span>
+        <span class="n">Node</span><span class="p">(</span>
+            <span class="n">package</span><span class="o">=</span><span class="s1">&#39;teleop_node&#39;</span><span class="p">,</span>
+            <span class="n">executable</span><span class="o">=</span><span class="s1">&#39;teleop_node&#39;</span><span class="p">,</span>
+            <span class="c1"># ...</span>
+        <span class="p">),</span>
+    <span class="p">]</span>
+
+<span class="c1"># ...</span>
+</pre></div>
+</div>
+<p>If you have any issues, please post in
+<a class="reference external" href="https://github.com/BaileyChessum/teleop_modular/discussions/new?category=q-a">Discussions</a>, and I will try to help!</p>
+</section>
+<section id="mapping-inputs">
+<h3>7. Mapping inputs<a class="headerlink" href="#mapping-inputs" title="Link to this heading"></a></h3>
+<p>Congrats! You’ve reached the fun part.</p>
+<p>Currently, your control mode isn’t getting any inputs from the input source. If we check the documentation
+for <a href="#id3"><span class="problematic" id="id4">:class:`teleop_modular_twist/TwistControlMode &lt;https://github.com/BaileyChessum/teleop_modular/tree/main/teleop_modular_twist&gt;`_</span></a>, we’ll find that it
+expects to get these axis inputs:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">linear.x</span></code>: The input axis providing the x component of the twist linear velocity from -1 to 1.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">linear.y</span></code>: The input axis providing the y component of the twist linear velocity from -1 to 1.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">linear.z</span></code>: The input axis providing the z component of the twist linear velocity from -1 to 1.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">angular.x</span></code>: The input axis providing the x component of the twist angular velocity from -1 to 1.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">angular.y</span></code>: The input axis providing the y component of the twist angular velocity from -1 to 1.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">angular.z</span></code>: The input axis providing the z component of the twist angular velocity from -1 to 1.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">speed</span></code>: The input axis that scales the output speed from 0 to 1. But, since we set <code class="docutils literal notranslate"><span class="pre">use_speed_input:</span> <span class="pre">false</span></code> in the parameter file, we shouldn’t need to set this.</p></li>
+</ul>
+<p>You could change the names of the inputs in <code class="docutils literal notranslate"><span class="pre">joy_input_source</span></code>’s <code class="docutils literal notranslate"><span class="pre">axis_definitions</span></code> parameter to match those needed by
+the control mode. But, chances are, the inputs aren’t behaving exactly as you’d like. Some input axes might be inverted,
+for example.</p>
+<p>Teleop Modular solves this problem with the set of remap params automatically added
+to every input source implementation. We can use them to:</p>
+<ul>
+<li><p>Rename inputs</p></li>
+<li><p>Create axes from buttons</p></li>
+<li><p>Create buttons from axes</p></li>
+<li><p>Transform input values in various ways, such as:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Inverting axes and buttons</p></li>
+<li><p>Linearly mapping an input range of axis values to an output range</p></li>
+<li><p>Clamping axes</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<p>We will apply these parameters to solve our problem in the following guide:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="remapping_and_transforming_inputs.html#remapping-and-transforming-inputs"><span class="std std-ref">Remapping and transforming inputs</span></a></p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="remapping_and_transforming_inputs.html" class="btn btn-neutral float-right" title="Remapping and transforming inputs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Bailey Chessum.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
