@@ -2,6 +2,8 @@
 
 A generic control mode that publishes inputs from teleop_modular.
 
+Publishes [teleop_msgs/InputNames](../../teleop_msgs/msg/InputNames.msg) and [teleop_msgs/CombinedInputValues](../../teleop_msgs/msg/CombinedInputValues.msg) messages.
+
 ### Inputs
 
 #### Axes
@@ -30,7 +32,7 @@ teleop_node:
   ros__parameters:
     control_modes:
       names: [ "input_publisher_mode" ]
-      twist_control_mode:
+      input_publisher_mode:
         type: "input_publisher_mode/InputPublisherMode"
 
 input_publisher_mode:

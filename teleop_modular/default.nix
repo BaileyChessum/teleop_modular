@@ -1,16 +1,5 @@
 { lib
-, buildRosPackage
-, ament-cmake
-, teleop-modular-control-mode
-, teleop-modular-input-source
-, teleop-modular-core
-, teleop-modular-joy
-, teleop-modular-twist
-, teleop-modular-node
-, teleop-modular-msgs
-, teleop-modular-srvs
-, teleop-modular-python-utils
-, teleop-modular-input-publisher-mode
+
 }:
 
 buildRosPackage {
@@ -42,6 +31,7 @@ buildRosPackage {
     teleop-modular-srvs
     teleop-modular-python-utils
     teleop-modular-input-publisher-mode
+    teleop-modular-locked-publisher
   ];
 
   meta = {

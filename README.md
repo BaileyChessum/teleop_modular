@@ -111,6 +111,8 @@ This is a list of plugins you can use with teleop_modular. Please post plugins t
 #### Control Modes
 
 - [teleop_modular_twist/TwistControlMode](control_mode_plugins/teleop_modular_twist) -- A control mode that sends [Twist](https://docs.ros2.org/latest/api/geometry_msgs/msg/Twist.html) and [TwistStamped](https://docs.ros2.org/latest/api/geometry_msgs/msg/TwistStamped.html) messages.
+- [teleop_modular_twist/InputPublisherMode](control_mode_plugins/input_publisher_mode) -- A control mode that forwards inputs to the ROS2 network. Can be used in conjunction with [teleop_python_utils](./teleop_python_utils)
+- [teleop_modular_twist/LockedPublisher](control_mode_plugins/locked_publisher) -- A control mode that publishes the locked status of the teleop system.
 
 Use [control_mode_template](https://github.com/BaileyChessum/control_mode_template) to generate empty control mode packages, and implement custom control modes for your robot.
 

@@ -15,6 +15,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   msg/InvokedEvents.msg
   msg/CombinedInputs.msg
   msg/CombinedInputValues.msg
+  msg/LockedStatus.msg
 
   DEPENDENCIES std_msgs
 )
