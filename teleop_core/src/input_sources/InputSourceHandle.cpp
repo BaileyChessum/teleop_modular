@@ -310,7 +310,7 @@ InputSourceHandle::get_axis_transform_params(const std::string & name)
         "Parameter %s.range.out should have exactly two elements, representing the upper and lower bound "
         "respectively.",
         prefix.c_str());
-      range_in = std::nullopt;
+      range_out = std::nullopt;
     }
 
     // Enforce default value for range_in

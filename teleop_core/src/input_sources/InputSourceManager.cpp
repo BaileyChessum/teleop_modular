@@ -69,6 +69,8 @@ void InputSourceManager::on_input_source_requested_update(const rclcpp::Time & n
 
 rclcpp::Time InputSourceManager::wait_for_update()
 {
+  rclcpp::Time result;
+
   if (params_.min_update_rate > 0) {
     const std::chrono::duration<double> min_wait_period{1.0 / params_.min_update_rate};
     std::unique_lock lock(mutex_);
@@ -83,14 +85,20 @@ rclcpp::Time InputSourceManager::wait_for_update()
       // No update was requested
       update_time_ = node_->now();
     }
+
+    // Reset and capture while still holding the lock to avoid a data race on update_time_
+    // and a missed-update window on should_update_.
+    should_update_ = false;
+    result = update_time_;
   } else {
     // Waiting without a min_update_rate is easier. Only unblock when should_update_ becomes true.
     std::unique_lock lock(mutex_);
     update_condition_.wait(lock, [&] {return should_update_.load();});
+    should_update_ = false;
+    result = update_time_;
   }
 
-  should_update_ = false;
-  return update_time_;
+  return result;
 }
 
 void InputSourceManager::update(const rclcpp::Time & now)

@@ -44,7 +44,7 @@ struct span
   {
   }
   constexpr explicit span(const std::vector<T> & vector) noexcept
-  : data_(vector.data()), size_(vector.size())
+  : data_(const_cast<T *>(vector.data())), size_(vector.size())
   {
   }
 

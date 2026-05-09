@@ -44,7 +44,7 @@ void SetAxisCommand::on_initialize(
 
   params_ = params;
 
-  context.get_states().get_buttons().set(params_.name, 0);
+  context.get_states().get_axes().set(params_.name, 0.0f);
 }
 
 void SetAxisCommand::execute(CommandDelegate & context, const rclcpp::Time & now)
