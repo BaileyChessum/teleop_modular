@@ -7,6 +7,7 @@
 , gtest
 , rclcpp
 , geometry-msgs
+, lifecycle-msgs
 , sensor-msgs
 , pluginlib
 , controller-manager-msgs
@@ -43,6 +44,7 @@ buildRosPackage {
     rclcpp-lifecycle
     std-srvs
     geometry-msgs
+    lifecycle-msgs
     sensor-msgs
     pluginlib
     controller-manager-msgs
@@ -55,6 +57,7 @@ buildRosPackage {
   propagatedBuildInputs = [ 
     controller-manager-msgs
     control-msgs 
+    lifecycle-msgs
     std-srvs
     std-msgs
     teleop-modular-control-mode

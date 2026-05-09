@@ -4,6 +4,7 @@ project(teleop_core LANGUAGES CXX)
 set(THIS_PACKAGE_INCLUDE_DEPENDS
   rclcpp
   rclcpp_lifecycle
+  lifecycle_msgs
   control_msgs
   controller_manager_msgs
   geometry_msgs
@@ -60,7 +61,9 @@ add_library(${PROJECT_NAME} SHARED
 
   src/inputs/input_pipeline_builder.cpp
 
+  src/control_modes/ordered_resource_manager.cpp
   src/control_modes/controller_manager_manager.cpp
+  src/control_modes/lifecycle_node_manager.cpp
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)  # Require C++17

@@ -135,6 +135,10 @@ void ControlModeManager::configure()
       params, "control_modes." + control_mode_name + ".controllers",
       "The names of ros2_control controllers to use for this control mode.",
       std::vector<std::string>());
+    const auto lifecycle_nodes = get_parameter_or_default<std::vector<std::string>>(
+      params, "control_modes." + control_mode_name + ".lifecycle_nodes",
+      "The names of lifecycle nodes to activate for this control mode.",
+      std::vector<std::string>());
     const auto start_active = get_parameter_or_default<bool>(
         params, "control_modes." + control_mode_name + ".active",
         "Whether this control mode should start active.",
@@ -142,6 +146,7 @@ void ControlModeManager::configure()
 
     const control_mode::ControlMode::CommonParams common_params{
       controllers,
+      lifecycle_nodes,
       start_active,
       display_name
     };
@@ -184,20 +189,25 @@ void ControlModeManager::configure()
     ++i;
   }
 
-  // Set up the controller manager manager with the given controller names
-  // Get the names of every control mode in a vector
   std::vector<std::reference_wrapper<const std::vector<std::string>>> controllers_for_cm_ids{};
+  std::vector<std::reference_wrapper<const std::vector<std::string>>> lifecycle_nodes_for_cm_ids{};
   controllers_for_cm_ids.reserve(control_modes_.size());
+  lifecycle_nodes_for_cm_ids.reserve(control_modes_.size());
 
   for (const auto control_mode : control_modes_by_id_) {
     if (!control_mode)
       throw std::invalid_argument("control_mode \"" + control_mode->get_name() + "\" was nullptr.");
 
     controllers_for_cm_ids.emplace_back(std::ref(control_mode->get_controllers()));
+    lifecycle_nodes_for_cm_ids.emplace_back(std::ref(control_mode->get_lifecycle_nodes()));
   }
 
-  controllers_.register_controllers_for_ids(controllers_for_cm_ids);
-  // TODO: Gracefully reconfigure the controller manager manager if a new control mode gets added dynamically
+  if (!controllers_.register_controllers_for_ids(controllers_for_cm_ids)) {
+    throw std::runtime_error("Failed to determine a valid shared controller activation order.");
+  }
+  if (!lifecycle_nodes_.register_lifecycle_nodes_for_ids(lifecycle_nodes_for_cm_ids)) {
+    throw std::runtime_error("Failed to determine a valid shared lifecycle node activation order.");
+  }
 }
 
 void ControlModeManager::activate_initial_control_modes()
@@ -272,9 +282,8 @@ bool ControlModeManager::switch_control_mode(
     deactivate_ids.emplace_back(cm_id);
   }
 
-  // Eagerly change active controllers in ros2_control in a separate worker thread, expecting all control mode state
-  // transitions will succeed
-  controllers_.switch_active(deactivate_ids, activate_ids);
+  controllers_.activate_for_modes(activate_ids);
+  lifecycle_nodes_.activate_for_modes(activate_ids);
 
   // These store the ids of modes to log after all switches have occurred:
   std::vector<size_t> deactivate_log_ids{};
@@ -286,7 +295,6 @@ bool ControlModeManager::switch_control_mode(
   std::vector<size_t> failed_deactivation_ids{};
   for (const auto& cm_id : deactivate_ids)
   {
-    // TODO: Check the success of the transition, and active respective ros2_control controllers on failure
     auto result = control_modes_by_id_[cm_id]->get_node()->deactivate();
 
     // Check for failures
@@ -320,6 +328,9 @@ bool ControlModeManager::switch_control_mode(
       activate_log_ids.emplace_back(cm_id);
     }
   }
+
+  controllers_.deactivate_for_modes(deactivate_log_ids);
+  lifecycle_nodes_.deactivate_for_modes(deactivate_log_ids);
 
   // Fancy log statement
 
@@ -359,13 +370,28 @@ bool ControlModeManager::switch_control_mode(
   // Send another controller change request on any transition failure
   if (failed_activation_ids.size() > 0 || failed_deactivation_ids.size() > 0) {
     RCLCPP_WARN(logger,
-                "Some control mode activations and deactivations failed. A second switch_controller request is being "
-                "made to compensate.");
-    controllers_.switch_active(failed_deactivation_ids, failed_activation_ids);
+                "Some control mode activations and deactivations failed. External resources are being reconciled.");
+    const auto active_ids = get_active_control_mode_ids();
+    controllers_.sync_to_active_modes(active_ids);
+    lifecycle_nodes_.sync_to_active_modes(active_ids);
     return false;
   }
 
   return true;
+}
+
+std::vector<size_t> ControlModeManager::get_active_control_mode_ids() const
+{
+  std::vector<size_t> active_ids{};
+  active_ids.reserve(control_modes_by_id_.size());
+
+  for (size_t cm_id = 0; cm_id < control_modes_by_id_.size(); ++cm_id) {
+    if (control_modes_by_id_[cm_id]->is_active()) {
+      active_ids.emplace_back(cm_id);
+    }
+  }
+
+  return active_ids;
 }
 
 bool ControlModeManager::set_control_mode(const std::string & name)

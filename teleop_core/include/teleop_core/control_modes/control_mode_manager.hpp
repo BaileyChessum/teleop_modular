@@ -25,6 +25,7 @@
 #include "teleop_core/inputs/input_pipeline_builder.hpp"
 #include "control_mode/event/event_collection.hpp"
 #include "teleop_core/control_modes/controller_manager_manager.hpp"
+#include "teleop_core/control_modes/lifecycle_node_manager.hpp"
 
 namespace teleop::internal
 {
@@ -133,6 +134,8 @@ private:
    */
   bool get_type_for_control_mode(const std::string & name, std::string & control_mode_type) const;
 
+  std::vector<size_t> get_active_control_mode_ids() const;
+
   /// The owning teleop_modular ROS2 node.
   std::shared_ptr<rclcpp::Node> node_;
   /// Add spawned nodes to this to get them to spin
@@ -142,6 +145,8 @@ private:
 
   /// Helps with switching controllers in ros2_control, managing separate threads, error recovery and activation order.
   ControllerManagerManager controllers_ = ControllerManagerManager(node_);
+  /// Helps with switching runtime lifecycle nodes in a separate worker thread.
+  LifecycleNodeManager lifecycle_nodes_ = LifecycleNodeManager(node_);
 
   // Control modes
   /// Loads the control modes, and needs to stay alive during the whole lifecycle of the control modes.

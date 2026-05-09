@@ -5,13 +5,16 @@ generalized to be useful for teleoperation with any system.
 
 ## Inputs
 
-TODO: Write
+Inputs are the values that flow from input sources to control modes. There are two types:
+
+- **Axes** — floating point values, typically in the range `[-1, 1]`. Used for continuous inputs like joystick positions.
+- **Buttons** — boolean values. Used for binary inputs like button presses. Buttons can also act as a safety lock, or trigger events that modify the teleop system.
+
+Inputs are identified by meaningful string names (e.g. `"linear.x"`, `"speed"`, `"lock"`). Control modes request inputs by name, decoupling them from the specific input device in use.
 
 ## Input Sources
 
 Input sources provide input values. This could be a joystick, a keyboard, etc. Anything at all.
-
-TODO: Write
 
 ### How input sources work
 
@@ -23,9 +26,7 @@ The node is spun on its own separate thread to input updates. You can store any 
 during topic subscription callbacks, then call `InputSource::request_update(rclcpp::Time now)` to have the main input 
 thread call your `InputSource` implementation's `update(rclcpp::Time now)` method.
 
-If you don't use a ROS2 topic to get the input values for your `InputSource`, you can also start up your own thread in
-`TODO: Determine the appropriate place to allow this`, and clean up the thread in `TODO: make a end of lifecycle virtual
-method`.
+If you don't use a ROS2 topic to get the input values for your `InputSource`, you can also start up your own thread — the right lifecycle hook for this is still an open design question.
 
 ### Input remapping
 
@@ -118,7 +119,9 @@ This has not yet been implemented.
 
 ## Control Modes
 
-TODO: Write
+Control modes are plugins that consume named inputs and publish control messages to some downstream system (e.g. `geometry_msgs/Twist` for a mobile base, or `trajectory_msgs/JointTrajectory` for an arm).
+
+Each control mode has its own node and is configured via ROS2 parameters. A `teleop_node` can run multiple control modes simultaneously, with only one active at a time.
 
 ### Using inputs directly in ROS2 *(for slop lovers)*
 
