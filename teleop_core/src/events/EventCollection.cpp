@@ -121,10 +121,7 @@ void EventCollection::add_child_element(const std::shared_ptr<InputPipelineBuild
 {
   child_elements_.emplace_back(element);
   if (pipeline_previously_linked_) {
-    // TODO: Make it possible to dynamically register button events, propegating input names down
-    RCLCPP_ERROR(logger_, "Dynamic event registration into the pipeline is yet to be implemented! "
-                 "Your button names will not be properly declared to any remapping parameters.");
-    relink_pipeline();
+    request_full_pipeline_relink();
   }
 }
 
@@ -143,6 +140,11 @@ void EventCollection::on_inputs_available(InputManager::Hardened& inputs)
 void EventCollection::relink()
 {
   relink_pipeline();
+}
+
+void EventCollection::request_full_relink()
+{
+  request_full_pipeline_relink();
 }
 
 void EventCollection::declare_input_names(InputPipelineBuilder::DeclaredNames& names)

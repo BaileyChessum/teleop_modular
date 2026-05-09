@@ -97,6 +97,8 @@ void TeleopNode::service_input_updates()
     const auto now = input_source_manager_->wait_for_update();
     const auto period = now - previous;
 
+    pipeline_.flush_pending_relink();
+
     input_source_manager_->update(now);
     inputs_.update(now);
     events_.update(now);

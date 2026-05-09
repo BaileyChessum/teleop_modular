@@ -91,6 +91,7 @@ install(FILES plugins.xml
     test/test_state.cpp
     test/test_input_map.cpp
     test/test_input_pipeline.cpp
+    test/test_dynamic_pipeline.cpp
   )
   ament_add_gtest(test_inputs
     ${TEST_INPUTS_SOURCE_FILES}

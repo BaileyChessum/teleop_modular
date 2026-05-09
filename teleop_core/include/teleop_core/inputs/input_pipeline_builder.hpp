@@ -21,12 +21,23 @@
 #include <set>
 #include <functional>
 #include <optional>
+#include <atomic>
 
 namespace teleop {
 
 class InputPipelineElementDelegate {
 public:
   virtual void relink() = 0;
+
+  /**
+   * Requests a full pipeline rebuild from element 0, including re-declaring all input names.
+   * Unlike relink(), this is deferred and executed safely on the update thread via
+   * InputPipelineBuilder::flush_pending_relink(). Elements that hold a pipeline delegate can use
+   * this to schedule a rebuild without risking concurrent modification of the InputMap.
+   *
+   * Default implementation falls back to relink() for delegates that don't support deferred rebuilds.
+   */
+  virtual void request_full_relink() { relink(); }
 };
 
 class PositionalInputPipelineElementDelegate : public InputPipelineElementDelegate {
@@ -102,10 +113,24 @@ public:
         return;
       }
 
-      // TODO: integrate some kind of scheduling/sync mechanism with the main thread to ensure safety. For currest use
-      //  cases, we can assume it is already delegated by the main thread as part of event queues
-
       delegate_.value()->relink();
+    }
+
+    /**
+     * Requests a full pipeline rebuild from element 0, including re-declaring all input names.
+     * This is safe to call from any thread — the actual rebuild is deferred and runs on the update
+     * thread via InputPipelineBuilder::flush_pending_relink(). Use this instead of relink_pipeline()
+     * when a new element has been added to the pipeline after initial construction.
+     */
+    void request_full_pipeline_relink() {
+      if (!delegate_.has_value()) {
+        RCLCPP_ERROR(rclcpp::get_logger("input_pipeline_builder"),
+                     "InputPipelineBuilder::Element tried to request_full_pipeline_relink(), but the delegate used to "
+                     "do so was never set.");
+        return;
+      }
+
+      delegate_.value()->request_full_relink();
     }
 
   private:
@@ -175,6 +200,26 @@ public:
   }
 
   /**
+   * Schedules a full pipeline rebuild — re-declares all input names then re-links and hardens
+   * from element 0. Thread-safe: can be called from any thread. The rebuild itself runs on the
+   * update thread when flush_pending_relink() is next called.
+   */
+  void request_full_relink() override {
+    full_relink_pending_.store(true, std::memory_order_release);
+  }
+
+  /**
+   * If a full relink was requested (via request_full_relink()), performs it now. Call this at
+   * the top of each update cycle on the update thread, before any reads from the InputMap.
+   */
+  void flush_pending_relink() {
+    if (full_relink_pending_.exchange(false, std::memory_order_acq_rel)) {
+      previously_declared_names_ = false;
+      relink_from(0);
+    }
+  }
+
+  /**
    * Reserves the size of the pipeline
    */
   void reserve(size_t size) {
@@ -210,6 +255,7 @@ public:
     names_ = DeclaredNames();
     previously_linked_ = false;
     previously_declared_names_ = false;
+    full_relink_pending_.store(false, std::memory_order_relaxed);
     target_.init(InputManager::Props());
   }
 
@@ -243,6 +289,10 @@ private:
       delegate.relink_from(position);
     }
 
+    void request_full_relink() override {
+      delegate.request_full_relink();
+    }
+
     ElementHandle(
         std::reference_wrapper<Element> element,
         InputManager::Props next,
@@ -261,8 +311,7 @@ private:
 
   bool previously_linked_ = false;
   bool previously_declared_names_ = false;
-
-  // TODO: Make construct, and add mechanism to trigger partial rebuild
+  std::atomic<bool> full_relink_pending_{false};
 };
 
 }  // namespace teleop

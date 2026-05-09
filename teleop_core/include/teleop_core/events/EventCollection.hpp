@@ -94,6 +94,7 @@ public:
   void on_inputs_available(InputManager::Hardened& inputs) override;;
 
   void relink() override;
+  void request_full_relink() override;
 
 private:
   void add_child_element(const std::shared_ptr<InputPipelineBuilder::Element>& element);
