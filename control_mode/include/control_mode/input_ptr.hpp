@@ -17,7 +17,6 @@
 #include <rclcpp/time.hpp>
 #include <utility>
 #include <string>
-#include <memory>
 #include "visibility_control.h"
 
 namespace control_mode
@@ -37,16 +36,7 @@ public:
   // Pointer-like operators
   const T& operator*() const { return *ptr_; }
   const T* operator->() const { return ptr_; }
-  /// Assume valid pointers will always have a valid name set
-  explicit operator bool() const { return name_ && !name_->empty() && ptr_ != &default_value(); }
-
-  // Accessors
-  [[nodiscard]] constexpr const std::string & get_name() const noexcept
-  {
-    if (!*this)
-      return *default_name();
-    return *name_;
-  }
+  explicit operator bool() const { return ptr_ != &default_value(); }
 
   // Type conversion
   constexpr inline explicit operator T()
@@ -69,49 +59,33 @@ public:
   /// This is left over from before the input class used to represent a pointer
   using SharedPtr [[deprecated("Shared pointers are no longer used for input memory management. The input class now acts as the pointer.")]] = InputPtr<T>*;
 
-  InputPtr(InputPtr<T>& other) : ptr_(other.ptr_), name_(other.name_) {}
-  InputPtr(InputPtr<T>&& other) : ptr_(other.ptr_), name_(std::move(other.name_)) {}
+  InputPtr(InputPtr<T>& other) : ptr_(other.ptr_) {}
+  InputPtr(InputPtr<T>&& other) : ptr_(other.ptr_) {}
   ~InputPtr() = default;
-  
+
   /// Creates a null input
-  InputPtr() {
-    ptr_ = &default_value();
-    name_ = default_name();
-  }
-  InputPtr(std::nullptr_t) {
-    ptr_ = &default_value();
-    name_ = default_name();
-  }
+  InputPtr() : ptr_(&default_value()) {}
+  InputPtr(std::nullptr_t) : ptr_(&default_value()) {}
 
   InputPtr& operator=(const std::nullptr_t) noexcept {
     ptr_ = &default_value();
-    name_ = default_name();
     return *this;
   }
   InputPtr& operator=(const InputPtr& other) noexcept {
     ptr_ = other.ptr_;
-    name_ = other.name_;
     return *this;
   }
 
-  explicit InputPtr(std::shared_ptr<std::string> name, T* ptr)
-  : name_(std::move(name)), ptr_(ptr)
-  {
-  }
+  explicit InputPtr(T* ptr) : ptr_(ptr) {}
 
 private:
   T* ptr_;
-  std::shared_ptr<std::string> name_;
 
   // Shared mutable default value
   static T& default_value() {
     // mutable T shared between all input pointers
-    static T value{};  
+    static T value{};
     return value;
-  }
-  static std::shared_ptr<std::string>& default_name() {
-    static std::shared_ptr<std::string> name = std::make_shared<std::string>("[null]");
-    return name;
   }
 };
 

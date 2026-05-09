@@ -19,7 +19,6 @@
 #include <variant>
 #include "teleop_core/inputs/InputAggregator.hpp"
 #include "control_mode/input_collection.hpp"
-#include <iostream>
 
 namespace teleop
 {
@@ -92,9 +91,8 @@ public:
    */
   inline T* find_ptr(const std::string& name) noexcept {
     auto it = map_.find(name);
-
     if (it == map_.end())
-      return InputT();
+      return nullptr;
     return it->second;
   }
 
@@ -108,14 +106,10 @@ public:
    */
   InputT operator[](const std::string & name) override {
     auto it = map_.find(name);
-
     if (it == map_.end()) {
       return InputT();  // return the default pointer, which points to a common sink value
     }
-      
-    it->second;
-    // TODO: Stop allocating duplicate strings to the heap!!
-    return InputT(std::make_shared<std::string>(name), it->second);
+    return InputT(it->second);
   }
 
   /**
