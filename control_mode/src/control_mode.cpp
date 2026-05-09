@@ -102,6 +102,11 @@ const std::vector<std::string> & ControlMode::get_controllers() const
   return common_params_.controllers;
 }
 
+const std::vector<std::string> & ControlMode::get_lifecycle_nodes() const
+{
+  return common_params_.lifecycle_nodes;
+}
+
 const ControlMode::CommonParams & ControlMode::get_common_params() const
 {
   return common_params_;
