@@ -18,6 +18,10 @@ Teleop Modular is a general framework for multimodal teleoperation in ROS2 based
    guides/writing_a_teleop_package
    guides/remapping_and_transforming_inputs
    guides/writing_a_control_mode
+   guides/using_multiple_control_modes
+   guides/adding_a_lock
+   guides/commands
+   guides/writing_an_input_source
 
 .. toctree::
    :maxdepth: 2
@@ -35,18 +39,19 @@ To get started using Teleop Modular, please follow these guides:
 * :ref:`writing_a_teleop_package`
 * :ref:`remapping_and_transforming_inputs`
 * :ref:`writing_a_control_mode`
-* Using multiple control modes
-* Adding a lock
+* :ref:`using_multiple_control_modes`
+* :ref:`adding_a_lock`
 
-These guides cover various ways to provide inputs:
+These guides cover commands and various ways to provide inputs:
 
-* Complex input using state Commands
-* Writing an `InputSource` plugin
-* Providing inputs without an input source using services
+* :ref:`commands`
+* :ref:`writing_an_input_source`
+
+*(Planned)* Providing inputs without an input source using services
 
 These guides discuss advanced topics:
 
-* Running multiple teleop_nodes
+*(Planned)* Running multiple teleop_nodes
 
 Architecture
 ------------

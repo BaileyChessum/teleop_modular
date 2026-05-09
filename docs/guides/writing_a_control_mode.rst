@@ -341,7 +341,7 @@ locked. If applicable, implement ``publish_halt_message()`` similar to above:
 
    // project_name.cpp
    // ...
-   void {{cookiecutter.control_mode_class_name}}::publish_halt_message(const rclcpp::Time & now) const
+   void ExampleControlMode::publish_halt_message(const rclcpp::Time & now) const
    {
      // TODO: Implement for your message type, or remove the method if it is not appropriate for the use case.
 

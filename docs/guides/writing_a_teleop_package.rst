@@ -261,7 +261,10 @@ In ``teleop.yaml`` define a control mode. I'll be using `teleop_modular_twist/Tw
 .. note::
 
    For ``ros2_control`` users: if you also want Teleop Modular to activate and deactivate controllers in ``ros2_control`` alongside your control modes,
-   you can add the names of the controllers you want to be activated with the control mode under the ``controllers`` parameter:
+   you can add the names of the controllers you want to be activated with the control mode under the ``controllers`` parameter.
+
+   You can also do the same for ROS2 lifecycle nodes with ``lifecycle_nodes``. Both lists are ordered: Teleop Modular
+   activates them in the listed order, and deactivates them in reverse order.
 
    .. code-block:: yaml
 
@@ -270,6 +273,9 @@ In ``teleop.yaml`` define a control mode. I'll be using `teleop_modular_twist/Tw
         type: "teleop_modular_twist/TwistControlMode"
         controllers: [
           "some_ros2_control_controller_name"
+        ]
+        lifecycle_nodes: [
+          "/some_lifecycle_node_name"
         ]
 
 Then, we need to define parameters for the node created for ``twist_control_mode``. You can either add this at the bottom of ``teleop.yaml``, or make a new parameter file. I will just be adding them to the end of ``teleop.yaml`` in this tutorial.
@@ -336,7 +342,7 @@ If you have any issues, please post in
 
 Adding an input source is a very similar process to the previous step.
 
-In ``teleop.yaml`` define an input source. I'll be using `teleop_modular_joy/JoyInputSource <https://github.com/BaileyChessum/teleop_modular/tree/main/teleop_modular_joy>`.
+In ``teleop.yaml`` define an input source. I'll be using `teleop_modular_joy/JoyInputSource <https://github.com/BaileyChessum/teleop_modular/tree/main/teleop_modular_joy>`_.
 
 .. code-block:: yaml
 
