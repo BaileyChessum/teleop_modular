@@ -26,11 +26,18 @@ teleop_node:
         controllers: [
           "nova_arm_velocity_controller"
         ]
+        lifecycle_nodes: [
+          "/joint_space_supervisor"
+        ]
       twist_ik_control:
         type: "teleop_modular_twist/TwistControlMode"
         controllers: [
           "nova_arm_position_controller",
           "nova_twistmapper"
+        ]
+        lifecycle_nodes: [
+          "/twist_supervisor",
+          "/twist_safety_gate"
         ]
 
     commands:

@@ -78,6 +78,12 @@ public:
     std::vector<std::string> controllers;
 
     /**
+     * The set of lifecycle nodes to activate with this control mode. Populated by the
+     * control_modes.control_mode_name.lifecycle_nodes parameter in the main teleop_modular node.
+     */
+    std::vector<std::string> lifecycle_nodes;
+
+    /**
      * Whether this control mode should be activated on startup.
      * Actual parameter name is "active".
      */
@@ -247,7 +253,10 @@ public:
 
   /// Gets the names of all ros2_control controllers to activate alongside this control mode.
   [[nodiscard]] const std::vector<std::string> & get_controllers() const;
-  /// Gets common params for the control mode, including whether the control mode should start active, and controllers
+  /// Gets the names of all lifecycle nodes to activate alongside this control mode.
+  [[nodiscard]] const std::vector<std::string> & get_lifecycle_nodes() const;
+  /// Gets common params for the control mode, including whether the control mode should start active and shared
+  /// resource declarations.
   [[nodiscard]] const CommonParams & get_common_params() const;
 
 protected:

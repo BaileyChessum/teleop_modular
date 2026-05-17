@@ -124,12 +124,20 @@ public:
     return handles_.size();
   }
 
+  void clear()
+  {
+    handles_.clear();
+    name_to_id_.clear();
+    is_sorted_ = false;
+  }
+
   /**
    * Ensures the controllers are sorted
    */
-  void sort() {
+  [[nodiscard]] bool sort() {
     if (!is_sorted_)
-      order();
+      return order();
+    return true;
   }
 
 private:
@@ -155,15 +163,13 @@ private:
   /**
    * Create value for ordering_
    */
-  void order()
+  [[nodiscard]] bool order()
   {
     std::vector<size_t> in_degrees{};   //< stores for each handle the number of dependencies of the handle
     in_degrees.reserve(handles_.size());
 
     std::vector<size_t> ordering{};
     ordering.reserve(handles_.size());
-
-    size_t root_count = 0;
 
     // Get the in_degree for every handle, and keep track of any root handles
     for (size_t i = 0; i < handles_.size(); ++i)
@@ -173,9 +179,10 @@ private:
       {
         // This element is a root, so we can safely add it to the ordering_
         ordering.emplace_back(i);
-        ++root_count;
       }
     }
+
+    bool valid = true;
 
     // Iterate over every element in the ordering_ to try add its children to the ordering_
     for (size_t i = 0; i < ordering.size(); ++i)
@@ -196,6 +203,8 @@ private:
 
     if (ordering.size() != handles_.size())
     {
+      valid = false;
+
       // Uh oh! The graph is not acyclic!
       const auto logger = rclcpp::get_logger("controller_ordering");
       RCLCPP_ERROR(logger,
@@ -234,11 +243,11 @@ private:
 
       auto dependencies = std::make_unique<std::set<size_t>>();
       for (const auto dependency : *old_handle.dependencies)
-        dependencies->insert(ordering[dependency]);
+        dependencies->insert(inverse_ordering[dependency]);
 
       auto children = std::make_unique<std::set<size_t>>();
       for (const auto child : *old_handle.children)
-        children->insert(ordering[child]);
+        children->insert(inverse_ordering[child]);
 
       new_handles.emplace_back(Handle{old_handle.name, std::move(dependencies), std::move(children)});
     }
@@ -250,6 +259,7 @@ private:
     }
 
     is_sorted_ = true;
+    return valid;
   }
 
   std::vector<Handle> handles_{};
