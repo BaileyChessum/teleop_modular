@@ -4,7 +4,6 @@ project(teleop_modular_twist)
 set(THIS_PACKAGE_INCLUDE_DEPENDS
   pluginlib
   rclcpp
-  rclcpp_lifecycle
   std_msgs
   geometry_msgs
   control_mode

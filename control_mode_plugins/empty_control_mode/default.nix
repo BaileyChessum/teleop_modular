@@ -6,6 +6,7 @@
 , ament-lint-auto
 , gtest
 , rclcpp
+, rclcpp-lifecycle
 , pluginlib
 , teleop-modular-control-mode
 }:
@@ -29,6 +30,7 @@ buildRosPackage {
 
   buildInputs = [
     rclcpp
+    rclcpp-lifecycle
     pluginlib
     teleop-modular-control-mode
   ];

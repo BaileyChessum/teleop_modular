@@ -4,6 +4,7 @@ project(empty_control_mode)
 set(THIS_PACKAGE_INCLUDE_DEPENDS
   pluginlib
   rclcpp
+  rclcpp_lifecycle
   control_mode
 )
 
