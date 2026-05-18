@@ -1,0 +1,5 @@
+<library path="empty_control_mode">
+    <class name="empty_control_mode/EmptyControlMode" type="empty_control_mode::EmptyControlMode" base_class_type="control_mode::ControlMode">
+        <description>A control mode that accepts no inputs and intentionally does nothing.</description>
+    </class>
+</library>

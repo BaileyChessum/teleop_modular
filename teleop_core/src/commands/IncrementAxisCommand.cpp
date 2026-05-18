@@ -19,7 +19,8 @@ namespace teleop
 
 void IncrementAxisCommand::on_initialize(
   const std::string & prefix,
-  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & parameters)
+  const ParameterInterface::SharedPtr & parameters,
+  CommandDelegate & context)
 {
   Params params{};
 
@@ -76,20 +77,27 @@ void IncrementAxisCommand::execute(CommandDelegate & context, const rclcpp::Time
   if (!state) {
     if (params_.log) {
       RCLCPP_ERROR(
-        logger, C_INPUT "  %s\tinvalid shared pointer!\t" C_QUIET "(state)" C_RESET,
-        params_.name.c_str());
+        logger, C_INPUT "  %s\tinvalid input pointer! Setting to 0 + %f...\t" C_QUIET "(state)" C_RESET,
+        params_.name.c_str(), params_.by);
     }
-    return;   //< This should never be possible
+
+    // Set to params_.by, limited by params_.until
+    if (params_.by < 0)
+      context.get_states().get_axes().set(params_.name, fmax(params_.by, params_.until));
+    else
+      context.get_states().get_axes().set(params_.name, fmin(params_.by, params_.until));
+
+    return;
   }
 
   // Do nothing when limit is reached
-  if (params_.by < 0.0 && state->value <= params_.until || params_.by >= 0.0 &&
-    state->value >= params_.until)
+  if ((params_.by < 0.0 && state->value <= params_.until) || (params_.by >= 0.0 &&
+    state->value >= params_.until))
   {
     if (params_.log) {
       RCLCPP_INFO(
         logger, C_INPUT "  %s\t%.2f\t" C_QUIET "(state, limit reached!)" C_RESET,
-        params_.name.c_str(), axis->value());
+        params_.name.c_str(), axis.value());
     }
     return;
   }
@@ -104,7 +112,7 @@ void IncrementAxisCommand::execute(CommandDelegate & context, const rclcpp::Time
   if (params_.log) {
     RCLCPP_INFO(
       logger, C_INPUT "  %s\t%.2f\t" C_QUIET "(state)" C_RESET, params_.name.c_str(),
-      axis->value());
+      axis.value());
   }
 }
 

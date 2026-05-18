@@ -244,9 +244,9 @@ Then, create the publisher in ``on_configure()`` in the ``.cpp`` file. You'll ag
 To put values into your message during ``update()``, you'll need to have stored references to some inputs to provide the
 values to use in the message.
 
-For all the inputs you need, add member variables to store them. This could be an ``Axis::SharedPtr`` for floating point
-values, ``Button::SharedPtr`` for true/false values, or some other structure that contains these pointers, such as a
-``std::vector<Axis::SharedPtr>``:
+For all the inputs you need, add member variables to store them. This could be an ``Axis`` for floating point
+values, ``Button`` for true/false values, or some other structure that contains these pointers, such as a
+``std::vector<Axis>``:
 
 .. code-block:: cpp
 
@@ -257,10 +257,10 @@ values, ``Button::SharedPtr`` for true/false values, or some other structure tha
 
      // You can hold references to inputs like this, and set their values in on_configure_inputs:
      /// Input from 0 to 1 that directly scales the output speed.
-     Axis::SharedPtr speed_;
+     Axis speed_;
 
      // Add any inputs you want here:
-     Axis::SharedPtr some_axis_;
+     Axis some_axis_;
 
 
      // ...
@@ -280,7 +280,7 @@ Then, in ``on_configure_inputs()`` in your ``.cpp`` file, assign your input shar
      // Capture inputs like this:
      speed_ = inputs.axes["speed"];
 
-     // TODO: Add Axis::SharedPtr and/or Button::SharedPtr member variables, then assign them here.
+     // TODO: Add Axis and/or Button member variables, then assign them here.
 
      // Assign your input shared pointers here:
      some_axis_ = inputs.axes["some_axis_name"];
@@ -311,8 +311,8 @@ In ``on_update()`` in your ``.cpp`` file, create a message, assign the message v
        return return_type::OK;
      }
 
-     // Get input values either with input_->value() or by referencing and implicitly casting *input_
-     const float speed = std::max(speed_->value(), 0.0f);
+     // Get input values either with input_.value() or by referencing and implicitly casting *input_
+     const float speed = std::max(speed_.value(), 0.0f);
 
      // TODO: Construct and send a message using values from inputs
 
@@ -322,7 +322,7 @@ In ``on_update()`` in your ``.cpp`` file, create a message, assign the message v
      // Set values in your message type:
      msg->some_value = *some_axis_ * speed;
      // Alternatively, you can write:
-     // msg->some_value = some_axis_->value() * speed;
+     // msg->some_value = some_axis_.value() * speed;
 
      // If your message has a header, you can do this:
      msg->header.stamp = now;

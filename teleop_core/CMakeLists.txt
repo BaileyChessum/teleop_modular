@@ -33,15 +33,12 @@ add_library(${PROJECT_NAME} SHARED
   src/commands/SetButtonCommand.cpp
 
   # These are also need to do unit tests
-  src/inputs/InputCommonSpecializations.cpp
   src/inputs/Button.cpp
   src/inputs/Axis.cpp
   src/commands/Command.cpp
-  src/control_modes/ControlModeManager.cpp
+  src/control_modes/control_mode_manager.cpp
   src/inputs/InputManager.cpp
   src/events/EventCollection.cpp
-  src/events/EventListenerQueue.cpp
-  src/inputs/InputCollection.cpp
 
   # State
   src/inputs/state/StateManager.cpp
@@ -50,13 +47,20 @@ add_library(${PROJECT_NAME} SHARED
 
   src/input_sources/InputSourceHandle.cpp
   src/events/ButtonEvent.cpp
-  src/events/Event.cpp
   src/events/EventManager.cpp
 
   src/input_sources/InputSourceManager.cpp
   src/commands/CommandManager.cpp
   src/commands/SetAxisCommand.cpp
   src/commands/IncrementAxisCommand.cpp
+
+  src/inputs/InputMapBuilder.cpp
+  src/inputs/InputAggregator.cpp
+  src/inputs/InputMap.cpp
+
+  src/inputs/input_pipeline_builder.cpp
+
+  src/control_modes/controller_manager_manager.cpp
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)  # Require C++17
@@ -78,9 +82,15 @@ install(FILES plugins.xml
 #  find_package(ament_lint_auto REQUIRED)
 
   # Add tests
-  ament_add_gtest(test_inputs
+
+  set(TEST_INPUTS_SOURCE_FILES
     test/test_inputs.cpp
     test/test_state.cpp
+    test/test_input_map.cpp
+    test/test_input_pipeline.cpp
+  )
+  ament_add_gtest(test_inputs
+    ${TEST_INPUTS_SOURCE_FILES}
   )
   target_link_libraries(test_inputs
     ${PROJECT_NAME}
@@ -121,11 +131,37 @@ install(TARGETS ${PROJECT_NAME}
 ament_export_libraries(
   ${PROJECT_NAME}
 )
+
+# This used to export test cases to its own executable -- useful for debugging segfaults
+# However, it might've made the CI pipeline segfault?
+#
+# find_package(GTest REQUIRED)
+# find_package(Threads REQUIRED)
+# # At the bottom of your CMakeLists.txt
+# add_executable(test_inputs_manual
+#   ${TEST_INPUTS_SOURCE_FILES}
+# )
+# target_link_libraries(test_inputs_manual
+#   ${PROJECT_NAME}
+#   GTest::gtest_main
+#   Threads::Threads
+# )
+# target_include_directories(test_inputs_manual PUBLIC
+#   include
+# )
+# install(TARGETS
+#   test_inputs_manual
+#   DESTINATION lib/${PROJECT_NAME}
+# )
+
+
 ament_export_targets(
-#  ${PROJECT_NAME}Targets
+  #  ${PROJECT_NAME}Targets
   export_${PROJECT_NAME}
   HAS_LIBRARY_TARGET
 )
+
+
 
 ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 ament_package()

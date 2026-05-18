@@ -8,27 +8,45 @@
 //     http://www.apache.org/licenses/LICENSE-2.0
 //
 //
-// Created by nova on 6/29/25.
+// Created by Bailey Chessum on 6/29/25.
 //
 
 #include "teleop_core/commands/SwitchControlModeCommand.hpp"
-#include "teleop_core/control_modes/ControlModeManager.hpp"
+#include "teleop_core/control_modes/control_mode_manager.hpp"
+#include "teleop_core/utilities/get_parameter.hpp"
 
 namespace teleop
 {
 
+using namespace teleop::utils;
+
 void SwitchControlModeCommand::on_initialize(
   const std::string & prefix,
-  const ParameterInterface::SharedPtr & parameters)
+  const ParameterInterface::SharedPtr & parameters,
+  CommandDelegate & context)
 {
+  logger_ = rclcpp::get_logger(get_name());
   Params params{};
 
-  auto to_descriptor = rcl_interfaces::msg::ParameterDescriptor{};
-  to_descriptor.name = prefix + "to";
-  to_descriptor.description = "The name of the control mode to activate.";
-  parameters->declare_parameter(to_descriptor.name, rclcpp::ParameterValue(""), to_descriptor);
-  if (rclcpp::Parameter to_param; parameters->get_parameter(to_descriptor.name, to_param)) {
-    params.to = to_param.as_string();
+  params.activate = get_parameter_or_default(
+      parameters, prefix + "activate",
+      "A list of control mode names to activate on command execution",
+      std::vector<std::string>{});
+
+  params.deactivate = get_parameter_or_default(
+      parameters, prefix + "deactivate",
+      "A list of control mode names to deactivate on command execution",
+      std::vector<std::string>{});
+
+  params.to = get_parameter<std::string>(
+      parameters, prefix + "to",
+      "Deprecated. The name of the control mode to activate.");
+
+  if (params.to.has_value()) {
+    RCLCPP_WARN(get_logger(),
+                "The '.to' parameter for the switch_control_mode command \"%s\" is deprecated!\nUse '.activate' and "
+                "'.deactivate' instead, providing a list of control mode names to activate and deactivate to each.",
+                get_name().c_str());
   }
 
   params_ = params;
@@ -36,7 +54,17 @@ void SwitchControlModeCommand::on_initialize(
 
 void SwitchControlModeCommand::execute(CommandDelegate & context, const rclcpp::Time & now)
 {
-  context.get_control_modes()->set_control_mode(params_.to);
+  if (params_.to.has_value()) {
+    context.get_control_modes()->set_control_mode(*params_.to);
+    return;
+  }
+
+  RCLCPP_DEBUG(get_logger(), "Switching control modes...");
+  auto result = context.get_control_modes()->switch_control_mode(params_.deactivate, params_.activate);
+
+  if (!result) {
+    RCLCPP_WARN(get_logger(), "Failed to switch control modes.");
+  }
 }
 
 }  // namespace teleop

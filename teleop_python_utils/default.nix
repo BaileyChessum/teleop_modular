@@ -4,6 +4,7 @@
 , rclpy
 , teleop-modular-msgs
 , ament-cmake-python
+, python3Packages
 }:
 
 buildRosPackage {
@@ -21,11 +22,13 @@ buildRosPackage {
 
   buildInputs = [
     rclpy
+    python3Packages.pytest
   ];
 
   propagatedBuildInputs = [
     rclpy
     teleop-modular-msgs
+    python3Packages.pytest
   ];
 
   doCheck = true;

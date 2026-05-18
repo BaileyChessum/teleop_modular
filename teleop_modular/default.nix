@@ -11,6 +11,7 @@
 , teleop-modular-srvs
 , teleop-modular-python-utils
 , teleop-modular-input-publisher-mode
+, empty-control-mode
 }:
 
 buildRosPackage {
@@ -42,6 +43,7 @@ buildRosPackage {
     teleop-modular-srvs
     teleop-modular-python-utils
     teleop-modular-input-publisher-mode
+    empty-control-mode
   ];
 
   meta = {

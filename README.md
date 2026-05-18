@@ -49,7 +49,7 @@ Every input source and control mode get their own node from which to retrieve pa
 > for:
 >
 > ```cpp
-> linear_.x = inputs.axes["linear.x"];  //< get input shared_ptr with meaningful name
+> linear_.x = inputs.axes["linear.x"];  //< get an input pointer with a meaningful name
 > // ...
 > twist.linear.x = *linear_.x;
 > ```
@@ -110,6 +110,7 @@ This is a list of plugins you can use with teleop_modular. Please post plugins t
 
 #### Control Modes
 
+- [empty_control_mode/EmptyControlMode](control_mode_plugins/empty_control_mode) -- A control mode that accepts no inputs and intentionally does nothing.
 - [teleop_modular_twist/TwistControlMode](control_mode_plugins/teleop_modular_twist) -- A control mode that sends [Twist](https://docs.ros2.org/latest/api/geometry_msgs/msg/Twist.html) and [TwistStamped](https://docs.ros2.org/latest/api/geometry_msgs/msg/TwistStamped.html) messages.
 
 Use [control_mode_template](https://github.com/BaileyChessum/control_mode_template) to generate empty control mode packages, and implement custom control modes for your robot.
@@ -133,5 +134,4 @@ Feel free to make a fork of the repository, and raise a pull request with any ch
 You are welcome to [raise new issues](https://github.com/BaileyChessum/teleop_modular/issues/new) for any bugs or feature requests.
 
 The project development roadmap is outlined for each upcoming version as [Milestones](https://github.com/BaileyChessum/teleop_modular/milestones).
-
 

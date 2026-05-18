@@ -19,7 +19,8 @@ namespace teleop
 
 void LogCommand::on_initialize(
   const std::string & prefix,
-  const ParameterInterface::SharedPtr & parameters)
+  const ParameterInterface::SharedPtr & parameters,
+  CommandDelegate & context)
 {
   Params params{};
 

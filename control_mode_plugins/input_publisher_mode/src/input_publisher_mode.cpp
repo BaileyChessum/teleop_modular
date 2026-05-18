@@ -106,6 +106,12 @@ void InputPublisherMode::on_configure_inputs(Inputs inputs)
   // This method is always run after on_configure(),
   // so you can assume that you already have any necessary parameters
 
+  // This method is called twice so clear inputs and values vectors
+  axes_.clear();
+  buttons_.clear();
+  axis_values_.clear();
+  button_values_.clear();
+
   // Capture inputs
   for (const auto & axis_name : axis_names_)
   {
@@ -147,10 +153,12 @@ void InputPublisherMode::publish_input_names_message() const
 
 void InputPublisherMode::publish_halt_message(const rclcpp::Time & now) const
 {
-  // TODO: Implement for your message type, or remove the method if it is not appropriate for the use case.
   auto msg = std::make_unique<teleop_msgs::msg::CombinedInputValues>();
   msg->values.header.stamp = now;
   msg->events.header.stamp = now;
+  msg->values.axes = std::vector<float>(axis_names_.size());
+  msg->values.buttons = std::vector<uint8_t>(button_names_.size());
+
   inputs_publisher_->publish(std::move(msg));
 }
 
@@ -175,11 +183,11 @@ return_type InputPublisherMode::on_update(const rclcpp::Time & now, const rclcpp
   // Update values
   for (int i = 0; i < static_cast<int>(axis_names_.size()); i++)
   {
-    axis_values_[i] = axes_[i]->value();
+    axis_values_[i] = axes_[i].value();
   }
   for (int i = 0; i < static_cast<int>(button_names_.size()); i++)
   {
-    button_values_[i] = buttons_[i]->value();
+    button_values_[i] = buttons_[i].value();
   }
 
   msg->values.axes = axis_values_;

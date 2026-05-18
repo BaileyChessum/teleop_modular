@@ -12,8 +12,8 @@
 # Created by Bailey Chessum on 2/8/25.
 #
 from typing import Dict, Iterator, Tuple
-from teleop_python_utils.Button import Button
-from teleop_python_utils.EventCollection import EventCollection
+from .Button import Button
+from .EventCollection import EventCollection
 
 class ButtonCollection:
     def __init__(self, events: EventCollection):

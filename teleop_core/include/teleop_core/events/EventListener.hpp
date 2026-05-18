@@ -11,26 +11,16 @@
 // Created by nova on 6/29/25.
 //
 
-#ifndef EVENTLISTENER_HPP
-#define EVENTLISTENER_HPP
-#include <memory>
+#ifndef TELEOP_CORE_EVENTLISTENER_HPP
+#define TELEOP_CORE_EVENTLISTENER_HPP
+
+#include "control_mode/event/event_listener.hpp"
 
 namespace teleop
 {
-/**
- * Interface providing a means for events to alert things that depend on them that they have been invoked.
- */
-class EventListener
-{
-public:
-  virtual ~EventListener() = default;
 
-  using WeakPtr = std::weak_ptr<EventListener>;
-  using SharedPtr = std::shared_ptr<EventListener>;
-
-  virtual void on_event_invoked(const rclcpp::Time & now) = 0;
-};
+using EventListener = control_mode::EventListener;
 
 }  // namespace teleop
 
-#endif  // EVENTLISTENER_HPP
+#endif  // TELEOP_CORE_EVENTLISTENER_HPP

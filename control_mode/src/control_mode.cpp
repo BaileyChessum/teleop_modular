@@ -102,4 +102,9 @@ const std::vector<std::string> & ControlMode::get_controllers() const
   return common_params_.controllers;
 }
 
+const ControlMode::CommonParams & ControlMode::get_common_params() const
+{
+  return common_params_;
+}
+
 }  // namespace control_mode

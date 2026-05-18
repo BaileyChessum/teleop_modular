@@ -22,8 +22,9 @@
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <rclcpp/executor.hpp>
 #include "visibility_control.h"
-#include "input_interface.hpp"
+#include "input_ptr.hpp"
 #include "input_collection.hpp"
+#include "event/event_collection.hpp"
 
 namespace control_mode
 {
@@ -54,6 +55,8 @@ struct CONTROL_MODE_PUBLIC_TYPE Inputs
 {
   ButtonCollection & buttons;
   AxisCollection & axes;
+
+  EventCollection & events;
 };
 
 /**
@@ -73,6 +76,18 @@ public:
      * control_modes.control_mode_name.controllers parameter in the main teleop_modular node.
      */
     std::vector<std::string> controllers;
+
+    /**
+     * Whether this control mode should be activated on startup.
+     * Actual parameter name is "active".
+     */
+    bool start_active;
+
+    /**
+     * Name of the control mode to use in various user-facing logs.
+     * Tries to derive a display name from a snake case get_name() by default.
+     */
+    std::string display_name;
   };
 
   ~ControlMode() override;
@@ -112,7 +127,7 @@ public:
    */
   [[nodiscard]] bool is_locked()
   {
-    return locked_->value();
+    return locked_.value();
   }
 
   /**
@@ -232,11 +247,13 @@ public:
 
   /// Gets the names of all ros2_control controllers to activate alongside this control mode.
   [[nodiscard]] const std::vector<std::string> & get_controllers() const;
+  /// Gets common params for the control mode, including whether the control mode should start active, and controllers
+  [[nodiscard]] const CommonParams & get_common_params() const;
 
 protected:
   /// An input button to represent a lock for the control mode. The control mode should tell the control system to halt
-  /// when ->value() is true
-  Button::SharedPtr locked_;
+  /// when .value() is true
+  Button locked_;
 
 private:
   /// The ROS2 node created by teleop_modular, which we get params from (for base and child classes)

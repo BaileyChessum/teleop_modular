@@ -22,6 +22,8 @@ buildRosPackage {
   name = "teleop-modular-core";
   buildType = "ament_cmake";
 
+
+
   src = builtins.path rec {
     name = "teleop-modular-core-source";
     path = ./.;
@@ -62,4 +64,12 @@ buildRosPackage {
 
   # Enable running tests during build
   doCheck = true;
+
+  # Added to debug a crazy segfault
+  dontStrip = true;
+  CMAKE_BUILD_TYPE = "Debug";
+  cmakeFlags = [
+    "-DCMAKE_BUILD_TYPE=Debug"
+    "-DCMAKE_CXX_FLAGS=-g"
+  ];
 }

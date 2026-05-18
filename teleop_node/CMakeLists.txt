@@ -21,7 +21,10 @@ foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
   find_package(${Dependency} REQUIRED)
 endforeach()
 
-add_executable(${PROJECT_NAME} src/teleop_node.cpp)
+add_executable(${PROJECT_NAME}
+  src/teleop_node.cpp
+  src/input_change_listener.cpp
+)
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
