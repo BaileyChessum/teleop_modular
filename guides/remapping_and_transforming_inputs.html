@@ -1,0 +1,374 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Remapping and transforming inputs &mdash; teleop_modular v0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=61b5c975" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5e3f2911"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Writing a ControlMode plugin" href="writing_a_control_mode.html" />
+    <link rel="prev" title="Writing a teleop package" href="writing_a_teleop_package.html" />
+     
+
+    <!-- Light Mode Icons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="../_static/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="../_static/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="../_static/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="../_static/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="../_static/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="../_static/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="../_static/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="../_static/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../_static/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../_static/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../_static/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="../_static/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../_static/favicon/favicon-16x16.png">
+    <link rel="manifest" href="../_static/favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="../_static/favicon/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Dark Mode Icons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="../_static/favicon_white/apple-icon-57x57.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="60x60" href="../_static/favicon_white/apple-icon-60x60.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="72x72" href="../_static/favicon_white/apple-icon-72x72.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="76x76" href="../_static/favicon_white/apple-icon-76x76.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="114x114" href="../_static/favicon_white/apple-icon-114x114.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="120x120" href="../_static/favicon_white/apple-icon-120x120.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="144x144" href="../_static/favicon_white/apple-icon-144x144.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="152x152" href="../_static/favicon_white/apple-icon-152x152.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="180x180" href="../_static/favicon_white/apple-icon-180x180.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="192x192" href="../_static/favicon_white/android-icon-192x192.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="32x32" href="../_static/favicon_white/favicon-32x32.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="96x96" href="../_static/favicon_white/favicon-96x96.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="16x16" href="../_static/favicon_white/favicon-16x16.png" media="(prefers-color-scheme: dark)">
+    <link rel="manifest" href="../_static/favicon_white/manifest.json" media="(prefers-color-scheme: dark)">
+    <meta name="msapplication-TileImage" content="../_static/favicon_white/ms-icon-144x144.png" media="(prefers-color-scheme: dark)">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            teleop_modular
+              <img src="../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_a_teleop_package.html">Writing a teleop package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Remapping and transforming inputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tasks">Tasks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#define-names-for-your-input-source-s-outputs">1. Define names for your input source’s outputs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rename-inputs">2. Rename inputs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#transform-axis-values">3. Transform axis values</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-a-button-from-an-axis">4. Create a button from an axis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-an-axis-from-buttons">5. Create an axis from buttons</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#summary">Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#see-also">See also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="writing_a_control_mode.html">Writing a <code class="docutils literal notranslate"><span class="pre">ControlMode</span></code> plugin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using_multiple_control_modes.html">Using multiple control modes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adding_a_lock.html">Adding a lock</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Commands and state inputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_an_input_source.html">Writing an InputSource plugin</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../about/input_source_remapping.html">Input source remapping</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">teleop_modular</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Remapping and transforming inputs</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/BaileyChessum/teleop_modular/blob/main/docs/guides/remapping_and_transforming_inputs.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="remapping-and-transforming-inputs">
+<span id="id1"></span><h1>Remapping and transforming inputs<a class="headerlink" href="#remapping-and-transforming-inputs" title="Link to this heading"></a></h1>
+<p><strong>Goal</strong>: Learn how to make control schemes with input source remapping.</p>
+<p><strong>Tutorial level</strong>: Intermediate</p>
+<p><strong>Time</strong>: 20 minutes</p>
+<section id="background">
+<h2>Background<a class="headerlink" href="#background" title="Link to this heading"></a></h2>
+<p>Teleop Modular adds a set of remap parameters to every input source
+implementation. They allow us to:</p>
+<ul>
+<li><p>Rename inputs</p></li>
+<li><p>Create axes from buttons</p></li>
+<li><p>Create buttons from axes</p></li>
+<li><p>Transform input values in various ways, such as:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Inverting axes and buttons</p></li>
+<li><p>Linearly mapping an input range of axis values to an output range</p></li>
+<li><p>Clamping axes</p></li>
+<li><p>Raising axes to a power</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<p>This guide walks through a practical example. For the full parameter reference, see
+<a class="reference internal" href="../about/input_source_remapping.html#input-source-remapping"><span class="std std-ref">Input source remapping</span></a>.</p>
+</section>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
+<p>You should be familiar with setting up a teleop package:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="writing_a_teleop_package.html#writing-a-teleop-package"><span class="std std-ref">Writing a teleop package</span></a></p></li>
+</ul>
+</section>
+<section id="tasks">
+<h2>Tasks<a class="headerlink" href="#tasks" title="Link to this heading"></a></h2>
+<section id="define-names-for-your-input-source-s-outputs">
+<h3>1. Define names for your input source’s outputs<a class="headerlink" href="#define-names-for-your-input-source-s-outputs" title="Link to this heading"></a></h3>
+<p>Input sources export their raw inputs under the names defined in their configuration.
+For <code class="docutils literal notranslate"><span class="pre">JoyInputSource</span></code>, this means setting <code class="docutils literal notranslate"><span class="pre">axis_definitions</span></code> and <code class="docutils literal notranslate"><span class="pre">button_definitions</span></code>
+to match the physical layout of your controller:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">joy_input_source</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">topic</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/joy&quot;</span>
+<span class="w">    </span><span class="nt">axis_definitions</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span>
+<span class="w">      </span><span class="s">&quot;left_stick_x&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;left_stick_y&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;right_stick_x&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;right_stick_y&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;right_trigger&quot;</span>
+<span class="w">    </span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">button_definitions</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span>
+<span class="w">      </span><span class="s">&quot;dpad_left&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;dpad_right&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;start&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;share&quot;</span>
+<span class="w">    </span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>These names are what you will use in the <code class="docutils literal notranslate"><span class="pre">remap:</span></code> parameters below.</p>
+</section>
+<section id="rename-inputs">
+<h3>2. Rename inputs<a class="headerlink" href="#rename-inputs" title="Link to this heading"></a></h3>
+<p>Your control modes request inputs by the names they expect (e.g. <code class="docutils literal notranslate"><span class="pre">linear.x</span></code>, <code class="docutils literal notranslate"><span class="pre">speed</span></code>).
+Use the <code class="docutils literal notranslate"><span class="pre">remap:</span></code> parameters to map from the exported source names to the names your
+control mode uses:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">joy_input_source</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># ...</span>
+<span class="w">    </span><span class="nt">remap</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">axes</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">linear.x</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;left_stick_y&quot;</span>
+<span class="w">        </span><span class="nt">linear.y</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;left_stick_x&quot;</span>
+<span class="w">        </span><span class="nt">angular.z</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;right_stick_x&quot;</span>
+<span class="w">      </span><span class="nt">buttons</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">lock</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;start&quot;</span>
+<span class="w">        </span><span class="nt">unlock</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;share&quot;</span>
+</pre></div>
+</div>
+<p>Any input that is remapped to a new name is only available under that new name – the
+original name is no longer exposed.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you want to apply a transformation without renaming, still specify <code class="docutils literal notranslate"><span class="pre">from</span></code> with
+the same name as the output.</p>
+</div>
+</section>
+<section id="transform-axis-values">
+<h3>3. Transform axis values<a class="headerlink" href="#transform-axis-values" title="Link to this heading"></a></h3>
+<p>Invert an axis when a joystick axis is backwards relative to what your control mode expects:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">remap</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">axes</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">linear.x</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;left_stick_y&quot;</span>
+<span class="w">      </span><span class="nt">invert</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</div>
+<p>Remap a trigger from its native <code class="docutils literal notranslate"><span class="pre">[-1.0,</span> <span class="pre">1.0]</span></code> range to a <code class="docutils literal notranslate"><span class="pre">[0.0,</span> <span class="pre">1.0]</span></code> speed range:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">remap</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">axes</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">speed</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;right_trigger&quot;</span>
+<span class="w">      </span><span class="nt">range</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">in</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">-1.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1.0</span><span class="p p-Indicator">]</span>
+<span class="w">        </span><span class="nt">out</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1.0</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>Apply an exponential curve to reduce sensitivity near the centre of a joystick:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">remap</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">axes</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">angular.z</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;right_stick_x&quot;</span>
+<span class="w">      </span><span class="nt">power</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span>
+</pre></div>
+</div>
+</section>
+<section id="create-a-button-from-an-axis">
+<h3>4. Create a button from an axis<a class="headerlink" href="#create-a-button-from-an-axis" title="Link to this heading"></a></h3>
+<p>You can derive a button from an axis with an optional threshold. The button is active
+(<code class="docutils literal notranslate"><span class="pre">true</span></code>) when the axis value is below the threshold (default <code class="docutils literal notranslate"><span class="pre">0.0</span></code>):</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">remap</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">buttons</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">braking</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">from_axis</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;right_trigger&quot;</span>
+<span class="w">        </span><span class="nt">threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.5</span><span class="w">  </span><span class="c1"># button is true when axis &lt; 0.5</span>
+</pre></div>
+</div>
+</section>
+<section id="create-an-axis-from-buttons">
+<h3>5. Create an axis from buttons<a class="headerlink" href="#create-an-axis-from-buttons" title="Link to this heading"></a></h3>
+<p>You can synthesise a virtual axis from a pair of buttons – useful for D-pad inputs:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">remap</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">axes</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">linear.y</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">from_buttons</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">negative</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dpad_left&quot;</span>
+<span class="w">        </span><span class="nt">positive</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dpad_right&quot;</span>
+<span class="w">        </span><span class="nt">default_value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+</pre></div>
+</div>
+<p>When the positive button is pressed the axis outputs <code class="docutils literal notranslate"><span class="pre">1.0</span></code>, when the negative button
+is pressed it outputs <code class="docutils literal notranslate"><span class="pre">-1.0</span></code>, and when neither is pressed it outputs <code class="docutils literal notranslate"><span class="pre">default_value</span></code>.</p>
+</section>
+</section>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading"></a></h2>
+<p>The complete example parameter file combining all of the above:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">joy_input_source</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">topic</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/joy&quot;</span>
+<span class="w">    </span><span class="nt">axis_definitions</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span>
+<span class="w">      </span><span class="s">&quot;left_stick_x&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;left_stick_y&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;right_stick_x&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;right_stick_y&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;right_trigger&quot;</span>
+<span class="w">    </span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">button_definitions</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span>
+<span class="w">      </span><span class="s">&quot;dpad_left&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;dpad_right&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;start&quot;</span><span class="p p-Indicator">,</span>
+<span class="w">      </span><span class="s">&quot;share&quot;</span>
+<span class="w">    </span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">remap</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">axes</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">linear.x</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;left_stick_y&quot;</span>
+<span class="w">          </span><span class="nt">invert</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">        </span><span class="nt">linear.y</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">from_buttons</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">negative</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dpad_left&quot;</span>
+<span class="w">            </span><span class="nt">positive</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dpad_right&quot;</span>
+<span class="w">            </span><span class="nt">default_value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="w">        </span><span class="nt">angular.z</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;right_stick_x&quot;</span>
+<span class="w">          </span><span class="nt">power</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span>
+<span class="w">        </span><span class="nt">speed</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;right_trigger&quot;</span>
+<span class="w">          </span><span class="nt">range</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">in</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">-1.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1.0</span><span class="p p-Indicator">]</span>
+<span class="w">            </span><span class="nt">out</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1.0</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">buttons</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">lock</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;start&quot;</span>
+<span class="w">        </span><span class="nt">unlock</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;share&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="see-also">
+<h2>See also<a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../about/input_source_remapping.html#input-source-remapping"><span class="std std-ref">Input source remapping</span></a> – full parameter reference for all remapping options</p></li>
+<li><p><a class="reference internal" href="writing_a_control_mode.html#writing-a-control-mode"><span class="std std-ref">Writing a ControlMode plugin</span></a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="writing_a_teleop_package.html" class="btn btn-neutral float-left" title="Writing a teleop package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="writing_a_control_mode.html" class="btn btn-neutral float-right" title="Writing a ControlMode plugin" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Bailey Chessum.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

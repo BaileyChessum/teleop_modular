@@ -1,0 +1,469 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Using multiple control modes &mdash; teleop_modular v0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=61b5c975" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5e3f2911"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Adding a lock" href="adding_a_lock.html" />
+    <link rel="prev" title="Writing a ControlMode plugin" href="writing_a_control_mode.html" />
+     
+
+    <!-- Light Mode Icons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="../_static/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="../_static/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="../_static/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="../_static/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="../_static/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="../_static/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="../_static/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="../_static/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../_static/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../_static/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../_static/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="../_static/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../_static/favicon/favicon-16x16.png">
+    <link rel="manifest" href="../_static/favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="../_static/favicon/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Dark Mode Icons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="../_static/favicon_white/apple-icon-57x57.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="60x60" href="../_static/favicon_white/apple-icon-60x60.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="72x72" href="../_static/favicon_white/apple-icon-72x72.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="76x76" href="../_static/favicon_white/apple-icon-76x76.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="114x114" href="../_static/favicon_white/apple-icon-114x114.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="120x120" href="../_static/favicon_white/apple-icon-120x120.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="144x144" href="../_static/favicon_white/apple-icon-144x144.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="152x152" href="../_static/favicon_white/apple-icon-152x152.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="180x180" href="../_static/favicon_white/apple-icon-180x180.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="192x192" href="../_static/favicon_white/android-icon-192x192.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="32x32" href="../_static/favicon_white/favicon-32x32.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="96x96" href="../_static/favicon_white/favicon-96x96.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="16x16" href="../_static/favicon_white/favicon-16x16.png" media="(prefers-color-scheme: dark)">
+    <link rel="manifest" href="../_static/favicon_white/manifest.json" media="(prefers-color-scheme: dark)">
+    <meta name="msapplication-TileImage" content="../_static/favicon_white/ms-icon-144x144.png" media="(prefers-color-scheme: dark)">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            teleop_modular
+              <img src="../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_a_teleop_package.html">Writing a teleop package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remapping_and_transforming_inputs.html">Remapping and transforming inputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_a_control_mode.html">Writing a <code class="docutils literal notranslate"><span class="pre">ControlMode</span></code> plugin</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using multiple control modes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tasks">Tasks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#declare-your-control-modes">1. Declare your control modes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configure-each-control-mode">2. Configure each control mode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#add-mode-switching-commands">3. Add mode-switching commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#map-input-buttons-for-mode-switching">4. Map input buttons for mode switching</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configure-inputs-for-each-mode">5. Configure inputs for each mode</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#summary">Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#see-also">See also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="adding_a_lock.html">Adding a lock</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Commands and state inputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_an_input_source.html">Writing an InputSource plugin</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../about/input_source_remapping.html">Input source remapping</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">teleop_modular</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Using multiple control modes</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/BaileyChessum/teleop_modular/blob/main/docs/guides/using_multiple_control_modes.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="using-multiple-control-modes">
+<span id="id1"></span><h1>Using multiple control modes<a class="headerlink" href="#using-multiple-control-modes" title="Link to this heading"></a></h1>
+<p><strong>Goal</strong>: Run multiple control modes and switch between them at runtime.</p>
+<p><strong>Tutorial level</strong>: Intermediate</p>
+<p><strong>Time</strong>: 20 minutes</p>
+<section id="background">
+<h2>Background<a class="headerlink" href="#background" title="Link to this heading"></a></h2>
+<p>A single <code class="docutils literal notranslate"><span class="pre">teleop_node</span></code> can manage several control modes simultaneously. Each control
+mode has its own node, parameters, and set of ros2_control controllers it manages.
+At runtime, each mode can be independently activated or deactivated – you choose which
+modes are active and configure commands to switch between them on button events.</p>
+<p>A typical use case is a robotic arm with two operating modes: a <em>joint space</em> mode
+that commands individual joint velocities, and a <em>task space</em> mode that commands
+end-effector motion via inverse kinematics. The operator holds a button to enter task
+space mode and releases it to return to joint space mode.</p>
+</section>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="writing_a_teleop_package.html#writing-a-teleop-package"><span class="std std-ref">Writing a teleop package</span></a></p></li>
+<li><p><a class="reference internal" href="writing_a_control_mode.html#writing-a-control-mode"><span class="std std-ref">Writing a ControlMode plugin</span></a></p></li>
+</ul>
+</section>
+<section id="tasks">
+<h2>Tasks<a class="headerlink" href="#tasks" title="Link to this heading"></a></h2>
+<section id="declare-your-control-modes">
+<h3>1. Declare your control modes<a class="headerlink" href="#declare-your-control-modes" title="Link to this heading"></a></h3>
+<p>List all control modes under the <code class="docutils literal notranslate"><span class="pre">control_modes.names</span></code> parameter. Each mode needs
+a <code class="docutils literal notranslate"><span class="pre">type</span></code> (the pluginlib class name) and optionally a <code class="docutils literal notranslate"><span class="pre">display_name</span></code>.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">teleop_arm</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># ...</span>
+<span class="w">    </span><span class="nt">control_modes</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">names</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">joint_space_mode</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">task_space_mode</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">task_space_velocity_mode</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">end_effector_mode</span>
+
+<span class="w">      </span><span class="nt">joint_space_mode</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">display_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Joint</span><span class="nv"> </span><span class="s">Space&quot;</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;joint_space_control_mode/JointSpaceControlMode&quot;</span>
+<span class="w">        </span><span class="nt">active</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">        </span><span class="nt">controllers</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nova_arm_velocity_controller</span>
+
+<span class="w">      </span><span class="nt">task_space_mode</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">display_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Task</span><span class="nv"> </span><span class="s">Space</span><span class="nv"> </span><span class="s">(IK)&quot;</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;teleop_modular_twist/TwistControlMode&quot;</span>
+<span class="w">        </span><span class="nt">controllers</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;nova_twistmapper&quot;</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;nova_arm_position_controller&quot;</span>
+
+<span class="w">      </span><span class="nt">task_space_velocity_mode</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">display_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Task</span><span class="nv"> </span><span class="s">Space</span><span class="nv"> </span><span class="s">(Velocity</span><span class="nv"> </span><span class="s">IK)&quot;</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;teleop_modular_twist/TwistControlMode&quot;</span>
+<span class="w">        </span><span class="nt">controllers</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;nova_twistmapper_velocity&quot;</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;nova_arm_velocity_controller&quot;</span>
+
+<span class="w">      </span><span class="nt">end_effector_mode</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">display_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;End</span><span class="nv"> </span><span class="s">Effector&quot;</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;joint_space_control_mode/JointSpaceControlMode&quot;</span>
+<span class="w">        </span><span class="nt">active</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">        </span><span class="nt">controllers</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nova_end_effector_velocity_controller</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">active:</span> <span class="pre">true</span></code> – the mode starts active when the node launches. Modes without
+this parameter start inactive.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">controllers</span></code> – the ros2_control controller names to activate/deactivate along with
+this mode. When the mode activates, these controllers are started; when it deactivates
+they are stopped.</p></li>
+</ul>
+</section>
+<section id="configure-each-control-mode">
+<h3>2. Configure each control mode<a class="headerlink" href="#configure-each-control-mode" title="Link to this heading"></a></h3>
+<p>Each control mode reads its parameters from a top-level node named after the mode.
+Add parameter blocks for each mode in your YAML:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">joint_space_mode</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">topic</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/arm/joint_velocity_command&quot;</span>
+<span class="w">    </span><span class="nt">use_speed_input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">joint_definitions</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;j1&quot;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;j2&quot;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;j3&quot;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;j4&quot;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;j5&quot;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;j6&quot;</span>
+<span class="w">    </span><span class="nt">joints</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">j1</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">input_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;j1&quot;</span>
+<span class="w">        </span><span class="nt">scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.188</span>
+<span class="w">      </span><span class="c1"># ...</span>
+
+<span class="nt">task_space_mode</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">stamped_topic</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/arm/task_space_twist_command&quot;</span>
+<span class="w">    </span><span class="nt">use_speed_input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">scale</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">linear</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">all</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span>
+<span class="w">      </span><span class="nt">angular</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">all</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.3</span>
+<span class="w">    </span><span class="nt">limits</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">linear</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">all</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span>
+<span class="w">        </span><span class="nt">normalized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">        </span><span class="nt">scale_with_speed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">      </span><span class="nt">angular</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">all</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="w">        </span><span class="nt">normalized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">        </span><span class="nt">scale_with_speed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</div>
+</section>
+<section id="add-mode-switching-commands">
+<h3>3. Add mode-switching commands<a class="headerlink" href="#add-mode-switching-commands" title="Link to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">switch_control_mode</span></code> commands to activate and deactivate modes in response to
+button events. Each command specifies which modes to <code class="docutils literal notranslate"><span class="pre">activate</span></code> and which to
+<code class="docutils literal notranslate"><span class="pre">deactivate</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">teleop_arm</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># ...</span>
+<span class="w">    </span><span class="nt">commands</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">names</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">enter_task_space</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">enter_task_space_velocity</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">exit_task_space_velocity</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">enter_joint_space</span>
+
+<span class="w">      </span><span class="nt">enter_task_space</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;task_space/down&quot;</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">switch_control_mode</span>
+<span class="w">        </span><span class="nt">activate</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;task_space_mode&quot;</span>
+<span class="w">        </span><span class="nt">deactivate</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;joint_space_mode&quot;</span>
+
+<span class="w">      </span><span class="nt">enter_task_space_velocity</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;task_space_velocity/down&quot;</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">switch_control_mode</span>
+<span class="w">        </span><span class="nt">activate</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;task_space_velocity_mode&quot;</span>
+<span class="w">        </span><span class="nt">deactivate</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;joint_space_mode&quot;</span>
+
+<span class="w">      </span><span class="nt">exit_task_space_velocity</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">on_any</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;task_space_velocity/up&quot;</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">switch_control_mode</span>
+<span class="w">        </span><span class="nt">activate</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;joint_space_mode&quot;</span>
+<span class="w">        </span><span class="nt">deactivate</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;task_space_velocity_mode&quot;</span>
+
+<span class="w">      </span><span class="nt">enter_joint_space</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">on_any</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;task_space/up&quot;</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">switch_control_mode</span>
+<span class="w">        </span><span class="nt">activate</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;joint_space_mode&quot;</span>
+<span class="w">        </span><span class="nt">deactivate</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;task_space_mode&quot;</span>
+</pre></div>
+</div>
+<p>This creates a <em>hold-to-activate</em> pattern: the task space mode is active while the
+button is held, and joint space mode resumes when it is released.</p>
+</section>
+<section id="map-input-buttons-for-mode-switching">
+<h3>4. Map input buttons for mode switching<a class="headerlink" href="#map-input-buttons-for-mode-switching" title="Link to this heading"></a></h3>
+<p>The commands listen for inputs named <code class="docutils literal notranslate"><span class="pre">task_space</span></code> and <code class="docutils literal notranslate"><span class="pre">task_space_velocity</span></code>. Remap
+these from your controller’s physical buttons:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">thrustmaster_right</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># ...</span>
+<span class="w">    </span><span class="nt">remap</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">buttons</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">task_space</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;r_btn_thumb_u_state&quot;</span>
+
+<span class="nt">thrustmaster_left</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># ...</span>
+<span class="w">    </span><span class="nt">remap</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">buttons</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">task_space_velocity</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;l_btn_thumb_u_state&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="configure-inputs-for-each-mode">
+<h3>5. Configure inputs for each mode<a class="headerlink" href="#configure-inputs-for-each-mode" title="Link to this heading"></a></h3>
+<p>Each control mode reads inputs by name. You can remap different physical inputs to the
+same meaningful names for each input source, allowing both controllers to cooperate.</p>
+<p>For example, the right Thrustmaster handles task-space angular inputs while the left
+handles linear inputs:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">thrustmaster_left</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">remap</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">axes</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">linear</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">x</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;l_ax_stick_y&quot;</span>
+<span class="w">          </span><span class="nt">y</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;l_ax_stick_x&quot;</span>
+<span class="w">          </span><span class="nt">z</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;l_ax_stick_twist&quot;</span>
+
+<span class="nt">thrustmaster_right</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">remap</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">axes</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">angular</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">x</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;r_ax_stick_twist&quot;</span>
+<span class="w">            </span><span class="nt">invert</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">          </span><span class="nt">y</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;r_ax_stick_y&quot;</span>
+<span class="w">          </span><span class="nt">z</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;r_ax_stick_x&quot;</span>
+<span class="w">            </span><span class="nt">invert</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Nested YAML keys like <code class="docutils literal notranslate"><span class="pre">linear:</span> <span class="pre">x:</span> <span class="pre">from:</span> <span class="pre">...</span></code> produce dotted input names. The
+example above provides <code class="docutils literal notranslate"><span class="pre">linear.x</span></code>, <code class="docutils literal notranslate"><span class="pre">linear.y</span></code>, and so on – the same names
+that <code class="docutils literal notranslate"><span class="pre">TwistControlMode</span></code> requests.</p>
+</div>
+</section>
+</section>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading"></a></h2>
+<p>Complete multi-mode configuration structure:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">teleop_arm</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">control_modes</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">names</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">joint_space_mode</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">task_space_mode</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">end_effector_mode</span>
+
+<span class="w">      </span><span class="nt">joint_space_mode</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">display_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Joint</span><span class="nv"> </span><span class="s">Space&quot;</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;joint_space_control_mode/JointSpaceControlMode&quot;</span>
+<span class="w">        </span><span class="nt">active</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">        </span><span class="nt">controllers</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nova_arm_velocity_controller</span>
+
+<span class="w">      </span><span class="nt">task_space_mode</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">display_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Task</span><span class="nv"> </span><span class="s">Space</span><span class="nv"> </span><span class="s">(IK)&quot;</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;teleop_modular_twist/TwistControlMode&quot;</span>
+<span class="w">        </span><span class="nt">controllers</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;nova_twistmapper&quot;</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;nova_arm_position_controller&quot;</span>
+
+<span class="w">      </span><span class="nt">end_effector_mode</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">display_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;End</span><span class="nv"> </span><span class="s">Effector&quot;</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;joint_space_control_mode/JointSpaceControlMode&quot;</span>
+<span class="w">        </span><span class="nt">active</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">        </span><span class="nt">controllers</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nova_end_effector_velocity_controller</span>
+
+<span class="w">    </span><span class="nt">commands</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">names</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">enter_task_space</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">enter_joint_space</span>
+
+<span class="w">      </span><span class="nt">enter_task_space</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;task_space/down&quot;</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">switch_control_mode</span>
+<span class="w">        </span><span class="nt">activate</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;task_space_mode&quot;</span>
+<span class="w">        </span><span class="nt">deactivate</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;joint_space_mode&quot;</span>
+
+<span class="w">      </span><span class="nt">enter_joint_space</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;task_space/up&quot;</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">switch_control_mode</span>
+<span class="w">        </span><span class="nt">activate</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;joint_space_mode&quot;</span>
+<span class="w">        </span><span class="nt">deactivate</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;task_space_mode&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="see-also">
+<h2>See also<a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="commands.html#commands"><span class="std std-ref">Commands and state inputs</span></a> – full reference for commands and events</p></li>
+<li><p><a class="reference internal" href="adding_a_lock.html#adding-a-lock"><span class="std std-ref">Adding a lock</span></a></p></li>
+<li><p><a class="reference internal" href="writing_a_control_mode.html#writing-a-control-mode"><span class="std std-ref">Writing a ControlMode plugin</span></a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="writing_a_control_mode.html" class="btn btn-neutral float-left" title="Writing a ControlMode plugin" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="adding_a_lock.html" class="btn btn-neutral float-right" title="Adding a lock" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Bailey Chessum.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

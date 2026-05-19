@@ -1,0 +1,353 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adding a lock &mdash; teleop_modular v0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=61b5c975" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5e3f2911"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Commands and state inputs" href="commands.html" />
+    <link rel="prev" title="Using multiple control modes" href="using_multiple_control_modes.html" />
+     
+
+    <!-- Light Mode Icons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="../_static/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="../_static/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="../_static/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="../_static/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="../_static/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="../_static/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="../_static/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="../_static/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../_static/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../_static/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../_static/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="../_static/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../_static/favicon/favicon-16x16.png">
+    <link rel="manifest" href="../_static/favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="../_static/favicon/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Dark Mode Icons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="../_static/favicon_white/apple-icon-57x57.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="60x60" href="../_static/favicon_white/apple-icon-60x60.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="72x72" href="../_static/favicon_white/apple-icon-72x72.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="76x76" href="../_static/favicon_white/apple-icon-76x76.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="114x114" href="../_static/favicon_white/apple-icon-114x114.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="120x120" href="../_static/favicon_white/apple-icon-120x120.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="144x144" href="../_static/favicon_white/apple-icon-144x144.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="152x152" href="../_static/favicon_white/apple-icon-152x152.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="180x180" href="../_static/favicon_white/apple-icon-180x180.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="192x192" href="../_static/favicon_white/android-icon-192x192.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="32x32" href="../_static/favicon_white/favicon-32x32.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="96x96" href="../_static/favicon_white/favicon-96x96.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="16x16" href="../_static/favicon_white/favicon-16x16.png" media="(prefers-color-scheme: dark)">
+    <link rel="manifest" href="../_static/favicon_white/manifest.json" media="(prefers-color-scheme: dark)">
+    <meta name="msapplication-TileImage" content="../_static/favicon_white/ms-icon-144x144.png" media="(prefers-color-scheme: dark)">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            teleop_modular
+              <img src="../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_a_teleop_package.html">Writing a teleop package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remapping_and_transforming_inputs.html">Remapping and transforming inputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_a_control_mode.html">Writing a <code class="docutils literal notranslate"><span class="pre">ControlMode</span></code> plugin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using_multiple_control_modes.html">Using multiple control modes</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Adding a lock</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tasks">Tasks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#add-lock-and-unlock-commands">1. Add lock and unlock commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#map-physical-buttons-to-lock-and-unlock">2. Map physical buttons to <code class="docutils literal notranslate"><span class="pre">lock</span></code> and <code class="docutils literal notranslate"><span class="pre">unlock</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#confirm-your-control-mode-respects-the-lock">3. Confirm your control mode respects the lock</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#add-log-messages-when-the-lock-state-changes">4. Add log messages when the lock state changes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#summary">Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#see-also">See also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Commands and state inputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_an_input_source.html">Writing an InputSource plugin</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../about/input_source_remapping.html">Input source remapping</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">teleop_modular</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Adding a lock</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/BaileyChessum/teleop_modular/blob/main/docs/guides/adding_a_lock.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="adding-a-lock">
+<span id="id1"></span><h1>Adding a lock<a class="headerlink" href="#adding-a-lock" title="Link to this heading"></a></h1>
+<p><strong>Goal</strong>: Add a safety lock that halts robot motion when active.</p>
+<p><strong>Tutorial level</strong>: Intermediate</p>
+<p><strong>Time</strong>: 15 minutes</p>
+<section id="background">
+<h2>Background<a class="headerlink" href="#background" title="Link to this heading"></a></h2>
+<p>A <em>lock</em> is a safety mechanism that prevents the robot from moving when active –
+similar to an E-stop or deadman switch. In <code class="docutils literal notranslate"><span class="pre">teleop_modular</span></code>, locking is implemented
+using a <em>state input</em>: a button whose value is controlled by commands rather than
+directly from a hardware input source.</p>
+<p>Control modes check this state button on every update. When it is <code class="docutils literal notranslate"><span class="pre">true</span></code>, the control
+mode stops publishing motion commands and publishes a halt message instead.</p>
+</section>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
+<p>You should be familiar with the basics of configuring a teleop package:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="writing_a_teleop_package.html#writing-a-teleop-package"><span class="std std-ref">Writing a teleop package</span></a></p></li>
+</ul>
+</section>
+<section id="tasks">
+<h2>Tasks<a class="headerlink" href="#tasks" title="Link to this heading"></a></h2>
+<section id="add-lock-and-unlock-commands">
+<h3>1. Add lock and unlock commands<a class="headerlink" href="#add-lock-and-unlock-commands" title="Link to this heading"></a></h3>
+<p>State inputs are created automatically when a command first references their name. To
+create a <code class="docutils literal notranslate"><span class="pre">locked</span></code> state button, declare two <code class="docutils literal notranslate"><span class="pre">set_button</span></code> commands in your teleop
+parameter file:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">teleop_arm</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># ...</span>
+<span class="w">    </span><span class="nt">commands</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">names</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lock</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unlock</span>
+
+<span class="w">      </span><span class="nt">lock</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;lock/down&quot;</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">set_button</span>
+<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;locked&quot;</span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+
+<span class="w">      </span><span class="nt">unlock</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;unlock/down&quot;</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">set_button</span>
+<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;locked&quot;</span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">set_button</span></code> – sets the named state button to the given value when the command fires</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">on:</span> <span class="pre">&quot;lock/down&quot;</span></code> – fires once when the <code class="docutils literal notranslate"><span class="pre">lock</span></code> input button is pressed (transitions from false to true)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">on:</span> <span class="pre">&quot;unlock/down&quot;</span></code> – fires once when the <code class="docutils literal notranslate"><span class="pre">unlock</span></code> input button is pressed</p></li>
+</ul>
+</section>
+<section id="map-physical-buttons-to-lock-and-unlock">
+<h3>2. Map physical buttons to <code class="docutils literal notranslate"><span class="pre">lock</span></code> and <code class="docutils literal notranslate"><span class="pre">unlock</span></code><a class="headerlink" href="#map-physical-buttons-to-lock-and-unlock" title="Link to this heading"></a></h3>
+<p>The commands listen to inputs named <code class="docutils literal notranslate"><span class="pre">lock</span></code> and <code class="docutils literal notranslate"><span class="pre">unlock</span></code>. Remap these from your
+controller’s physical buttons:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">joy_input_source</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># ...</span>
+<span class="w">    </span><span class="nt">remap</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">buttons</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">lock</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;BACK&quot;</span>
+<span class="w">        </span><span class="nt">unlock</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;START&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="confirm-your-control-mode-respects-the-lock">
+<h3>3. Confirm your control mode respects the lock<a class="headerlink" href="#confirm-your-control-mode-respects-the-lock" title="Link to this heading"></a></h3>
+<p>Built-in control modes like <code class="docutils literal notranslate"><span class="pre">teleop_modular_twist/TwistControlMode</span></code> automatically
+check the <code class="docutils literal notranslate"><span class="pre">locked</span></code> state button and halt when it is true. If you are writing a
+custom control mode, check <code class="docutils literal notranslate"><span class="pre">is_locked()</span></code> in your <code class="docutils literal notranslate"><span class="pre">on_update()</span></code> and publish a halt
+message:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">return_type</span><span class="w"> </span><span class="nf">MyControlMode::on_update</span><span class="p">(</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">Time</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">now</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">Duration</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">period</span><span class="p">)</span><span class="w"> </span><span class="k">override</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">is_locked</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">publish_halt_message</span><span class="p">(</span><span class="n">now</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">return_type</span><span class="o">::</span><span class="n">OK</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="c1">// ... normal update logic ...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="add-log-messages-when-the-lock-state-changes">
+<h3>4. Add log messages when the lock state changes<a class="headerlink" href="#add-log-messages-when-the-lock-state-changes" title="Link to this heading"></a></h3>
+<p>It is good practice to log whenever the system is locked or unlocked. Add <code class="docutils literal notranslate"><span class="pre">log</span></code>
+commands that trigger on the <em>state button’s own events</em>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">commands</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">names</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lock</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unlock</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">log_locked</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">log_unlocked</span>
+
+<span class="w">  </span><span class="nt">lock</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;lock/down&quot;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">set_button</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;locked&quot;</span>
+<span class="w">    </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+
+<span class="w">  </span><span class="nt">unlock</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;unlock/down&quot;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">set_button</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;locked&quot;</span>
+<span class="w">    </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+
+<span class="w">  </span><span class="nt">log_locked</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;locked/down&quot;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">log</span>
+<span class="w">    </span><span class="nt">message</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Locked&quot;</span>
+
+<span class="w">  </span><span class="nt">log_unlocked</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;locked/up&quot;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">log</span>
+<span class="w">    </span><span class="nt">message</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Unlocked&quot;</span>
+</pre></div>
+</div>
+<p>Notice that <code class="docutils literal notranslate"><span class="pre">log_locked</span></code> fires on <code class="docutils literal notranslate"><span class="pre">&quot;locked/down&quot;</span></code> – the event for the state
+button <code class="docutils literal notranslate"><span class="pre">locked</span></code> itself becoming true – not the physical <code class="docutils literal notranslate"><span class="pre">lock</span></code> button. This means
+the log fires whenever the state changes, regardless of what caused it.</p>
+</section>
+</section>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading"></a></h2>
+<p>Complete lock configuration using a gamepad:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">teleop_arm</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># ...</span>
+<span class="w">    </span><span class="nt">commands</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">names</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lock</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unlock</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">log_locked</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">log_unlocked</span>
+
+<span class="w">      </span><span class="nt">lock</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;lock/down&quot;</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">set_button</span>
+<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;locked&quot;</span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+
+<span class="w">      </span><span class="nt">unlock</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;unlock/down&quot;</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">set_button</span>
+<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;locked&quot;</span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+
+<span class="w">      </span><span class="nt">log_locked</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;locked/down&quot;</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">log</span>
+<span class="w">        </span><span class="nt">message</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Locked&quot;</span>
+
+<span class="w">      </span><span class="nt">log_unlocked</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;locked/up&quot;</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">log</span>
+<span class="w">        </span><span class="nt">message</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Unlocked&quot;</span>
+
+<span class="nt">joy_input_source</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># ...</span>
+<span class="w">    </span><span class="nt">remap</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">buttons</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">lock</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;BACK&quot;</span>
+<span class="w">        </span><span class="nt">unlock</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;START&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="see-also">
+<h2>See also<a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="commands.html#commands"><span class="std std-ref">Commands and state inputs</span></a> – full reference for all command types and events</p></li>
+<li><p><a class="reference internal" href="writing_a_control_mode.html#writing-a-control-mode"><span class="std std-ref">Writing a ControlMode plugin</span></a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="using_multiple_control_modes.html" class="btn btn-neutral float-left" title="Using multiple control modes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="commands.html" class="btn btn-neutral float-right" title="Commands and state inputs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Bailey Chessum.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

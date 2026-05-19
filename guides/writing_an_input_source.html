@@ -1,0 +1,424 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Writing an InputSource plugin &mdash; teleop_modular v0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=61b5c975" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5e3f2911"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Input source remapping" href="../about/input_source_remapping.html" />
+    <link rel="prev" title="Commands and state inputs" href="commands.html" />
+     
+
+    <!-- Light Mode Icons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="../_static/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="../_static/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="../_static/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="../_static/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="../_static/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="../_static/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="../_static/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="../_static/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../_static/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../_static/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../_static/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="../_static/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../_static/favicon/favicon-16x16.png">
+    <link rel="manifest" href="../_static/favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="../_static/favicon/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Dark Mode Icons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="../_static/favicon_white/apple-icon-57x57.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="60x60" href="../_static/favicon_white/apple-icon-60x60.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="72x72" href="../_static/favicon_white/apple-icon-72x72.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="76x76" href="../_static/favicon_white/apple-icon-76x76.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="114x114" href="../_static/favicon_white/apple-icon-114x114.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="120x120" href="../_static/favicon_white/apple-icon-120x120.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="144x144" href="../_static/favicon_white/apple-icon-144x144.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="152x152" href="../_static/favicon_white/apple-icon-152x152.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="180x180" href="../_static/favicon_white/apple-icon-180x180.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="192x192" href="../_static/favicon_white/android-icon-192x192.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="32x32" href="../_static/favicon_white/favicon-32x32.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="96x96" href="../_static/favicon_white/favicon-96x96.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="16x16" href="../_static/favicon_white/favicon-16x16.png" media="(prefers-color-scheme: dark)">
+    <link rel="manifest" href="../_static/favicon_white/manifest.json" media="(prefers-color-scheme: dark)">
+    <meta name="msapplication-TileImage" content="../_static/favicon_white/ms-icon-144x144.png" media="(prefers-color-scheme: dark)">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            teleop_modular
+              <img src="../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_a_teleop_package.html">Writing a teleop package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remapping_and_transforming_inputs.html">Remapping and transforming inputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_a_control_mode.html">Writing a <code class="docutils literal notranslate"><span class="pre">ControlMode</span></code> plugin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using_multiple_control_modes.html">Using multiple control modes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adding_a_lock.html">Adding a lock</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Commands and state inputs</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Writing an InputSource plugin</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tasks">Tasks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#create-the-package">1. Create the package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#declare-dependencies">2. Declare dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#write-the-header">3. Write the header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#implement-the-source">4. Implement the source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#register-the-plugin">5. Register the plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#use-your-input-source-in-a-teleop-package">6. Use your input source in a teleop package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#how-request-update-works">How request_update works</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#see-also">See also</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../about/input_source_remapping.html">Input source remapping</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">teleop_modular</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Writing an InputSource plugin</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/BaileyChessum/teleop_modular/blob/main/docs/guides/writing_an_input_source.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="writing-an-inputsource-plugin">
+<span id="writing-an-input-source"></span><h1>Writing an InputSource plugin<a class="headerlink" href="#writing-an-inputsource-plugin" title="Link to this heading"></a></h1>
+<p><strong>Goal</strong>: Create a custom plugin that provides inputs to <code class="docutils literal notranslate"><span class="pre">teleop_modular</span></code> from any source.</p>
+<p><strong>Tutorial level</strong>: Advanced</p>
+<p><strong>Time</strong>: 40 minutes</p>
+<section id="background">
+<h2>Background<a class="headerlink" href="#background" title="Link to this heading"></a></h2>
+<p>An <code class="docutils literal notranslate"><span class="pre">InputSource</span></code> is a pluginlib plugin that exposes a set of named axes and buttons
+to the teleop system. You implement three methods:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">on_init()</span></code> – set up subscriptions, parameters, or threads</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">export_axes()</span></code> / <code class="docutils literal notranslate"><span class="pre">export_buttons()</span></code> – declare the names and initial values of your inputs</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">on_update()</span></code> – write the current values into the provided spans</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">teleop_modular</span></code> takes care of remapping, transformations, and thread safety – your
+implementation only needs to get values from your source and export them.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">JoyInputSource</span></code> plugin (<code class="docutils literal notranslate"><span class="pre">teleop_modular_joy</span></code>) is a good reference implementation.</p>
+</section>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="writing_a_teleop_package.html#writing-a-teleop-package"><span class="std std-ref">Writing a teleop package</span></a></p></li>
+<li><p>You should be comfortable writing ROS2 C++ packages.</p></li>
+</ul>
+</section>
+<section id="tasks">
+<h2>Tasks<a class="headerlink" href="#tasks" title="Link to this heading"></a></h2>
+<section id="create-the-package">
+<h3>1. Create the package<a class="headerlink" href="#create-the-package" title="Link to this heading"></a></h3>
+<p>Create a standard ROS2 ament_cmake package:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ros2<span class="w"> </span>pkg<span class="w"> </span>create<span class="w"> </span>--build-type<span class="w"> </span>ament_cmake<span class="w"> </span>my_input_source<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--dependencies<span class="w"> </span>rclcpp<span class="w"> </span>input_source<span class="w"> </span>pluginlib
+</pre></div>
+</div>
+</section>
+<section id="declare-dependencies">
+<h3>2. Declare dependencies<a class="headerlink" href="#declare-dependencies" title="Link to this heading"></a></h3>
+<p>In <code class="docutils literal notranslate"><span class="pre">package.xml</span></code>, ensure you have:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;depend&gt;</span>rclcpp<span class="nt">&lt;/depend&gt;</span>
+<span class="nt">&lt;depend&gt;</span>input_source<span class="nt">&lt;/depend&gt;</span>
+<span class="nt">&lt;build_depend&gt;</span>pluginlib<span class="nt">&lt;/build_depend&gt;</span>
+</pre></div>
+</div>
+<p>In <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code>:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">find_package</span><span class="p">(</span><span class="s">rclcpp</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+<span class="nb">find_package</span><span class="p">(</span><span class="s">input_source</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+<span class="nb">find_package</span><span class="p">(</span><span class="s">pluginlib</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+
+<span class="nb">add_library</span><span class="p">(</span><span class="s">my_input_source</span><span class="w"> </span><span class="s">SHARED</span>
+<span class="w">  </span><span class="s">src/my_input_source.cpp</span>
+<span class="p">)</span>
+
+<span class="nb">target_include_directories</span><span class="p">(</span><span class="s">my_input_source</span><span class="w"> </span><span class="s">PUBLIC</span>
+<span class="w">  </span><span class="o">$&lt;</span><span class="nv">BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include</span><span class="o">&gt;</span>
+<span class="w">  </span><span class="o">$&lt;</span><span class="nv">INSTALL_INTERFACE:include</span><span class="o">&gt;</span>
+<span class="p">)</span>
+
+<span class="nb">ament_target_dependencies</span><span class="p">(</span><span class="s">my_input_source</span>
+<span class="w">  </span><span class="s">rclcpp</span>
+<span class="w">  </span><span class="s">input_source</span>
+<span class="w">  </span><span class="s">pluginlib</span>
+<span class="p">)</span>
+
+<span class="nb">pluginlib_export_plugin_description_file</span><span class="p">(</span><span class="s">input_source</span><span class="w"> </span><span class="s">plugins.xml</span><span class="p">)</span>
+
+<span class="nb">install</span><span class="p">(</span><span class="s">TARGETS</span><span class="w"> </span><span class="s">my_input_source</span>
+<span class="w">  </span><span class="s">EXPORT</span><span class="w"> </span><span class="s">export_my_input_source</span>
+<span class="w">  </span><span class="s">ARCHIVE</span><span class="w"> </span><span class="s">DESTINATION</span><span class="w"> </span><span class="s">lib</span>
+<span class="w">  </span><span class="s">LIBRARY</span><span class="w"> </span><span class="s">DESTINATION</span><span class="w"> </span><span class="s">lib</span>
+<span class="w">  </span><span class="s">RUNTIME</span><span class="w"> </span><span class="s">DESTINATION</span><span class="w"> </span><span class="s">bin</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="write-the-header">
+<h3>3. Write the header<a class="headerlink" href="#write-the-header" title="Link to this heading"></a></h3>
+<p>Create <code class="docutils literal notranslate"><span class="pre">include/my_input_source/my_input_source.hpp</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#pragma once</span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;input_source/input_source.hpp&gt;</span>
+
+<span class="k">namespace</span><span class="w"> </span><span class="nn">my_input_source</span>
+<span class="p">{</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyInputSource</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">input_source</span><span class="o">::</span><span class="n">InputSource</span>
+<span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+<span class="w">  </span><span class="n">input_source</span><span class="o">::</span><span class="n">return_type</span><span class="w"> </span><span class="n">on_init</span><span class="p">()</span><span class="w"> </span><span class="k">override</span><span class="p">;</span>
+
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">export_buttons</span><span class="p">(</span><span class="n">input_source</span><span class="o">::</span><span class="n">InputDeclarationList</span><span class="o">&lt;</span><span class="kt">uint8_t</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">declarations</span><span class="p">)</span><span class="w"> </span><span class="k">override</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">export_axes</span><span class="p">(</span><span class="n">input_source</span><span class="o">::</span><span class="n">InputDeclarationList</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">declarations</span><span class="p">)</span><span class="w"> </span><span class="k">override</span><span class="p">;</span>
+
+<span class="w">  </span><span class="n">input_source</span><span class="o">::</span><span class="n">return_type</span><span class="w"> </span><span class="nf">on_update</span><span class="p">(</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">Time</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">now</span><span class="p">,</span>
+<span class="w">    </span><span class="n">input_source</span><span class="o">::</span><span class="n">InputValueSpans</span><span class="w"> </span><span class="n">values</span><span class="p">)</span><span class="w"> </span><span class="k">override</span><span class="p">;</span>
+
+<span class="k">private</span><span class="o">:</span>
+<span class="w">  </span><span class="c1">// Your members here -- subscriptions, parameters, mutexes, etc.</span>
+<span class="p">};</span>
+
+<span class="p">}</span><span class="w">  </span><span class="c1">// namespace my_input_source</span>
+</pre></div>
+</div>
+</section>
+<section id="implement-the-source">
+<h3>4. Implement the source<a class="headerlink" href="#implement-the-source" title="Link to this heading"></a></h3>
+<p>Create <code class="docutils literal notranslate"><span class="pre">src/my_input_source.cpp</span></code>:</p>
+<p><strong>on_init()</strong></p>
+<p>Set up anything your input source needs – subscriptions, parameter listeners, or threads:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;my_input_source/my_input_source.hpp&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;pluginlib/class_list_macros.hpp&gt;</span>
+
+<span class="k">namespace</span><span class="w"> </span><span class="nn">my_input_source</span>
+<span class="p">{</span>
+
+<span class="n">input_source</span><span class="o">::</span><span class="n">return_type</span><span class="w"> </span><span class="nf">MyInputSource::on_init</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="c1">// get_node() provides your input source&#39;s ROS2 node</span>
+<span class="w">  </span><span class="n">subscription_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_node</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">create_subscription</span><span class="o">&lt;</span><span class="n">sensor_msgs</span><span class="o">::</span><span class="n">msg</span><span class="o">::</span><span class="n">Joy</span><span class="o">&gt;</span><span class="p">(</span>
+<span class="w">    </span><span class="s">&quot;/joy&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">QoS</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
+<span class="w">    </span><span class="p">[</span><span class="k">this</span><span class="p">](</span><span class="n">sensor_msgs</span><span class="o">::</span><span class="n">msg</span><span class="o">::</span><span class="n">Joy</span><span class="o">::</span><span class="n">SharedPtr</span><span class="w"> </span><span class="n">msg</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="c1">// Call request_update() when new data arrives</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">request_update</span><span class="p">(</span><span class="n">msg</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">stamp</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">input_source</span><span class="o">::</span><span class="n">return_type</span><span class="o">::</span><span class="n">OK</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">unique_lock</span><span class="w"> </span><span class="n">lock</span><span class="p">{</span><span class="n">mutex_</span><span class="p">};</span>
+<span class="w">        </span><span class="n">latest_msg_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">msg</span><span class="p">;</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">});</span>
+
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">input_source</span><span class="o">::</span><span class="n">return_type</span><span class="o">::</span><span class="n">OK</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>export_buttons() and export_axes()</strong></p>
+<p>Declare all the inputs your source provides. The order you add them here must
+match the order you write values in <code class="docutils literal notranslate"><span class="pre">on_update()</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">MyInputSource::export_buttons</span><span class="p">(</span>
+<span class="w">  </span><span class="n">input_source</span><span class="o">::</span><span class="n">InputDeclarationList</span><span class="o">&lt;</span><span class="kt">uint8_t</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">declarations</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="n">declarations</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="s">&quot;button_a&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">  </span><span class="n">declarations</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="s">&quot;button_b&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">MyInputSource::export_axes</span><span class="p">(</span>
+<span class="w">  </span><span class="n">input_source</span><span class="o">::</span><span class="n">InputDeclarationList</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">declarations</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="n">declarations</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="s">&quot;stick_x&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">);</span>
+<span class="w">  </span><span class="n">declarations</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="s">&quot;stick_y&quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>on_update()</strong></p>
+<p>Called after <code class="docutils literal notranslate"><span class="pre">request_update()</span></code> – write the latest values into <code class="docutils literal notranslate"><span class="pre">values</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">input_source</span><span class="o">::</span><span class="n">return_type</span><span class="w"> </span><span class="nf">MyInputSource::on_update</span><span class="p">(</span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">Time</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">now</span><span class="p">,</span>
+<span class="w">  </span><span class="n">input_source</span><span class="o">::</span><span class="n">InputValueSpans</span><span class="w"> </span><span class="n">values</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">unique_lock</span><span class="w"> </span><span class="n">lock</span><span class="p">{</span><span class="n">mutex_</span><span class="p">};</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">latest_msg_</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">input_source</span><span class="o">::</span><span class="n">return_type</span><span class="o">::</span><span class="n">OK</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="c1">// Write button values by index, matching the order in export_buttons()</span>
+<span class="w">  </span><span class="n">values</span><span class="p">.</span><span class="n">buttons</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">latest_msg_</span><span class="o">-&gt;</span><span class="n">buttons</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="n">values</span><span class="p">.</span><span class="n">buttons</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">latest_msg_</span><span class="o">-&gt;</span><span class="n">buttons</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="w">  </span><span class="c1">// Write axis values by index, matching the order in export_axes()</span>
+<span class="w">  </span><span class="n">values</span><span class="p">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">latest_msg_</span><span class="o">-&gt;</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="w">  </span><span class="n">values</span><span class="p">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">latest_msg_</span><span class="o">-&gt;</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">input_source</span><span class="o">::</span><span class="n">return_type</span><span class="o">::</span><span class="n">OK</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Plugin export macro</strong></p>
+<p>At the bottom of the source file, register the class with pluginlib:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="p">}</span><span class="w">  </span><span class="c1">// namespace my_input_source</span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;pluginlib/class_list_macros.hpp&gt;</span>
+
+<span class="n">PLUGINLIB_EXPORT_CLASS</span><span class="p">(</span><span class="n">my_input_source</span><span class="o">::</span><span class="n">MyInputSource</span><span class="p">,</span><span class="w"> </span><span class="n">input_source</span><span class="o">::</span><span class="n">InputSource</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="register-the-plugin">
+<h3>5. Register the plugin<a class="headerlink" href="#register-the-plugin" title="Link to this heading"></a></h3>
+<p>Create <code class="docutils literal notranslate"><span class="pre">plugins.xml</span></code> in the package root:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;library</span><span class="w"> </span><span class="na">path=</span><span class="s">&quot;my_input_source&quot;</span><span class="nt">&gt;</span>
+<span class="w">  </span><span class="nt">&lt;class</span>
+<span class="w">    </span><span class="na">name=</span><span class="s">&quot;my_input_source/MyInputSource&quot;</span>
+<span class="w">    </span><span class="na">type=</span><span class="s">&quot;my_input_source::MyInputSource&quot;</span>
+<span class="w">    </span><span class="na">base_class_type=</span><span class="s">&quot;input_source::InputSource&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;description&gt;</span>My<span class="w"> </span>custom<span class="w"> </span>input<span class="w"> </span>source.<span class="nt">&lt;/description&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/class&gt;</span>
+<span class="nt">&lt;/library&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="use-your-input-source-in-a-teleop-package">
+<h3>6. Use your input source in a teleop package<a class="headerlink" href="#use-your-input-source-in-a-teleop-package" title="Link to this heading"></a></h3>
+<p>In your teleop parameter file, reference the plugin type and configure its parameters:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">teleop_arm</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">input_sources</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">names</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_source</span>
+
+<span class="w">      </span><span class="nt">my_source</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;my_input_source/MyInputSource&quot;</span>
+
+<span class="c1"># Remapping goes under the node named after the input source</span>
+<span class="nt">my_source</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">remap</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">axes</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">linear.x</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;stick_y&quot;</span>
+<span class="w">      </span><span class="nt">buttons</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">lock</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;button_a&quot;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The input source’s parameters live on a node with the same name as the input
+source (<code class="docutils literal notranslate"><span class="pre">my_source</span></code> in this example). You can declare and get parameters
+from this node inside <code class="docutils literal notranslate"><span class="pre">on_init()</span></code> using <code class="docutils literal notranslate"><span class="pre">get_node()</span></code>.</p>
+<p>All of the standard <code class="docutils literal notranslate"><span class="pre">remap:</span></code> parameters are provided automatically for free
+by the framework – you do not need to declare them yourself.</p>
+</div>
+</section>
+</section>
+<section id="how-request-update-works">
+<h2>How request_update works<a class="headerlink" href="#how-request-update-works" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">request_update()</span></code> is a thread-safe signal to the input manager that new data is
+available. The input manager will then call <code class="docutils literal notranslate"><span class="pre">on_update()</span></code> from the update thread at
+the appropriate time. This means:</p>
+<ul class="simple">
+<li><p>You can call <code class="docutils literal notranslate"><span class="pre">request_update()</span></code> from any thread (e.g. a subscription callback)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">on_update()</span></code> is always called from the update thread, so you must protect shared
+data with a mutex</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">request_update()</span></code> returns <code class="docutils literal notranslate"><span class="pre">ERROR</span></code>, the update should be skipped for this cycle</p></li>
+</ul>
+</section>
+<section id="see-also">
+<h2>See also<a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="remapping_and_transforming_inputs.html#remapping-and-transforming-inputs"><span class="std std-ref">Remapping and transforming inputs</span></a></p></li>
+<li><p><a class="reference internal" href="writing_a_control_mode.html#writing-a-control-mode"><span class="std std-ref">Writing a ControlMode plugin</span></a></p></li>
+<li><p><a class="reference internal" href="writing_a_teleop_package.html#writing-a-teleop-package"><span class="std std-ref">Writing a teleop package</span></a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="commands.html" class="btn btn-neutral float-left" title="Commands and state inputs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../about/input_source_remapping.html" class="btn btn-neutral float-right" title="Input source remapping" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Bailey Chessum.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

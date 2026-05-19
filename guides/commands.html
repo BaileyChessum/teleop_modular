@@ -1,0 +1,409 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Commands and state inputs &mdash; teleop_modular v0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=61b5c975" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5e3f2911"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Writing an InputSource plugin" href="writing_an_input_source.html" />
+    <link rel="prev" title="Adding a lock" href="adding_a_lock.html" />
+     
+
+    <!-- Light Mode Icons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="../_static/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="../_static/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="../_static/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="../_static/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="../_static/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="../_static/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="../_static/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="../_static/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../_static/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../_static/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../_static/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="../_static/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../_static/favicon/favicon-16x16.png">
+    <link rel="manifest" href="../_static/favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="../_static/favicon/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Dark Mode Icons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="../_static/favicon_white/apple-icon-57x57.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="60x60" href="../_static/favicon_white/apple-icon-60x60.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="72x72" href="../_static/favicon_white/apple-icon-72x72.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="76x76" href="../_static/favicon_white/apple-icon-76x76.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="114x114" href="../_static/favicon_white/apple-icon-114x114.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="120x120" href="../_static/favicon_white/apple-icon-120x120.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="144x144" href="../_static/favicon_white/apple-icon-144x144.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="152x152" href="../_static/favicon_white/apple-icon-152x152.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="180x180" href="../_static/favicon_white/apple-icon-180x180.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="192x192" href="../_static/favicon_white/android-icon-192x192.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="32x32" href="../_static/favicon_white/favicon-32x32.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="96x96" href="../_static/favicon_white/favicon-96x96.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="16x16" href="../_static/favicon_white/favicon-16x16.png" media="(prefers-color-scheme: dark)">
+    <link rel="manifest" href="../_static/favicon_white/manifest.json" media="(prefers-color-scheme: dark)">
+    <meta name="msapplication-TileImage" content="../_static/favicon_white/ms-icon-144x144.png" media="(prefers-color-scheme: dark)">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            teleop_modular
+              <img src="../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_a_teleop_package.html">Writing a teleop package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remapping_and_transforming_inputs.html">Remapping and transforming inputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_a_control_mode.html">Writing a <code class="docutils literal notranslate"><span class="pre">ControlMode</span></code> plugin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using_multiple_control_modes.html">Using multiple control modes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adding_a_lock.html">Adding a lock</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Commands and state inputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#declaring-commands">Declaring commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#events">Events</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#on"><code class="docutils literal notranslate"><span class="pre">on</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#on-any"><code class="docutils literal notranslate"><span class="pre">on_any</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#event-names">Event names</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#command-types">Command types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#set-button"><code class="docutils literal notranslate"><span class="pre">set_button</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#set-axis"><code class="docutils literal notranslate"><span class="pre">set_axis</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#increment-axis"><code class="docutils literal notranslate"><span class="pre">increment_axis</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#switch-control-mode"><code class="docutils literal notranslate"><span class="pre">switch_control_mode</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#log"><code class="docutils literal notranslate"><span class="pre">log</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#state-inputs">State inputs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#example-a-speed-level-controlled-by-buttons">Example: a speed level controlled by buttons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-chaining-commands-via-state-events">Example: chaining commands via state events</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#see-also">See also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="writing_an_input_source.html">Writing an InputSource plugin</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../about/input_source_remapping.html">Input source remapping</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">teleop_modular</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Commands and state inputs</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/BaileyChessum/teleop_modular/blob/main/docs/guides/commands.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="commands-and-state-inputs">
+<span id="commands"></span><h1>Commands and state inputs<a class="headerlink" href="#commands-and-state-inputs" title="Link to this heading"></a></h1>
+<p><strong>Goal</strong>: Understand how commands and state inputs work, and use them for complex control logic.</p>
+<p><strong>Tutorial level</strong>: Intermediate</p>
+<p><strong>Time</strong>: 20 minutes</p>
+<section id="background">
+<h2>Background<a class="headerlink" href="#background" title="Link to this heading"></a></h2>
+<p>Commands are actions that fire in response to <em>events</em> – typically button presses or
+releases. They can change the teleop system’s state in various ways: locking the robot,
+switching control modes, adjusting a speed level, or logging a message.</p>
+<p><em>State inputs</em> are named buttons and axes whose values are managed by commands rather
+than by an input source. They integrate with the rest of the input system: control modes
+can read them, they can be remapped, and their transitions generate their own events
+that can trigger further commands.</p>
+</section>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="writing_a_teleop_package.html#writing-a-teleop-package"><span class="std std-ref">Writing a teleop package</span></a></p></li>
+</ul>
+</section>
+<section id="declaring-commands">
+<h2>Declaring commands<a class="headerlink" href="#declaring-commands" title="Link to this heading"></a></h2>
+<p>Commands are declared in the <code class="docutils literal notranslate"><span class="pre">commands</span></code> section of your teleop node’s parameter file.
+List the names of all commands in <code class="docutils literal notranslate"><span class="pre">commands.names</span></code>, then configure each one:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">teleop_arm</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">commands</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">names</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_command</span>
+
+<span class="w">      </span><span class="nt">my_command</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;some_button/down&quot;</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">set_button</span>
+<span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;my_state&quot;</span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</div>
+</section>
+<section id="events">
+<h2>Events<a class="headerlink" href="#events" title="Link to this heading"></a></h2>
+<p>Each command must specify the event(s) that trigger it.</p>
+<section id="on">
+<h3><code class="docutils literal notranslate"><span class="pre">on</span></code><a class="headerlink" href="#on" title="Link to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">on</span></code> to trigger on a single event:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">my_command</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;lock/down&quot;</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="c1"># ...</span>
+</pre></div>
+</div>
+</section>
+<section id="on-any">
+<h3><code class="docutils literal notranslate"><span class="pre">on_any</span></code><a class="headerlink" href="#on-any" title="Link to this heading"></a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">on_any</span></code> to trigger when <em>any</em> of a list of events fires:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">my_command</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">on_any</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;lock/down&quot;</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;emergency/down&quot;</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="c1"># ...</span>
+</pre></div>
+</div>
+</section>
+<section id="event-names">
+<h3>Event names<a class="headerlink" href="#event-names" title="Link to this heading"></a></h3>
+<p>Event names have a suffix that determines what they listen to:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;button_name/down&quot;</span></code> – fires once when <code class="docutils literal notranslate"><span class="pre">button_name</span></code> transitions from false to true (pressed)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;button_name/up&quot;</span></code> – fires once when <code class="docutils literal notranslate"><span class="pre">button_name</span></code> transitions from true to false (released)</p></li>
+</ul>
+<p>The button name can refer to any button available in the input system – including state
+buttons created by other commands. For example, <code class="docutils literal notranslate"><span class="pre">&quot;locked/down&quot;</span></code> fires when the
+<code class="docutils literal notranslate"><span class="pre">locked</span></code> state button becomes true.</p>
+</section>
+</section>
+<section id="command-types">
+<h2>Command types<a class="headerlink" href="#command-types" title="Link to this heading"></a></h2>
+<section id="set-button">
+<h3><code class="docutils literal notranslate"><span class="pre">set_button</span></code><a class="headerlink" href="#set-button" title="Link to this heading"></a></h3>
+<p>Sets a state button to a fixed value. Creates the state button if it does not yet exist.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">lock</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;lock/down&quot;</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">set_button</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;locked&quot;</span><span class="w">    </span><span class="c1"># Name of the state button to set</span>
+<span class="w">  </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">       </span><span class="c1"># Value to set (true or false)</span>
+
+<span class="nt">unlock</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;unlock/down&quot;</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">set_button</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;locked&quot;</span>
+<span class="w">  </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</pre></div>
+</div>
+</section>
+<section id="set-axis">
+<h3><code class="docutils literal notranslate"><span class="pre">set_axis</span></code><a class="headerlink" href="#set-axis" title="Link to this heading"></a></h3>
+<p>Sets a state axis to a fixed value. Creates the state axis if it does not yet exist.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">set_speed_low</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;speed_low/down&quot;</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">set_axis</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;speed&quot;</span><span class="w">    </span><span class="c1"># Name of the state axis to set</span>
+<span class="w">  </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.3</span><span class="w">       </span><span class="c1"># Value to set (float)</span>
+</pre></div>
+</div>
+</section>
+<section id="increment-axis">
+<h3><code class="docutils literal notranslate"><span class="pre">increment_axis</span></code><a class="headerlink" href="#increment-axis" title="Link to this heading"></a></h3>
+<p>Increments a state axis by a fixed amount each time the command fires, up to a
+maximum value.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">increase_speed</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dpad_up/down&quot;</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">increment_axis</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;speed_level&quot;</span><span class="w">    </span><span class="c1"># Name of the state axis to increment</span>
+<span class="w">  </span><span class="nt">by</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span><span class="w">                </span><span class="c1"># Amount to increment each time the command fires</span>
+<span class="w">  </span><span class="nt">until</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span><span class="w">             </span><span class="c1"># Maximum value (increments stop here)</span>
+<span class="w">  </span><span class="nt">log</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">              </span><span class="c1"># Whether to log the new value (default: true)</span>
+</pre></div>
+</div>
+</section>
+<section id="switch-control-mode">
+<h3><code class="docutils literal notranslate"><span class="pre">switch_control_mode</span></code><a class="headerlink" href="#switch-control-mode" title="Link to this heading"></a></h3>
+<p>Activates and deactivates control modes. Use <code class="docutils literal notranslate"><span class="pre">activate</span></code> and <code class="docutils literal notranslate"><span class="pre">deactivate</span></code> to specify
+which modes to change:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">enter_task_space</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;task_space/down&quot;</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">switch_control_mode</span>
+<span class="w">  </span><span class="nt">activate</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;task_space_mode&quot;</span>
+<span class="w">  </span><span class="nt">deactivate</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;joint_space_mode&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="log">
+<h3><code class="docutils literal notranslate"><span class="pre">log</span></code><a class="headerlink" href="#log" title="Link to this heading"></a></h3>
+<p>Logs a message at the INFO level. Useful for tracking state changes.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">log_locked</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;locked/down&quot;</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">log</span>
+<span class="w">  </span><span class="nt">message</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;System</span><span class="nv"> </span><span class="s">locked&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="state-inputs">
+<h2>State inputs<a class="headerlink" href="#state-inputs" title="Link to this heading"></a></h2>
+<p>A state input is created automatically the first time a command references it by name.
+Once created, it behaves like any other named input in the system:</p>
+<ul class="simple">
+<li><p>Control modes can request it alongside hardware inputs</p></li>
+<li><p>It can be used in <code class="docutils literal notranslate"><span class="pre">from:</span></code> remap definitions</p></li>
+<li><p>Its transitions (e.g. <code class="docutils literal notranslate"><span class="pre">&quot;locked/down&quot;</span></code>) generate events that other commands can react to</p></li>
+</ul>
+<p>State buttons and axes persist across updates – they retain their value until a command
+changes them.</p>
+<section id="example-a-speed-level-controlled-by-buttons">
+<h3>Example: a speed level controlled by buttons<a class="headerlink" href="#example-a-speed-level-controlled-by-buttons" title="Link to this heading"></a></h3>
+<p>This creates a <code class="docutils literal notranslate"><span class="pre">speed_level</span></code> state axis that can be stepped up or down with D-pad
+buttons, then used as a speed scaler in a control mode:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">commands</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">names</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">speed_up</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">speed_down</span>
+
+<span class="w">  </span><span class="nt">speed_up</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;DPAD_UP/down&quot;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">increment_axis</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;speed_level&quot;</span>
+<span class="w">    </span><span class="nt">by</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.25</span>
+<span class="w">    </span><span class="nt">until</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
+
+<span class="w">  </span><span class="nt">speed_down</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;DPAD_DOWN/down&quot;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">increment_axis</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;speed_level&quot;</span>
+<span class="w">    </span><span class="nt">by</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-0.25</span>
+<span class="w">    </span><span class="nt">until</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">speed_level</span></code> state axis can then be used in the control mode’s parameter file
+wherever it accepts an input name.</p>
+</section>
+<section id="example-chaining-commands-via-state-events">
+<h3>Example: chaining commands via state events<a class="headerlink" href="#example-chaining-commands-via-state-events" title="Link to this heading"></a></h3>
+<p>Commands can react to the events of state inputs created by other commands. This
+creates a chain: when <code class="docutils literal notranslate"><span class="pre">set_locked</span></code> fires and sets <code class="docutils literal notranslate"><span class="pre">locked</span></code> to true, the
+<code class="docutils literal notranslate"><span class="pre">&quot;locked/down&quot;</span></code> event fires, which triggers <code class="docutils literal notranslate"><span class="pre">log_locked</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">commands</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">names</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lock</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unlock</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">log_locked</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">log_unlocked</span>
+
+<span class="w">  </span><span class="nt">lock</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;lock/down&quot;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">set_button</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;locked&quot;</span>
+<span class="w">    </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+
+<span class="w">  </span><span class="nt">unlock</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;unlock/down&quot;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">set_button</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;locked&quot;</span>
+<span class="w">    </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+
+<span class="w">  </span><span class="nt">log_locked</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;locked/down&quot;</span><span class="w">    </span><span class="c1"># Reacts to the *state button&#39;s* own event</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">log</span>
+<span class="w">    </span><span class="nt">message</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Locked&quot;</span>
+
+<span class="w">  </span><span class="nt">log_unlocked</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;locked/up&quot;</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">log</span>
+<span class="w">    </span><span class="nt">message</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Unlocked&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="see-also">
+<h2>See also<a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="adding_a_lock.html#adding-a-lock"><span class="std std-ref">Adding a lock</span></a></p></li>
+<li><p><a class="reference internal" href="using_multiple_control_modes.html#using-multiple-control-modes"><span class="std std-ref">Using multiple control modes</span></a></p></li>
+<li><p><a class="reference internal" href="remapping_and_transforming_inputs.html#remapping-and-transforming-inputs"><span class="std std-ref">Remapping and transforming inputs</span></a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="adding_a_lock.html" class="btn btn-neutral float-left" title="Adding a lock" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="writing_an_input_source.html" class="btn btn-neutral float-right" title="Writing an InputSource plugin" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Bailey Chessum.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
