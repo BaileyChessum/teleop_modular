@@ -16,6 +16,7 @@
 , teleop-modular-control-mode
 , teleop-modular-input-source
 , rclcpp-lifecycle
+, teleop-modular-msgs
 }:
 
 buildRosPackage {
@@ -59,6 +60,7 @@ buildRosPackage {
     std-msgs
     teleop-modular-control-mode
     teleop-modular-input-source
+    teleop-modular-msgs
     rclcpp-lifecycle
   ];
 

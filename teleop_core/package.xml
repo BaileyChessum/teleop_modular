@@ -20,6 +20,7 @@
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>
   <depend>std_srvs</depend>
+  <depend>teleop_msgs</depend>
   <build_depend>control_mode</build_depend>
   <build_export_depend>control_mode</build_export_depend>
   <build_depend>input_source</build_depend>

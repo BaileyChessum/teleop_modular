@@ -1,5 +1,6 @@
-# A component could be a control mode, input source, or other
+# Current state of all control modes.
 
-bool active    # Whether the components state is active
-string state
+std_msgs/Header header    # timestamp in the header is the time of the last change
 
+string[] names            # List of control modes.
+bool[] active             # Whether each of those control modes is active.

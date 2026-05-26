@@ -25,6 +25,7 @@
 #include "teleop_core/inputs/input_pipeline_builder.hpp"
 #include "control_mode/event/event_collection.hpp"
 #include "teleop_core/control_modes/controller_manager_manager.hpp"
+#include "teleop_core/control_modes/control_mode_manager_state_publisher.hpp"
 
 namespace teleop::internal
 {
@@ -39,7 +40,7 @@ public:
     const std::shared_ptr<rclcpp::Node> & node,
     const std::weak_ptr<rclcpp::Executor> & executor,
     control_mode::EventCollection & events)
-  : node_(node), executor_(executor), events_(events)
+  : node_(node), executor_(executor), events_(events), state_publisher_(node, *this)
   {
   }
 
@@ -93,6 +94,11 @@ public:
     return control_modes_.end();
   }
 
+  [[nodiscard]] size_t size() const
+  {
+    return control_modes_.size();
+  }
+
   void add(const std::string & key, const std::shared_ptr<control_mode::ControlMode> & value);
 
   void activate_initial_control_modes();
@@ -107,14 +113,14 @@ public:
 
   // TODO: Rename to make clear that these are the inputs we want to consume, not provide
   /**
-     * Allows an element to declare what inputs it CONSUMES, not provides. This is useful for any dynamic remapping of
-     * any previous elements in the pipeline.
-     * \param[in, out] names the set accumulating all declared input names. Add names to declare to this set.
+   * Allows an element to declare what inputs it CONSUMES, not provides. This is useful for any dynamic remapping of
+   * any previous elements in the pipeline.
+   * \param[in, out] names the set accumulating all declared input names. Add names to declare to this set.
    */
   void declare_input_names(InputPipelineBuilder::DeclaredNames& names) override;
 
   /**
-     * Callback ran when hardened inputs are available.
+   * Callback ran when hardened inputs are available.
    */
   void on_inputs_available(InputManager::Hardened& inputs) override;
 
@@ -153,6 +159,8 @@ private:
 
   std::vector<std::shared_ptr<control_mode::ControlMode>> control_modes_by_id_{};
   std::map<std::string, size_t> name_to_cm_id_{};
+
+  ControlModeManagerStatePublisher state_publisher_;
 };
 
 }  // namespace teleop::internal

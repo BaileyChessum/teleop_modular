@@ -219,6 +219,8 @@ void ControlModeManager::activate_initial_control_modes()
                 "No control modes start activated. \nDid you mean to set the parameter:\n"
                 "\tcontrol_modes.<name>.active: true\nfor one of your control modes?");
   }
+
+  state_publisher_.publish_control_mode_states(node_->now());
 }
 
 bool ControlModeManager::switch_control_mode(
@@ -356,6 +358,9 @@ bool ControlModeManager::switch_control_mode(
 
   RCLCPP_INFO(logger, C_QUIET_QUIET "Switched control modes:" C_RESET "%s", log.str().c_str());
 
+  // Publish state
+  state_publisher_.publish_control_mode_states(node_->now());
+
   // Send another controller change request on any transition failure
   if (failed_activation_ids.size() > 0 || failed_deactivation_ids.size() > 0) {
     RCLCPP_WARN(logger,
@@ -467,6 +472,8 @@ void ControlModeManager::declare_input_names(InputPipelineBuilder::DeclaredNames
     fake_events
   };
 
+  state_publisher_.configure_inputs(control_mode_inputs);
+
   // Provide fake inputs to the control mode in order to extract the input names they want to use
   for (auto& [name, mode] : control_modes_) {
     // TODO: Make sure we don't try configure any errored out modes
@@ -484,6 +491,9 @@ void ControlModeManager::on_inputs_available(InputManager::Hardened& inputs)
     inputs.axes,
     events_
   };
+
+  state_publisher_.configure_inputs(control_mode_inputs);
+  state_publisher_.publish_state(node_->now());
 
   // Provide the real inputs after supplying fake inputs in declare_input_names()
   for (auto& [name, mode] : control_modes_) {

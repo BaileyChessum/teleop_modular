@@ -13,6 +13,7 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   std_srvs
   control_mode
   input_source
+  teleop_msgs
 )
 
 find_package(ament_cmake REQUIRED)
@@ -61,6 +62,7 @@ add_library(${PROJECT_NAME} SHARED
   src/inputs/input_pipeline_builder.cpp
 
   src/control_modes/controller_manager_manager.cpp
+  src/control_modes/control_mode_manager_state_publisher.cpp
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)  # Require C++17
